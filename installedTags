@@ -1,4 +1,4 @@
-#instructions for v45_0 of cfA
+#instructions for v48_0 of cfA
 export SCRAM_ARCH="slc5_amd64_gcc434"
 cmsrel CMSSW_4_2_5
 cd CMSSW_4_2_5/src
@@ -14,17 +14,11 @@ addpkg RecoTauTag/RecoTau         V01-02-07
 addpkg RecoTauTag/TauTagTools     V01-02-00
 addpkg FWCore/GuiBrowsers         V00-00-57
 
-addpkg MuonAnalysis/MuonAssociators                  V01-13-00
-addpkg PhysicsTools/Configuration                         V00-10-16
+addpkg MuonAnalysis/MuonAssociators     V01-13-00
+addpkg PhysicsTools/Configuration       V00-10-16
 
 # bug fix for JEC - jet area not set otherwise
 cvs update -r V08-06-39 PhysicsTools/PatAlgos/python/recoLayer0/jetCorrFactors_cfi.py
 
-
-cvs co -r cfA_48 -d Workspace/ConfigurableAnalysis UserCode/JRVlimant/cmssw/WorkSpace/ConfigurableAnalysis
-cvs co -r UCSBv33_0 -d Workspace/Dictionaries UserCode/JRVlimant/cmssw/WorkSpace/Dictionaries
-cvs co -r UCSBv33_0 -d Workspace/BFieldProducer UserCode/JRVlimant/cmssw/WorkSpace/BFieldProducer
-cvs co -r cfA_48 -d Workspace/JetCorrProducer UserCode/JRVlimant/cmssw/WorkSpace/JetCorrProducer
-
-scram b -c
-scram b -j9
+cvs co -r cfA_v48 -d Workspace UserCode/pbgeff/cmssw/Workspace
+scram b -rj2
