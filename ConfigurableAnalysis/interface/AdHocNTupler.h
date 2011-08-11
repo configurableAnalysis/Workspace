@@ -10,8 +10,6 @@
 #include "DataFormats/Scalers/interface/DcsStatus.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 
-// comment
-
 #include "DataFormats/Common/interface/ConditionsInEdm.h"
 #include "FWCore/Framework/interface/Run.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
