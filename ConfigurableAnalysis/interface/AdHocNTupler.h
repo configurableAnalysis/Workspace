@@ -2,7 +2,6 @@
 #include "DataFormats/PatCandidates/interface/TriggerPath.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 #include "DataFormats/PatCandidates/interface/TriggerAlgorithm.h"
-
 #include "RecoEgamma/EgammaTools/interface/ConversionFinder.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 #include "MagneticField/Engine/interface/MagneticField.h"
@@ -13,7 +12,6 @@
 
 #include "DataFormats/Common/interface/ConditionsInEdm.h"
 #include "FWCore/Framework/interface/Run.h"
-
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
