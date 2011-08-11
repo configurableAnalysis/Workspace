@@ -16,6 +16,8 @@
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
+
 using namespace std;
 
 class AdHocNTupler : public NTupler {
@@ -85,6 +87,13 @@ class AdHocNTupler : public NTupler {
     jets_AK5clean_corrL1L2L3_ = new std::vector<float>;
     jets_AK5clean_corrL1FastL2L3Residual_ = new std::vector<float>;
     jets_AK5clean_corrL1L2L3Residual_ = new std::vector<float>;
+    PU_zpositions_ = new std::vector<std::vector<float> >;
+    PU_sumpT_lowpT_ = new std::vector<std::vector<float> >;
+    PU_sumpT_highpT_ = new std::vector<std::vector<float> >;
+    PU_ntrks_lowpT_ = new std::vector<std::vector<int> >;
+    PU_ntrks_highpT_ = new std::vector<std::vector<int> >;
+    num_PU_vertices_ = new std::vector<int>;
+    PU_bunchCrossing_ = new std::vector<int>;
   }
 
   ~AdHocNTupler(){
@@ -133,6 +142,13 @@ class AdHocNTupler : public NTupler {
     delete jets_AK5clean_corrL1L2L3_;
     delete jets_AK5clean_corrL1FastL2L3Residual_;
     delete jets_AK5clean_corrL1L2L3Residual_;
+    delete PU_zpositions_;
+    delete PU_sumpT_lowpT_;
+    delete PU_sumpT_highpT_;
+    delete PU_ntrks_lowpT_;
+    delete PU_ntrks_highpT_;
+    delete num_PU_vertices_;
+    delete PU_bunchCrossing_;
   }
 
   uint registerleaves(edm::ProducerBase * producer){
@@ -201,6 +217,13 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("jets_AK5_corrL1L2L3",&jets_AK5clean_corrL1L2L3_);
       tree_->Branch("jets_AK5_corrL1FastL2L3Residual",&jets_AK5clean_corrL1FastL2L3Residual_);
       tree_->Branch("jets_AK5_corrL1L2L3Residual",&jets_AK5clean_corrL1L2L3Residual_);
+      tree_->Branch("PU_zpositions",&PU_zpositions_);
+      tree_->Branch("PU_sumpT_lowpT",&PU_sumpT_lowpT_);
+      tree_->Branch("PU_sumpT_highpT",&PU_sumpT_highpT_);
+      tree_->Branch("PU_ntrks_lowpT",&PU_ntrks_lowpT_);
+      tree_->Branch("PU_ntrks_highpT",&PU_ntrks_highpT_);
+      tree_->Branch("num_PU_vertices",&num_PU_vertices_);
+      tree_->Branch("PU_bunchCrossing",&PU_bunchCrossing_);
     }
 
     else{
@@ -495,6 +518,22 @@ class AdHocNTupler : public NTupler {
     }
 
 
+  if(!iEvent.isRealData()) { //Access PU info in MC
+    edm::Handle<std::vector< PileupSummaryInfo > >  PupInfo;
+    iEvent.getByLabel("addPileupInfo", PupInfo);
+    std::vector<PileupSummaryInfo>::const_iterator PVI;
+
+    for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
+  //    std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() <<"   "<< iEvent.id().event() << std::endl;
+      (*num_PU_vertices_).push_back(PVI->getPU_NumInteractions());
+      (*PU_bunchCrossing_).push_back(PVI->getBunchCrossing());
+      (*PU_zpositions_).push_back(PVI->getPU_zpositions());
+      (*PU_sumpT_lowpT_).push_back(PVI->getPU_sumpT_lowpT());
+      (*PU_sumpT_highpT_).push_back(PVI->getPU_sumpT_highpT());
+      (*PU_ntrks_lowpT_).push_back(PVI->getPU_ntrks_lowpT());
+      (*PU_ntrks_highpT_).push_back(PVI->getPU_ntrks_highpT());
+    }
+  }
 
     //fill the tree    
     if (ownTheTree_){ tree_->Fill(); }
@@ -541,7 +580,13 @@ class AdHocNTupler : public NTupler {
     (*jets_AK5clean_corrL1L2L3_).clear();
     (*jets_AK5clean_corrL1FastL2L3Residual_).clear();
     (*jets_AK5clean_corrL1L2L3Residual_).clear();
-
+    (*PU_zpositions_).clear();
+    (*PU_sumpT_lowpT_).clear();
+    (*PU_sumpT_highpT_).clear();
+    (*PU_ntrks_lowpT_).clear();
+    (*PU_ntrks_highpT_).clear();
+    (*num_PU_vertices_).clear();
+    (*PU_bunchCrossing_).clear(); 
   }
 
   void callBack(){
@@ -598,5 +643,11 @@ class AdHocNTupler : public NTupler {
   std::vector<float> * jets_AK5clean_corrL1L2L3_;
   std::vector<float> * jets_AK5clean_corrL1FastL2L3Residual_;
   std::vector<float> * jets_AK5clean_corrL1L2L3Residual_;
-
+  std::vector<std::vector<float> > * PU_zpositions_;
+  std::vector<std::vector<float> > * PU_sumpT_lowpT_;
+  std::vector<std::vector<float> > * PU_sumpT_highpT_;
+  std::vector<std::vector<int> > * PU_ntrks_lowpT_;
+  std::vector<std::vector<int> > * PU_ntrks_highpT_;
+  std::vector<int> * num_PU_vertices_;
+  std::vector<int> * PU_bunchCrossing_;
 };
