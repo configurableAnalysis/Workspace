@@ -92,7 +92,7 @@ class AdHocNTupler : public NTupler {
     PU_sumpT_highpT_ = new std::vector<std::vector<float> >;
     PU_ntrks_lowpT_ = new std::vector<std::vector<int> >;
     PU_ntrks_highpT_ = new std::vector<std::vector<int> >;
-    num_PU_vertices_ = new std::vector<int>;
+    PU_NumInteractions_ = new std::vector<int>;
     PU_bunchCrossing_ = new std::vector<int>;
   }
 
@@ -147,7 +147,7 @@ class AdHocNTupler : public NTupler {
     delete PU_sumpT_highpT_;
     delete PU_ntrks_lowpT_;
     delete PU_ntrks_highpT_;
-    delete num_PU_vertices_;
+    delete PU_NumInteractions_;
     delete PU_bunchCrossing_;
   }
 
@@ -222,7 +222,7 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("PU_sumpT_highpT",&PU_sumpT_highpT_);
       tree_->Branch("PU_ntrks_lowpT",&PU_ntrks_lowpT_);
       tree_->Branch("PU_ntrks_highpT",&PU_ntrks_highpT_);
-      tree_->Branch("num_PU_vertices",&num_PU_vertices_);
+      tree_->Branch("PU_NumInteractions",&PU_NumInteractions_);
       tree_->Branch("PU_bunchCrossing",&PU_bunchCrossing_);
     }
 
@@ -525,7 +525,7 @@ class AdHocNTupler : public NTupler {
 
     for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
   //    std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() <<"   "<< iEvent.id().event() << std::endl;
-      (*num_PU_vertices_).push_back(PVI->getPU_NumInteractions());
+      (*PU_NumInteractions_).push_back(PVI->getPU_NumInteractions());
       (*PU_bunchCrossing_).push_back(PVI->getBunchCrossing());
       (*PU_zpositions_).push_back(PVI->getPU_zpositions());
       (*PU_sumpT_lowpT_).push_back(PVI->getPU_sumpT_lowpT());
@@ -585,7 +585,7 @@ class AdHocNTupler : public NTupler {
     (*PU_sumpT_highpT_).clear();
     (*PU_ntrks_lowpT_).clear();
     (*PU_ntrks_highpT_).clear();
-    (*num_PU_vertices_).clear();
+    (*PU_NumInteractions_).clear();
     (*PU_bunchCrossing_).clear(); 
   }
 
@@ -648,6 +648,6 @@ class AdHocNTupler : public NTupler {
   std::vector<std::vector<float> > * PU_sumpT_highpT_;
   std::vector<std::vector<int> > * PU_ntrks_lowpT_;
   std::vector<std::vector<int> > * PU_ntrks_highpT_;
-  std::vector<int> * num_PU_vertices_;
+  std::vector<int> * PU_NumInteractions_;
   std::vector<int> * PU_bunchCrossing_;
 };
