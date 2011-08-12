@@ -7,7 +7,7 @@ addpkg DataFormats/PatCandidates  V06-04-18
 addpkg PhysicsTools/PatAlgos      V08-06-38
 addpkg PhysicsTools/PatExamples   V00-05-22
 addpkg PhysicsTools/SelectorUtils V00-03-17
-addpkg PhysicsTools/Utilities			V08-03-09
+addpkg PhysicsTools/Utilities     V08-03-09
 addpkg CommonTools/RecoAlgos      V00-03-13
 addpkg RecoJets/Configuration     V02-04-17
 addpkg RecoTauTag/Configuration   V01-02-03
