@@ -23,10 +23,20 @@ cvs update -r V08-06-39 PhysicsTools/PatAlgos/python/recoLayer0/jetCorrFactors_c
 
 cvs co -r cfA_v50 -d Workspace UserCode/pbgeff/cmssw/Workspace
 
-
 # adding TriggerResult Filters to cfA.
 cvs co -r V00-00-08 RecoMET/METAnalyzers/  # CSCHaloFilter
 cvs co -r Seema02June2011 -d Sandbox/Skims UserCode/seema/SandBox/Skims #TrackingFailure
-cvs co  Workspace/DeadCellFilterLists UserCode/crohringer/DeadCellFilterLists/ #TP Filter
+cvs co -r V19MAY2011_v3 JetMETAnalysis/ecalDeadCellTools #TP Filter
+# Fixing TrackingFailure's codes.
+echo "" >> Sandbox/Skims/python/trackingFailureFilter_cfi.py
+echo "goodVerticesRA4 = cms.EDFilter(" >> Sandbox/Skims/python/trackingFailureFilter_cfi.py 
+echo "  \"VertexSelector\"," >> Sandbox/Skims/python/trackingFailureFilter_cfi.py
+echo "  filter = cms.bool(False)," >> Sandbox/Skims/python/trackingFailureFilter_cfi.py
+echo "  src = cms.InputTag(\"offlinePrimaryVertices\")," >> Sandbox/Skims/python/trackingFailureFilter_cfi.py
+echo "  cut = cms.string(\" ! isFake && ndof > 4 && abs(z) <= 24 && position.rho < 2\")" >> Sandbox/Skims/python/trackingFailureFilter_cfi.py
+echo ")" >> Sandbox/Skims/python/trackingFailureFilter_cfi.py
+sed -e 's+goodVerticesRA2+goodVerticesRA4+g' Sandbox/Skims/python/trackingFailureFilter_cfi.py > tmp
+mv tmp Sandbox/Skims/python/trackingFailureFilter_cfi.py
+rm Sandbox/Skims/python/RA2*_cff.py
 
 scram b -rj2
