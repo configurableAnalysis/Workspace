@@ -28,7 +28,6 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
 			'file:/LVM/SATA/wto/RECO/Run166512/MuHad/FA3D4FB8-BA91-E011-97AB-003048673374.root',
     )
-		#maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
@@ -50,12 +49,12 @@ process.patTrigger.addL1Algos = cms.bool( True )
 ## Output Module Configuration (expects a path 'p')
 from PhysicsTools.PatAlgos.patEventContent_cff import patEventContent
 process.out = cms.OutputModule("PoolOutputModule",
-     verbose = cms.untracked.bool(True),
+     #verbose = cms.untracked.bool(True),
      fileName = cms.untracked.string('patTuple.root'),
      SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
-     outputCommands = cms.untracked.vstring('drop *', "keep *_BFieldColl_*_*_","keep *_JetCorrColl_*_*_",*patEventContent )
+     outputCommands = cms.untracked.vstring('drop *', "keep *_BFieldColl_*_*_","keep *_JetCorrColl_*_*_", *patEventContent 
+		 )
 )
-#process.outpath = cms.EndPath(process.out)
 
 #-- SUSYPAT and GlobalTag Settings -----------------------------------------------------------
 #process.GlobalTag.globaltag = 'START42_V13::All' # MC Setting
@@ -74,6 +73,9 @@ switchOnTrigger(process, triggerProducer='patTrigger', triggerEventProducer='pat
 
 process.load("Workspace.ConfigurableAnalysis.configurableAnalysis_ForPattuple_cff")
 process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
+process.load('RecoMET.METAnalyzers.CSCHaloFilter_cfi')
+process.load('Sandbox.Skims.trackingFailureFilter_cfi')
+process.load('JetMETAnalysis.ecalDeadCellTools.RA2TPfilter_cff')
 
 #-- Output module configuration -----------------------------------------------
 process.out.fileName = "SUSYPAT.root" 
@@ -81,13 +83,14 @@ process.out.splitLevel = cms.untracked.int32(99)  # Turn on split level (smaller
 process.out.overrideInputFileSplitLevels = cms.untracked.bool(True)
 process.out.dropMetaData = cms.untracked.string('DROPPED')   # Get rid of metadata related to dropped collections
 process.out.outputCommands = cms.untracked.vstring('drop *',"keep *_HBHENoiseFilterResultProducer_*_*","keep *_BFieldColl_*_*","keep *_JetCorrectionColl_*_*", *SUSY_pattuple_outputCommands )
-
 #-- Execution path ------------------------------------------------------------
 # Full path
 #This is to run on full sim or data
-process.p = cms.Path(process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl + process.configurableAnalysis)
-#This is to run on FastSim
-#process.p = cms.Path( process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl +process.configurableAnalysis)
+process.ecaltpfilter= cms.Path(process.ecalDeadCellTPfilter)
+process.csctighthalofilter = cms.Path(process.CSCTightHaloFilter)
+process.p = cms.Path(process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
+process.trackingfailturefilter = cms.Path(process.goodVerticesRA4*process.trackingFailureFilter)
+process.outpath = cms.EndPath(process.configurableAnalysis)
 
 #-- Dump config ------------------------------------------------------------
 file = open('SusyPAT_cfg.py','w')
