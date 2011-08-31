@@ -9,7 +9,7 @@ VariableHelperService = cms.Service("VariableHelperService")
 UpdaterService = cms.Service("UpdaterService")
 
 TFileService = cms.Service("TFileService",
-    fileName = cms.string('configurableAnalysis.root')
+    fileName = cms.string('configurableAnalysis_withCSCFilter.root')
 )
 
 

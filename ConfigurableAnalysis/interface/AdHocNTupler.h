@@ -17,6 +17,8 @@
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "FWCore/Common/interface/TriggerNames.h"
 
 using namespace std;
 
@@ -74,6 +76,9 @@ class AdHocNTupler : public NTupler {
     els_conversion_dist = new std::vector<float>;
     els_conversion_dcot = new std::vector<float>;
     hbhefilter_decision_ = new int;
+    cschalofilter_decision_ = new int;
+    ecalTPfilter_decision_ = new int;
+    trackingfailurefilter_decision_ = new int;
     MPT_ = new float;
     jets_AK5PFclean_corrL2L3_ = new std::vector<float>; 
     jets_AK5PFclean_corrL2L3Residual_ = new std::vector<float>;
@@ -129,6 +134,9 @@ class AdHocNTupler : public NTupler {
     delete els_conversion_dist;
     delete els_conversion_dcot;
     delete hbhefilter_decision_;
+    delete cschalofilter_decision_;
+    delete ecalTPfilter_decision_;
+    delete trackingfailurefilter_decision_;
     delete MPT_;
     delete jets_AK5PFclean_corrL2L3_;
     delete jets_AK5PFclean_corrL2L3Residual_;
@@ -204,6 +212,9 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("els_conversion_dist",&els_conversion_dist);
       tree_->Branch("els_conversion_dcot",&els_conversion_dcot);
       tree_->Branch("hbhefilter_decision",hbhefilter_decision_,"hbhefilter_decision/I");
+      tree_->Branch("trackingfailurefilter_decision",trackingfailurefilter_decision_,"trackingfailurefilter_decision/I");
+			tree_->Branch("cschalofilter_decision",cschalofilter_decision_,"cschalofilter_decision/I");
+			tree_->Branch("ecalTPfilter_decision",ecalTPfilter_decision_,"ecalTPfilter_decision/I");
       tree_->Branch("MPT",MPT_,"MPT/F");
       tree_->Branch("jets_AK5PFclean_corrL2L3",&jets_AK5PFclean_corrL2L3_);
       tree_->Branch("jets_AK5PFclean_corrL2L3Residual",&jets_AK5PFclean_corrL2L3Residual_);
@@ -246,6 +257,27 @@ class AdHocNTupler : public NTupler {
     //    std::cout<<"The trigger HLT table is"<<triggerevent->nameHltTable()<<std::endl;
 
 
+		edm::Handle<edm::TriggerResults> hltresults;
+		edm::InputTag myPatTrig("TriggerResults","","PAT");
+		iEvent.getByLabel(myPatTrig,hltresults);
+	//	iEvent.getByLabel("TriggerResults","","PAT",hltresults);
+		int ntrigs=hltresults->size();
+
+		// get hold of trigger names - based on TriggerResults object!
+		const edm::TriggerNames & triggerNames_ = iEvent.triggerNames(*hltresults);
+		int cschalofilterResult =1, trackingfailturefilterResult=1, ecaltpfilterResult=1;
+		for (int itrig=0; itrig< ntrigs; itrig++) {
+ 			TString trigName = triggerNames_.triggerName(itrig);
+  		int hltflag = (*hltresults)[itrig].accept();
+	 		if (trigName=="csctighthalofilter") cschalofilterResult = hltflag;
+	 		if (trigName=="trackingfailturefilter") trackingfailturefilterResult = hltflag;
+	 		if (trigName=="ecaltpfilter") trackingfailturefilterResult = hltflag;
+	 	}
+		
+    *cschalofilter_decision_ = cschalofilterResult;
+    *trackingfailurefilter_decision_ = trackingfailturefilterResult;
+    *ecalTPfilter_decision_ = ecaltpfilterResult;
+		
     edm::Handle< std::vector<pat::TriggerPath> > triggerpaths;
     iEvent.getByLabel("patTrigger",triggerpaths);  
     for( std::vector<pat::TriggerPath>::const_iterator tp=triggerpaths->begin(); tp!=triggerpaths->end(); ++tp ){
@@ -517,7 +549,6 @@ class AdHocNTupler : public NTupler {
       (*jets_AK5clean_corrL1L2L3Residual_).push_back((*ak5CaloL1L2L3Residual_)[it]);
     }
 
-
   if(!iEvent.isRealData()) { //Access PU info in MC
     edm::Handle<std::vector< PileupSummaryInfo > >  PupInfo;
     iEvent.getByLabel("addPileupInfo", PupInfo);
@@ -630,6 +661,9 @@ class AdHocNTupler : public NTupler {
   std::vector<float> * els_conversion_dist;
   std::vector<float> * els_conversion_dcot;
   int * hbhefilter_decision_;
+  int * cschalofilter_decision_;
+  int * ecalTPfilter_decision_;
+  int * trackingfailurefilter_decision_;
   float * MPT_;
   std::vector<float> * jets_AK5PFclean_corrL2L3_;
   std::vector<float> * jets_AK5PFclean_corrL2L3Residual_;
