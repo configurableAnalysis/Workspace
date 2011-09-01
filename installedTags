@@ -1,4 +1,4 @@
-#instructions for v49 of cfA
+#instructions for v50 of cfA
 export SCRAM_ARCH="slc5_amd64_gcc434"
 cmsrel CMSSW_4_2_5
 cd CMSSW_4_2_5/src
