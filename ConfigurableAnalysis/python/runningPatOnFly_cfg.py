@@ -64,6 +64,7 @@ process.GlobalTag.globaltag = 'GR_R_42_V19::All' 	# Data Setting
 addDefaultSUSYPAT(process,False,'HLT',['L1FastJet','L2Relative','L3Absolute','L2L3Residual'],'',['AK5PF','AK5JPT'])
 process.metJESCorAK5PFTypeI.corrector = cms.string('ak5PFL2L3Residual') # Type1PFMET Residual for data only.
 #addDefaultSUSYPAT(process,True,'HLT',['L1FastJet','L2Relative','L3Absolute'],'',['AK5PF','AK5JPT'])
+process.pfNoTauPF.enable = cms.bool(False)
 SUSY_pattuple_outputCommands = getSUSY_pattuple_outputCommands( process )
 ############################## END SUSYPAT specifics ####################################
 
