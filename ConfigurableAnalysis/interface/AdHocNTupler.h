@@ -271,7 +271,7 @@ class AdHocNTupler : public NTupler {
   		int hltflag = (*hltresults)[itrig].accept();
 	 		if (trigName=="csctighthalofilter") cschalofilterResult = hltflag;
 	 		if (trigName=="trackingfailturefilter") trackingfailturefilterResult = hltflag;
-	 		if (trigName=="ecaltpfilter") trackingfailturefilterResult = hltflag;
+	 		if (trigName=="ecaltpfilter") ecaltpfilterResult = hltflag;
 	 	}
 		
     *cschalofilter_decision_ = cschalofilterResult;
