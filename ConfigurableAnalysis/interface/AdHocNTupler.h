@@ -275,7 +275,7 @@ class AdHocNTupler : public NTupler {
 	 		if (trigName=="csctighthalofilter") cschalofilterResult = hltflag;
 	 		if (trigName=="trackingfailturefilter") trackingfailturefilterResult = hltflag;
 	 		if (trigName=="ecaltpfilter") ecaltpfilterResult = hltflag;
-	 		if (trigName=="scrapingveto") {scrapingVetoResult = hltflag;if(!hltflag)std::cout<<"scrapingveto\n";}
+	 		if (trigName=="scrapingveto") scrapingVetoResult = hltflag;
 	 	}
 		
     *cschalofilter_decision_ = cschalofilterResult;
