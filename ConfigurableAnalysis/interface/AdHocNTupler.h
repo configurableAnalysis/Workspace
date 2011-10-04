@@ -78,6 +78,7 @@ class AdHocNTupler : public NTupler {
     hbhefilter_decision_ = new int;
     cschalofilter_decision_ = new int;
     ecalTPfilter_decision_ = new int;
+    scrapingVeto_decision_ = new int;
     trackingfailurefilter_decision_ = new int;
     MPT_ = new float;
     jets_AK5PFclean_corrL2L3_ = new std::vector<float>; 
@@ -136,6 +137,7 @@ class AdHocNTupler : public NTupler {
     delete hbhefilter_decision_;
     delete cschalofilter_decision_;
     delete ecalTPfilter_decision_;
+		delete scrapingVeto_decision_;
     delete trackingfailurefilter_decision_;
     delete MPT_;
     delete jets_AK5PFclean_corrL2L3_;
@@ -215,6 +217,7 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("trackingfailurefilter_decision",trackingfailurefilter_decision_,"trackingfailurefilter_decision/I");
 			tree_->Branch("cschalofilter_decision",cschalofilter_decision_,"cschalofilter_decision/I");
 			tree_->Branch("ecalTPfilter_decision",ecalTPfilter_decision_,"ecalTPfilter_decision/I");
+			tree_->Branch("scrapingVeto_decision",scrapingVeto_decision_,"scrapingVeto_decision/I");
       tree_->Branch("MPT",MPT_,"MPT/F");
       tree_->Branch("jets_AK5PFclean_corrL2L3",&jets_AK5PFclean_corrL2L3_);
       tree_->Branch("jets_AK5PFclean_corrL2L3Residual",&jets_AK5PFclean_corrL2L3Residual_);
@@ -265,18 +268,20 @@ class AdHocNTupler : public NTupler {
 
 		// get hold of trigger names - based on TriggerResults object!
 		const edm::TriggerNames & triggerNames_ = iEvent.triggerNames(*hltresults);
-		int cschalofilterResult =1, trackingfailturefilterResult=1, ecaltpfilterResult=1;
+		int cschalofilterResult =1, trackingfailturefilterResult=1, ecaltpfilterResult=1, scrapingVetoResult=1;
 		for (int itrig=0; itrig< ntrigs; itrig++) {
  			TString trigName = triggerNames_.triggerName(itrig);
   		int hltflag = (*hltresults)[itrig].accept();
 	 		if (trigName=="csctighthalofilter") cschalofilterResult = hltflag;
 	 		if (trigName=="trackingfailturefilter") trackingfailturefilterResult = hltflag;
 	 		if (trigName=="ecaltpfilter") ecaltpfilterResult = hltflag;
+	 		if (trigName=="scrapingveto") {scrapingVetoResult = hltflag;if(!hltflag)std::cout<<"scrapingveto\n";}
 	 	}
 		
     *cschalofilter_decision_ = cschalofilterResult;
     *trackingfailurefilter_decision_ = trackingfailturefilterResult;
     *ecalTPfilter_decision_ = ecaltpfilterResult;
+    *scrapingVeto_decision_ = scrapingVetoResult;
 		
     edm::Handle< std::vector<pat::TriggerPath> > triggerpaths;
     iEvent.getByLabel("patTrigger",triggerpaths);  
@@ -663,6 +668,7 @@ class AdHocNTupler : public NTupler {
   int * hbhefilter_decision_;
   int * cschalofilter_decision_;
   int * ecalTPfilter_decision_;
+  int * scrapingVeto_decision_;
   int * trackingfailurefilter_decision_;
   float * MPT_;
   std::vector<float> * jets_AK5PFclean_corrL2L3_;
