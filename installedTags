@@ -1,4 +1,4 @@
-#instructions for v51 of cfA
+#instructions for v51a of cfA
 export SCRAM_ARCH="slc5_amd64_gcc434"
 cmsrel CMSSW_4_2_5
 cd CMSSW_4_2_5/src
@@ -21,9 +21,7 @@ addpkg PhysicsTools/Configuration       V00-10-16
 # bug fix for JEC - jet area not set otherwise
 cvs update -r V08-06-39 PhysicsTools/PatAlgos/python/recoLayer0/jetCorrFactors_cfi.py
 
-cvs co -r cfA_v51 -d Workspace UserCode/pbgeff/cmssw/Workspace
-#for transient version with scrapingVeto in since tracks were removed.
-#cvs co -r cfA_v51a -d Workspace UserCode/pbgeff/cmssw/Workspace
+cvs co -r cfA_v51a -d Workspace UserCode/pbgeff/cmssw/Workspace
 
 # adding TriggerResult Filters to cfA.
 # CSCHaloFilter
