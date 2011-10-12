@@ -26,7 +26,8 @@ process.MessageLogger.cerr.PATSummaryTables = cms.untracked.PSet(
 #-- Source information ------------------------------------------------------
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-			'file:/LVM/SATA/wto/RECO/Run166512/MuHad/FA3D4FB8-BA91-E011-97AB-003048673374.root',
+			#'file:/LVM/SATA/wto/RECO/Run166512/MuHad/FA3D4FB8-BA91-E011-97AB-003048673374.root',
+			'file:/LVM/SATA/pbgeff/temp_423_ntuple/mSUGRA_scan_tanb10_FA961CB6-C0A3-E011-9F6C-001BFCDBD11E.root',
     )
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
@@ -62,12 +63,12 @@ process.out = cms.OutputModule("PoolOutputModule",
 #-- SUSYPAT and GlobalTag Settings -----------------------------------------------------------
 from PhysicsTools.Configuration.SUSY_pattuple_cff import addDefaultSUSYPAT, getSUSY_pattuple_outputCommands
 
-#process.GlobalTag.globaltag = 'START42_V13::All' # MC Setting
-#addDefaultSUSYPAT(process,True,'HLT',['L1FastJet','L2Relative','L3Absolute'],'',['AK5PF','AK5JPT'])
+process.GlobalTag.globaltag = 'START42_V13::All' # MC Setting
+addDefaultSUSYPAT(process,True,'HLT',['L1FastJet','L2Relative','L3Absolute'],'',['AK5PF','AK5JPT'])
 
-process.GlobalTag.globaltag = 'GR_R_42_V19::All'   # Data Setting
-addDefaultSUSYPAT(process,False,'HLT',['L1FastJet','L2Relative','L3Absolute','L2L3Residual'],'',['AK5PF','AK5JPT'])
-process.metJESCorAK5PFTypeI.corrector = cms.string('ak5PFL2L3Residual') # Type1PFMET Residual for data only.
+#process.GlobalTag.globaltag = 'GR_R_42_V19::All'   # Data Setting
+#addDefaultSUSYPAT(process,False,'HLT',['L1FastJet','L2Relative','L3Absolute','L2L3Residual'],'',['AK5PF','AK5JPT'])
+#process.metJESCorAK5PFTypeI.corrector = cms.string('ak5PFL2L3Residual') # Type1PFMET Residual for data only.
 
 process.pfNoTauPF.enable = cms.bool(False)
 SUSY_pattuple_outputCommands = getSUSY_pattuple_outputCommands( process )
@@ -99,11 +100,11 @@ process.out.dropMetaData = cms.untracked.string('DROPPED')   # Get rid of metada
 process.out.outputCommands = cms.untracked.vstring('drop *',"keep *_HBHENoiseFilterResultProducer_*_*","keep *_BFieldColl_*_*","keep *_JetCorrectionColl_*_*", *SUSY_pattuple_outputCommands )
 #-- Execution path ------------------------------------------------------------
 # Full path
-#This is to run on full sim or data
+#This is to run on fast sim
 process.ecaltpfilter= cms.Path(process.ecalDeadCellTPfilter)
 process.csctighthalofilter = cms.Path(process.CSCTightHaloFilter)
 process.scrapingveto = cms.Path(process.scrapingVeto)
-process.p = cms.Path(process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
+process.p = cms.Path(process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
 process.trackingfailturefilter = cms.Path(process.goodVerticesRA4*process.trackingFailureFilter)
 process.outpath = cms.EndPath(cms.ignore(process.configurableAnalysis))
 
