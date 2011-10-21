@@ -35,7 +35,7 @@
 #include <memory>
 #include <string>
 #include <sstream>
-  
+
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDFilter.h"
 #include "FWCore/Framework/interface/Event.h"
@@ -44,7 +44,6 @@
  
 // LHE Event
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
-
 
 
 class TreeBranch {
@@ -415,17 +414,18 @@ class StringBasedNTupler : public NTupler {
 //      using namespace edm;
 
       edm::Handle<LHEEventProduct> product;
-      iEvent.getByLabel("source", product);
+      *model_params_ = "NULL";
+      if(iEvent.getByLabel("source", product)) { 
+        comments_const_iterator c_begin = product->comments_begin();
+        comments_const_iterator c_end = product->comments_end();
 
-      comments_const_iterator c_begin = product->comments_begin();
-      comments_const_iterator c_end = product->comments_end();
-
-      for( comments_const_iterator cit=c_begin; cit!=c_end; ++cit) {
-        size_t found = (*cit).find("model");
-        if( found != std::string::npos)   {
-           //std::cout << *cit << std::endl;  
-           *model_params_ = *cit;
-        }
+        for( comments_const_iterator cit=c_begin; cit!=c_end; ++cit) {
+          size_t found = (*cit).find("model");
+          if( found != std::string::npos)   {
+             //std::cout << *cit << std::endl;  
+             *model_params_ = *cit;
+          }
+        } 
       }
 
 

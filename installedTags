@@ -1,5 +1,4 @@
-#instructions for v52 of cfA
-#it is the same as v51a, but altered to run on Fastsim SUSY scans
+#instructions for v53 of cfA
 export SCRAM_ARCH="slc5_amd64_gcc434"
 cmsrel CMSSW_4_2_5
 cd CMSSW_4_2_5/src
@@ -22,7 +21,7 @@ addpkg PhysicsTools/Configuration       V00-10-16
 # bug fix for JEC - jet area not set otherwise
 cvs update -r V08-06-39 PhysicsTools/PatAlgos/python/recoLayer0/jetCorrFactors_cfi.py
 
-cvs co -r cfA_v52 -d Workspace UserCode/pbgeff/cmssw/Workspace
+cvs co -r cfA_v53 -d Workspace UserCode/pbgeff/cmssw/Workspace
 
 # adding TriggerResult Filters to cfA.
 # CSCHaloFilter
