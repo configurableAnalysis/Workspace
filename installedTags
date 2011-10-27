@@ -27,7 +27,7 @@ cvs co -r Seema02June2011 -d Sandbox/Skims UserCode/seema/SandBox/Skims
 #TP Filter
 cvs co -r V19MAY2011_v3 JetMETAnalysis/ecalDeadCellTools 
 # Fixing TrackingFailure's codes.
-cp Patches/trackingFailureFilter_cfi.py Sandbox/Skims/python/trackingFailureFilter_cfi.py
+cp Workspace/Patches/trackingFailureFilter_cfi.py Sandbox/Skims/python/trackingFailureFilter_cfi.py
 rm Sandbox/Skims/python/RA2*_cff.py
 
 scram b -rj2
