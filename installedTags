@@ -1,27 +1,23 @@
 #instructions for v53 of cfA
 export SCRAM_ARCH="slc5_amd64_gcc434"
-cmsrel CMSSW_4_2_5
-cd CMSSW_4_2_5/src
+cmsrel CMSSW_4_2_8_patch7
+cd CMSSW_4_2_8_patch7/src
 cmsenv
-addpkg DataFormats/PatCandidates  V06-04-18
-addpkg PhysicsTools/PatAlgos      V08-06-38
-addpkg PhysicsTools/PatExamples   V00-05-22
-addpkg PhysicsTools/SelectorUtils V00-03-17
-addpkg PhysicsTools/Utilities     V08-03-09
-addpkg CommonTools/RecoAlgos      V00-03-13
-addpkg RecoJets/Configuration     V02-04-17
+
+addpkg DataFormats/PatCandidates  V06-04-19-02
+addpkg PhysicsTools/PatAlgos      V08-06-46
+addpkg PhysicsTools/PatExamples   V00-05-24
+addpkg CommonTools/ParticleFlow   B4_2_X_V00-03-00
+addpkg PhysicsTools/SelectorUtils V00-03-24
+addpkg PhysicsTools/UtilAlgos     V08-02-14
 addpkg RecoTauTag/Configuration   V01-02-03
 addpkg RecoTauTag/RecoTau         V01-02-07
 addpkg RecoTauTag/TauTagTools     V01-02-00
-addpkg FWCore/GuiBrowsers         V00-00-57
 
-addpkg MuonAnalysis/MuonAssociators     V01-13-00
-addpkg PhysicsTools/Configuration       V00-10-16
+addpkg MuonAnalysis/MuonAssociators   V01-13-00
+addpkg PhysicsTools/Configuration     V00-10-17
 
-# bug fix for JEC - jet area not set otherwise
-cvs update -r V08-06-39 PhysicsTools/PatAlgos/python/recoLayer0/jetCorrFactors_cfi.py
-
-cvs co -r cfA_v53 -d Workspace UserCode/pbgeff/cmssw/Workspace
+cvs co -r cfA_t54 -d Workspace UserCode/pbgeff/cmssw/Workspace
 
 # adding TriggerResult Filters to cfA.
 # CSCHaloFilter
@@ -31,15 +27,7 @@ cvs co -r Seema02June2011 -d Sandbox/Skims UserCode/seema/SandBox/Skims
 #TP Filter
 cvs co -r V19MAY2011_v3 JetMETAnalysis/ecalDeadCellTools 
 # Fixing TrackingFailure's codes.
-echo "" >> Sandbox/Skims/python/trackingFailureFilter_cfi.py
-echo "goodVerticesRA4 = cms.EDFilter(" >> Sandbox/Skims/python/trackingFailureFilter_cfi.py 
-echo "  \"VertexSelector\"," >> Sandbox/Skims/python/trackingFailureFilter_cfi.py
-echo "  filter = cms.bool(False)," >> Sandbox/Skims/python/trackingFailureFilter_cfi.py
-echo "  src = cms.InputTag(\"offlinePrimaryVertices\")," >> Sandbox/Skims/python/trackingFailureFilter_cfi.py
-echo "  cut = cms.string(\" ! isFake && ndof > 4 && abs(z) <= 24 && position.rho < 2\")" >> Sandbox/Skims/python/trackingFailureFilter_cfi.py
-echo ")" >> Sandbox/Skims/python/trackingFailureFilter_cfi.py
-sed -e 's+goodVerticesRA2+goodVerticesRA4+g' Sandbox/Skims/python/trackingFailureFilter_cfi.py > tmp
-mv tmp Sandbox/Skims/python/trackingFailureFilter_cfi.py
+cp Patches/trackingFailureFilter_cfi.py Sandbox/Skims/python/trackingFailureFilter_cfi.py
 rm Sandbox/Skims/python/RA2*_cff.py
 
 scram b -rj2
