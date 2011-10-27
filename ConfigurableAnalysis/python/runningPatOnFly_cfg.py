@@ -69,7 +69,7 @@ from PhysicsTools.Configuration.SUSY_pattuple_cff import addDefaultSUSYPAT, getS
 #addDefaultSUSYPAT(process,True,'HLT',['L1FastJet','L2Relative','L3Absolute'],'',['AK5PF','AK5JPT'])
 
 process.GlobalTag.globaltag = 'GR_R_42_V19::All'   # Data Setting
-addDefaultSUSYPAT(process,False,'HLT',['L1FastJet','L2Relative','L3Absolute','L2L3Residual'],'',['AK5PF','AK5JPT'])
+addDefaultSUSYPAT(process,False,'HLT',['L1FastJet','L2Relative','L3Absolute','L2L3Residual'],'',['AK5PF'])
 process.metJESCorAK5PFTypeI.corrector = cms.string('ak5PFL2L3Residual') # Type1PFMET Residual for data only.
 
 process.pfNoTauPF.enable = cms.bool(False)
