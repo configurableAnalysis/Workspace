@@ -24,10 +24,9 @@ cvs co -r cfA_t54 -d Workspace UserCode/pbgeff/cmssw/Workspace
 cvs co -r V00-00-08 RecoMET/METAnalyzers/  
 #TrackingFailure
 cvs co -r Seema02June2011 -d Sandbox/Skims UserCode/seema/SandBox/Skims 
-#TP Filter
-cvs co -r V19MAY2011_v3 JetMETAnalysis/ecalDeadCellTools 
-# Fixing TrackingFailure's codes.
 cp Workspace/Patches/trackingFailureFilter_cfi.py Sandbox/Skims/python/trackingFailureFilter_cfi.py
 rm Sandbox/Skims/python/RA2*_cff.py
+#TP Filter
+cvs co -r V19MAY2011_v3 JetMETAnalysis/ecalDeadCellTools 
 
 scram b -rj2
