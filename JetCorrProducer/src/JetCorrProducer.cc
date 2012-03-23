@@ -163,13 +163,13 @@ JetCorrProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       int index = iuncorrjet-uncorJets.begin();
       const edm::RefToBase<reco::Jet> uncorjetRef(edm::Ref<std::vector<pat::Jet> >(&uncorJets,index));
 
-      ak5PFL2L3s->push_back( ak5PFL2L3Corrector_.correction( *iuncorrjet, uncorjetRef, iEvent,iSetup ) );
-      ak5PFL1FastL2L3s->push_back( ak5PFL1FastL2L3Corrector_.correction( *iuncorrjet, uncorjetRef, iEvent,iSetup ) );
-      ak5PFL1L2L3s->push_back( ak5PFL1L2L3Corrector_.correction( *iuncorrjet, uncorjetRef, iEvent,iSetup ) );
+      ak5PFL2L3s->push_back( ak5PFL2L3Corrector_.correction( *iuncorrjet, /*uncorjetRef,*/ iEvent,iSetup ) );
+      ak5PFL1FastL2L3s->push_back( ak5PFL1FastL2L3Corrector_.correction( *iuncorrjet, /*uncorjetRef,*/ iEvent,iSetup ) );
+      ak5PFL1L2L3s->push_back( ak5PFL1L2L3Corrector_.correction( *iuncorrjet, /*uncorjetRef,*/ iEvent,iSetup ) );
       if(useResiduals) {
-	ak5PFL2L3Residuals->push_back( ak5PFL2L3ResidualCorrector_.correction( *iuncorrjet, uncorjetRef, iEvent,iSetup ) );
-	ak5PFL1FastL2L3Residuals->push_back( ak5PFL1FastL2L3ResidualCorrector_.correction( *iuncorrjet, uncorjetRef, iEvent,iSetup ) );
-	ak5PFL1L2L3Residuals->push_back( ak5PFL1L2L3ResidualCorrector_.correction( *iuncorrjet, uncorjetRef, iEvent,iSetup ) );
+	ak5PFL2L3Residuals->push_back( ak5PFL2L3ResidualCorrector_.correction( *iuncorrjet, /*uncorjetRef,*/ iEvent,iSetup ) );
+	ak5PFL1FastL2L3Residuals->push_back( ak5PFL1FastL2L3ResidualCorrector_.correction( *iuncorrjet, /*uncorjetRef,*/ iEvent,iSetup ) );
+	ak5PFL1L2L3Residuals->push_back( ak5PFL1L2L3ResidualCorrector_.correction( *iuncorrjet, /*uncorjetRef,*/ iEvent,iSetup ) );
       }
       else {
 	ak5PFL2L3Residuals->push_back(0);
@@ -209,13 +209,13 @@ JetCorrProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       int index = iuncorrCalojet-uncorCaloJets.begin();
       const edm::RefToBase<reco::Jet> uncorjetRef(edm::Ref<std::vector<pat::Jet> >(&uncorCaloJets,index));
 
-      ak5CaloL2L3s->push_back( ak5CaloL2L3Corrector_.correction( *iuncorrCalojet, uncorjetRef, iEvent,iSetup ) );
-      ak5CaloL1FastL2L3s->push_back( ak5CaloL1FastL2L3Corrector_.correction( *iuncorrCalojet, uncorjetRef, iEvent,iSetup ) );
-      ak5CaloL1L2L3s->push_back( ak5CaloL1L2L3Corrector_.correction( *iuncorrCalojet, uncorjetRef, iEvent,iSetup ) );
+      ak5CaloL2L3s->push_back( ak5CaloL2L3Corrector_.correction( *iuncorrCalojet, /*uncorjetRef,*/ iEvent,iSetup ) );
+      ak5CaloL1FastL2L3s->push_back( ak5CaloL1FastL2L3Corrector_.correction( *iuncorrCalojet, /*uncorjetRef,*/ iEvent,iSetup ) );
+      ak5CaloL1L2L3s->push_back( ak5CaloL1L2L3Corrector_.correction( *iuncorrCalojet, /*uncorjetRef,*/ iEvent,iSetup ) );
       if(useResiduals) {
-	ak5CaloL2L3Residuals->push_back( ak5CaloL2L3ResidualCorrector_.correction( *iuncorrCalojet, uncorjetRef, iEvent,iSetup ) );
-	ak5CaloL1FastL2L3Residuals->push_back( ak5CaloL1FastL2L3ResidualCorrector_.correction( *iuncorrCalojet, uncorjetRef, iEvent,iSetup ) );
-	ak5CaloL1L2L3Residuals->push_back( ak5CaloL1L2L3ResidualCorrector_.correction( *iuncorrCalojet, uncorjetRef, iEvent,iSetup ) );
+	ak5CaloL2L3Residuals->push_back( ak5CaloL2L3ResidualCorrector_.correction( *iuncorrCalojet, /*uncorjetRef,*/ iEvent,iSetup ) );
+	ak5CaloL1FastL2L3Residuals->push_back( ak5CaloL1FastL2L3ResidualCorrector_.correction( *iuncorrCalojet, /*uncorjetRef,*/ iEvent,iSetup ) );
+	ak5CaloL1L2L3Residuals->push_back( ak5CaloL1L2L3ResidualCorrector_.correction( *iuncorrCalojet, /*uncorjetRef,*/ iEvent,iSetup ) );
       }
       else {
 	ak5CaloL2L3Residuals->push_back(0);

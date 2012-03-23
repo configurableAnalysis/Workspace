@@ -478,6 +478,8 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                         'tIso:trackIso',
                         'ecalIso:ecalIso',
                         'hcalIso:hcalIso',
+                        'ecalvetoDep:ecalIsoDeposit.candEnergy',
+                        'hcalvetoDep:hcalIsoDeposit.candEnergy',
 #                        'id:leptonID', 
                         'calEnergyEm:calEnergy.em',
                         'calEnergyHad:calEnergy.had',
@@ -485,8 +487,6 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                         'calEnergyEmS9:calEnergy.emS9',
                         'calEnergyHadS9:calEnergy.hadS9',
                         'calEnergyHoS9:calEnergy.hoS9',
-                        'iso03_emVetoEt:isolationR03.emVetoEt',
-                        'iso03_hadVetoEt:isolationR03.hadVetoEt',
                         'iso03_sumPt:isolationR03.sumPt',
                         'iso03_emEt:isolationR03.emEt',
                         'iso03_hadEt:isolationR03.hadEt',
@@ -710,7 +710,8 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
 
 
                   pfTypeImets = cms.PSet( 	 
-	                   src = cms.InputTag("patMETsTypeIPF"), 	 
+	                   #src = cms.InputTag("patMETsTypeIPF"), 	
+                           src = cms.InputTag("patPFMETsTypeIcorrected"),  
 	                    leaves = cms.PSet( 	 
 	                     vars = cms.vstring('et:et', 	 
 	                         'phi:phi', 	 
@@ -722,10 +723,27 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
 	                         'sumEt:sumEt', 	 
 	                         'unCPhi:uncorrectedPhi', 	 
 	                         'unCPt:uncorrectedPt') 	 
-	                 ), 	 
+	                 ),	 
 	                 Class = cms.string('pat::MET') 	 
 	             ), 	 
 	 
+#  		  #PF TypeI MET for full PF2PAT jets (postfix=PFLOW)
+                  pfTypeImetsPFLOW = cms.PSet(
+                           src = cms.InputTag("patPFMETsTypeIcorrectedPFLOW"),
+                            leaves = cms.PSet(
+                             vars = cms.vstring('et:et',
+                                 'phi:phi',
+                                 'ex:px',
+                                 'ey:py',
+                                 'gen_et:genMET.et',
+                                 'gen_phi:genMET.phi',
+                                 'sign:metSignificance',
+                                 'sumEt:sumEt',
+                                 'unCPhi:uncorrectedPhi',
+                                 'unCPt:uncorrectedPt')
+                         ),
+                         Class = cms.string('pat::MET')
+                     ),
 
 
             tcmets = cms.PSet(
@@ -1101,8 +1119,8 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                         'tIso:trackIso',
                         'ecalIso:ecalIso',
                         'hcalIso:hcalIso',
-                        'iso03_emVetoEt:isolationR03.emVetoEt',
-                        'iso03_hadVetoEt:isolationR03.hadVetoEt',
+                        'ecalvetoDep:ecalIsoDeposit.candEnergy',
+                        'hcalvetoDep:hcalIsoDeposit.candEnergy',
 #                        'id:leptonID',
                         'calEnergyEm:calEnergy.em',
                         'calEnergyHad:calEnergy.had',

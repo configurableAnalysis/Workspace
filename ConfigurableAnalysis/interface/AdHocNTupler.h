@@ -20,9 +20,6 @@
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 
-//#include "DataFormats/HcalRecHit/interface/HcalRecHitCollections.h"
-#include "DataFormats/HcalRecHit/interface/HBHERecHit.h"
-
 using namespace std;
 
 class AdHocNTupler : public NTupler {
@@ -83,6 +80,9 @@ class AdHocNTupler : public NTupler {
     ecalTPfilter_decision_ = new int;
     scrapingVeto_decision_ = new int;
     trackingfailurefilter_decision_ = new int;
+    greedymuonfilter_decision_ = new int;
+    inconsistentPFmuonfilter_decision_ = new int;
+    eenoisefilter_decision_ = new int;
     MPT_ = new float;
     jets_AK5PFclean_corrL2L3_ = new std::vector<float>; 
     jets_AK5PFclean_corrL2L3Residual_ = new std::vector<float>;
@@ -103,7 +103,6 @@ class AdHocNTupler : public NTupler {
     PU_ntrks_highpT_ = new std::vector<std::vector<int> >;
     PU_NumInteractions_ = new std::vector<int>;
     PU_bunchCrossing_ = new std::vector<int>;
-    PU_TrueNumInteractions_ = new std::vector<int>;
   }
 
   ~AdHocNTupler(){
@@ -141,8 +140,11 @@ class AdHocNTupler : public NTupler {
     delete hbhefilter_decision_;
     delete cschalofilter_decision_;
     delete ecalTPfilter_decision_;
-		delete scrapingVeto_decision_;
+    delete scrapingVeto_decision_;
     delete trackingfailurefilter_decision_;
+    delete greedymuonfilter_decision_;
+    delete inconsistentPFmuonfilter_decision_;
+    delete eenoisefilter_decision_;
     delete MPT_;
     delete jets_AK5PFclean_corrL2L3_;
     delete jets_AK5PFclean_corrL2L3Residual_;
@@ -163,7 +165,6 @@ class AdHocNTupler : public NTupler {
     delete PU_ntrks_highpT_;
     delete PU_NumInteractions_;
     delete PU_bunchCrossing_;
-    delete PU_TrueNumInteractions_;
   }
 
   uint registerleaves(edm::ProducerBase * producer){
@@ -223,6 +224,9 @@ class AdHocNTupler : public NTupler {
 			tree_->Branch("cschalofilter_decision",cschalofilter_decision_,"cschalofilter_decision/I");
 			tree_->Branch("ecalTPfilter_decision",ecalTPfilter_decision_,"ecalTPfilter_decision/I");
 			tree_->Branch("scrapingVeto_decision",scrapingVeto_decision_,"scrapingVeto_decision/I");
+      tree_->Branch("greedymuonfilter_decision",greedymuonfilter_decision_,"greedymuonfilter_decision/I");
+      tree_->Branch("inconsistentPFmuonfilter_decision",inconsistentPFmuonfilter_decision_,"inconsistentPFmuonfilter_decision/I");
+      tree_->Branch("eenoisefilter_decision",eenoisefilter_decision_,"eenoisefilter_decision/I");
       tree_->Branch("MPT",MPT_,"MPT/F");
       tree_->Branch("jets_AK5PFclean_corrL2L3",&jets_AK5PFclean_corrL2L3_);
       tree_->Branch("jets_AK5PFclean_corrL2L3Residual",&jets_AK5PFclean_corrL2L3Residual_);
@@ -243,7 +247,6 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("PU_ntrks_highpT",&PU_ntrks_highpT_);
       tree_->Branch("PU_NumInteractions",&PU_NumInteractions_);
       tree_->Branch("PU_bunchCrossing",&PU_bunchCrossing_);
-      tree_->Branch("PU_TrueNumInteractions",&PU_TrueNumInteractions_);
     }
 
     else{
@@ -275,6 +278,7 @@ class AdHocNTupler : public NTupler {
 		// get hold of trigger names - based on TriggerResults object!
 		const edm::TriggerNames & triggerNames_ = iEvent.triggerNames(*hltresults);
 		int cschalofilterResult =1, trackingfailturefilterResult=1, ecaltpfilterResult=1, scrapingVetoResult=1;
+		int greedymuonfilterResult=1, inconsistentPFmuonfilterResult=1, eenoisefilterResult=1;
 		for (int itrig=0; itrig< ntrigs; itrig++) {
  			TString trigName = triggerNames_.triggerName(itrig);
   		int hltflag = (*hltresults)[itrig].accept();
@@ -282,13 +286,20 @@ class AdHocNTupler : public NTupler {
 	 		if (trigName=="trackingfailturefilter") trackingfailturefilterResult = hltflag;
 	 		if (trigName=="ecaltpfilter") ecaltpfilterResult = hltflag;
 	 		if (trigName=="scrapingveto") scrapingVetoResult = hltflag;
+			if (trigName=="greedymuonfilter") greedymuonfilterResult = hltflag;
+                        if (trigName=="inconsistentPFmuonfilter") inconsistentPFmuonfilterResult = hltflag;
+                        if (trigName=="eenoisefilter") eenoisefilterResult = hltflag;
 	 	}
 		
     *cschalofilter_decision_ = cschalofilterResult;
     *trackingfailurefilter_decision_ = trackingfailturefilterResult;
     *ecalTPfilter_decision_ = ecaltpfilterResult;
     *scrapingVeto_decision_ = scrapingVetoResult;
-		
+    *greedymuonfilter_decision_ = greedymuonfilterResult;
+    *inconsistentPFmuonfilter_decision_ = inconsistentPFmuonfilterResult;
+    *eenoisefilter_decision_ = eenoisefilterResult;
+	
+	
     edm::Handle< std::vector<pat::TriggerPath> > triggerpaths;
     iEvent.getByLabel("patTrigger",triggerpaths);  
     for( std::vector<pat::TriggerPath>::const_iterator tp=triggerpaths->begin(); tp!=triggerpaths->end(); ++tp ){
@@ -568,7 +579,6 @@ class AdHocNTupler : public NTupler {
     for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
   //    std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() <<"   "<< iEvent.id().event() << std::endl;
       (*PU_NumInteractions_).push_back(PVI->getPU_NumInteractions());
-      (*PU_TrueNumInteractions_).push_back(PVI->getTrueNumInteractions());
       (*PU_bunchCrossing_).push_back(PVI->getBunchCrossing());
       (*PU_zpositions_).push_back(PVI->getPU_zpositions());
       (*PU_sumpT_lowpT_).push_back(PVI->getPU_sumpT_lowpT());
@@ -630,7 +640,6 @@ class AdHocNTupler : public NTupler {
     (*PU_ntrks_highpT_).clear();
     (*PU_NumInteractions_).clear();
     (*PU_bunchCrossing_).clear(); 
-    (*PU_TrueNumInteractions_).clear();
   }
 
   void callBack(){
@@ -678,6 +687,9 @@ class AdHocNTupler : public NTupler {
   int * ecalTPfilter_decision_;
   int * scrapingVeto_decision_;
   int * trackingfailurefilter_decision_;
+  int * greedymuonfilter_decision_;
+  int * inconsistentPFmuonfilter_decision_;
+  int * eenoisefilter_decision_;
   float * MPT_;
   std::vector<float> * jets_AK5PFclean_corrL2L3_;
   std::vector<float> * jets_AK5PFclean_corrL2L3Residual_;
@@ -698,5 +710,4 @@ class AdHocNTupler : public NTupler {
   std::vector<std::vector<int> > * PU_ntrks_highpT_;
   std::vector<int> * PU_NumInteractions_;
   std::vector<int> * PU_bunchCrossing_;
-  std::vector<int> * PU_TrueNumInteractions_;
 };

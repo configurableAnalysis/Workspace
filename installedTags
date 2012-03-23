@@ -1,23 +1,27 @@
-#instructions for v54 of cfA
+#instructions for v55 of cfA
 export SCRAM_ARCH="slc5_amd64_gcc434"
-cmsrel CMSSW_4_2_8_patch7
-cd CMSSW_4_2_8_patch7/src
+cmsrel CMSSW_4_2_5
+cd CMSSW_4_2_5/src
 cmsenv
-
-addpkg DataFormats/PatCandidates  V06-04-19-02
-addpkg PhysicsTools/PatAlgos      V08-06-46
-addpkg PhysicsTools/PatExamples   V00-05-24
-addpkg CommonTools/ParticleFlow   B4_2_X_V00-03-00
-addpkg PhysicsTools/SelectorUtils V00-03-24
-addpkg PhysicsTools/UtilAlgos     V08-02-14
+addpkg DataFormats/PatCandidates  V06-04-18
+addpkg PhysicsTools/PatAlgos      V08-06-38
+addpkg PhysicsTools/PatExamples   V00-05-22
+addpkg PhysicsTools/SelectorUtils V00-03-17
+addpkg PhysicsTools/Utilities     V08-03-09
+addpkg CommonTools/RecoAlgos      V00-03-13
+addpkg RecoJets/Configuration     V02-04-17
 addpkg RecoTauTag/Configuration   V01-02-03
 addpkg RecoTauTag/RecoTau         V01-02-07
 addpkg RecoTauTag/TauTagTools     V01-02-00
+addpkg FWCore/GuiBrowsers         V00-00-57
 
-addpkg MuonAnalysis/MuonAssociators   V01-13-00
-addpkg PhysicsTools/Configuration     V00-10-17
+addpkg MuonAnalysis/MuonAssociators     V01-13-00
+addpkg PhysicsTools/Configuration       V00-10-16
 
-cvs co -r cfA_t54 -d Workspace UserCode/pbgeff/cmssw/Workspace
+# bug fix for JEC - jet area not set otherwise
+cvs update -r V08-06-39 PhysicsTools/PatAlgos/python/recoLayer0/jetCorrFactors_cfi.py
+
+cvs co -r cfA_v55 -d Workspace UserCode/pbgeff/cmssw/Workspace
 
 # adding TriggerResult Filters to cfA.
 # CSCHaloFilter
@@ -25,8 +29,40 @@ cvs co -r V00-00-08 RecoMET/METAnalyzers/
 #TrackingFailure
 cvs co -r Seema02June2011 -d Sandbox/Skims UserCode/seema/SandBox/Skims 
 cp Workspace/Patches/trackingFailureFilter_cfi.py Sandbox/Skims/python/trackingFailureFilter_cfi.py
-rm Sandbox/Skims/python/RA2*_cff.py
+
 #TP Filter
 cvs co -r V19MAY2011_v3 JetMETAnalysis/ecalDeadCellTools 
 
-scram b -rj2
+#greedy or inconsistent muon filter
+cvs co -r lhx_12JAN2012_v1 DataFormats/METReco
+cvs co -r lhx_08FEB2012_v2 RecoMET/METFilters
+#remove re-definition of tracking failure filter
+rm RecoMET/METFilters/python/trackingFailureFilter_cfi.py
+rm RecoMET/METFilters/src/TrackingFailureFilter.cc
+
+#typeI PFmet stuff
+cvs co -r V04-05-03 JetMETCorrections/Type1MET
+cvs co -r V03-09-19 PhysicsTools/PatUtils
+
+addpkg DataFormats/METReco
+cvs up -r 1.28 DataFormats/METReco/src/classes.h
+cvs up -r 1.25 DataFormats/METReco/src/classes_def.xml
+
+cvs co -r V02-03-00 JetMETCorrections/Algorithms
+rm JetMETCorrections/Algorithms/interface/L1JPTOffsetCorrector.h
+rm JetMETCorrections/Algorithms/src/L1JPTOffsetCorrector.cc
+cvs co -r V03-01-00 JetMETCorrections/Objects
+addpkg JetMETCorrections/Modules
+cvs up -r 1.4 JetMETCorrections/Modules/plugins/JetCorrectorOnTheFly.cc
+cvs up -r 1.6 JetMETCorrections/Modules/interface/JetCorrectionProducer.h
+scram b -j 8
+
+
+#Patch Files needed for typeI PFMET recipe from Cornell
+cp Workspace/Patches/SUSY_pattuple_cff.py PhysicsTools/Configuration/python/SUSY_pattuple_cff.py 
+cp Workspace/Patches/pfMETCorrections_cff.py JetMETCorrections/Type1MET/python/pfMETCorrections_cff.py 
+cp Workspace/Patches/SUSY_pattuple_extrastuff_cff.py Workspace/ConfigurableAnalysis/python/SUSY_pattuple_extrastuff_cff.py
+
+
+scram b -rj4
+
