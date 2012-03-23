@@ -710,8 +710,7 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
 
 
                   pfTypeImets = cms.PSet( 	 
-	                   #src = cms.InputTag("patMETsTypeIPF"), 	
-                           src = cms.InputTag("patPFMETsTypeIcorrected"),  
+                           src = cms.InputTag("patPFMETsTypeIcorrectedPFLOW"),  
 	                    leaves = cms.PSet( 	 
 	                     vars = cms.vstring('et:et', 	 
 	                         'phi:phi', 	 
@@ -727,9 +726,8 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
 	                 Class = cms.string('pat::MET') 	 
 	             ), 	 
 	 
-#  		  #PF TypeI MET for full PF2PAT jets (postfix=PFLOW)
-                  pfTypeImetsPFLOW = cms.PSet(
-                           src = cms.InputTag("patPFMETsTypeIcorrectedPFLOW"),
+                  pfTypeImetsvanilla = cms.PSet(
+                           src = cms.InputTag("patPFMETsTypeIcorrected"),
                             leaves = cms.PSet(
                              vars = cms.vstring('et:et',
                                  'phi:phi',
