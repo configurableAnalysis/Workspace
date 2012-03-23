@@ -29,16 +29,10 @@ cvs co -r V00-00-08 RecoMET/METAnalyzers/
 #TrackingFailure
 cvs co -r Seema02June2011 -d Sandbox/Skims UserCode/seema/SandBox/Skims 
 cp Workspace/Patches/trackingFailureFilter_cfi.py Sandbox/Skims/python/trackingFailureFilter_cfi.py
+rm Sandbox/Skims/python/RA2*_cff.py
 
 #TP Filter
 cvs co -r V19MAY2011_v3 JetMETAnalysis/ecalDeadCellTools 
-
-#greedy or inconsistent muon filter
-cvs co -r lhx_12JAN2012_v1 DataFormats/METReco
-cvs co -r lhx_08FEB2012_v2 RecoMET/METFilters
-#remove re-definition of tracking failure filter
-rm RecoMET/METFilters/python/trackingFailureFilter_cfi.py
-rm RecoMET/METFilters/src/TrackingFailureFilter.cc
 
 #typeI PFmet stuff
 cvs co -r V04-05-03 JetMETCorrections/Type1MET
@@ -56,6 +50,17 @@ addpkg JetMETCorrections/Modules
 cvs up -r 1.4 JetMETCorrections/Modules/plugins/JetCorrectorOnTheFly.cc
 cvs up -r 1.6 JetMETCorrections/Modules/interface/JetCorrectionProducer.h
 scram b -j 8
+
+
+#greedy or inconsistent muon filter
+#This overlaps with a TypeI MET package above so could cause problems!!!
+cvs co -r lhx_12JAN2012_v1 DataFormats/METReco
+cvs co -r lhx_08FEB2012_v2 RecoMET/METFilters
+#remove re-definition of tracking failure filter
+rm RecoMET/METFilters/python/trackingFailureFilter_cfi.py
+rm RecoMET/METFilters/src/TrackingFailureFilter.cc
+
+
 
 
 #Patch Files needed for typeI PFMET recipe from Cornell
