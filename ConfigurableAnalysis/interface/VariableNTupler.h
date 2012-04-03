@@ -18,6 +18,8 @@
 
 #include "PhysicsTools/UtilAlgos/interface/NTupler.h"
 
+#include <algorithm>
+
 class VariableNTupler : public NTupler{
  public:
   VariableNTupler(const edm::ParameterSet& iConfig){
@@ -88,9 +90,9 @@ class VariableNTupler : public NTupler{
       iterator i_end= leaves_.end();
       for(;i!=i_end;++i){
 	nLeaves++;
-	TString lName(i->first);
-	lName.ReplaceAll("_","0");
-	producer->produces<double>(lName.Data()).setBranchAlias(i->first);
+	std::string lName(i->first);
+	std::replace(lName.begin(), lName.end(), '_','0');
+	producer->produces<double>(lName.c_str()).setBranchAlias(i->first);
       }
     }
     return nLeaves;
@@ -115,9 +117,9 @@ class VariableNTupler : public NTupler{
       iterator i_end=leaves_.end();
       for(;i!=i_end;++i){
 	std::auto_ptr<double> leafValue(new double((*i->second)(iEvent)));
-	TString lName(i->first); 
-	lName.ReplaceAll("_","0");
-	iEvent.put(leafValue, lName.Data());
+	std::string lName(i->first); 
+	std::replace(lName.begin(), lName.end(),'_','0');
+	iEvent.put(leafValue, lName.c_str());
       }
     }
   }

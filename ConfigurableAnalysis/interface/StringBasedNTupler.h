@@ -64,9 +64,9 @@ class TreeBranch {
   const std::string & selection() const { return selection_;}
   const std::string & maxIndexName() const { return maxIndexName_;}
   const std::string branchName()const{ 
-	TString name(branchAlias_);
-	name.ReplaceAll("_","0");
-	return std::string(name.Data());}
+	std::string name(branchAlias_);
+	std::replace(name.begin(), name.end(), '_','0');
+	return std::string(name.c_str());}
   const std::string & branchAlias()const{ return branchAlias_;}
   const std::string & branchTitle()const{ return branchTitle_;}
   typedef std::auto_ptr<std::vector<float> > value;

@@ -56,7 +56,7 @@ class AdHocNTupler : public NTupler {
     triggerobject_energy = new std::vector<std::vector<float> >;
     triggerobject_phi = new std::vector<std::vector<float> >;
     triggerobject_eta = new std::vector<std::vector<float> >;
-    triggerobject_collectionname = new std::vector<std::vector<TString> >;
+    triggerobject_collectionname = new std::vector<std::vector<std::string> >;
     standalone_triggerobject_pt = new std::vector<float>;
     standalone_triggerobject_px = new std::vector<float>;
     standalone_triggerobject_py = new std::vector<float>;
@@ -280,7 +280,7 @@ class AdHocNTupler : public NTupler {
 		int cschalofilterResult =1, trackingfailturefilterResult=1, ecaltpfilterResult=1, scrapingVetoResult=1;
 		int greedymuonfilterResult=1, inconsistentPFmuonfilterResult=1, eenoisefilterResult=1;
 		for (int itrig=0; itrig< ntrigs; itrig++) {
- 			TString trigName = triggerNames_.triggerName(itrig);
+ 			std::string trigName = triggerNames_.triggerName(itrig);
   		int hltflag = (*hltresults)[itrig].accept();
 	 		if (trigName=="csctighthalofilter") cschalofilterResult = hltflag;
 	 		if (trigName=="trackingfailturefilter") trackingfailturefilterResult = hltflag;
@@ -310,7 +310,7 @@ class AdHocNTupler : public NTupler {
       (*trigger_name).push_back(name);
       (*trigger_decision).push_back(decision);
 
-      std::vector<TString> collection_names;
+      std::vector<std::string> collection_names;
       std::vector<float> pt_vector;
       std::vector<float> px_vector;
       std::vector<float> py_vector;
@@ -344,7 +344,7 @@ class AdHocNTupler : public NTupler {
 	  double energy = triggerObject->energy(); 
           double phi = triggerObject->phi();
           double eta = triggerObject->eta();
-	  TString collname(triggerObject->collection());
+	  std::string collname(triggerObject->collection());
 	  //cout<<"The trigger collname is: "<<collname<<endl;
 	  //cout<<"The trigger objectpt is: "<<pt<<endl;
 	  collection_names.push_back(collname);
@@ -663,7 +663,7 @@ class AdHocNTupler : public NTupler {
   std::vector<std::vector<float> > * triggerobject_energy;
   std::vector<std::vector<float> > * triggerobject_phi;
   std::vector<std::vector<float> > * triggerobject_eta;
-  std::vector<std::vector<TString> > * triggerobject_collectionname;
+  std::vector<std::vector<std::string> > * triggerobject_collectionname;
   std::vector<float> * standalone_triggerobject_pt;
   std::vector<float> * standalone_triggerobject_px;
   std::vector<float> * standalone_triggerobject_py;
