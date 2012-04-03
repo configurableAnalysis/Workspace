@@ -1,8 +1,7 @@
 // -*- C++ -*-
 //Add includes for your classes here
 #include <vector>
-//#include <string>
-#include "TString.h"
+#include <string>
 #include "DataFormats/Common/interface/Wrapper.h"
 
 namespace {
@@ -13,14 +12,14 @@ namespace {
     std::vector<std::vector<float> > vf2d;
     edm::Wrapper<std::vector<std::vector<float> > > wvf2d;
 
-    TString s;
-    edm::Wrapper<TString> ws;
+    std::string s;
+    edm::Wrapper<std::string> ws;
       
-    std::vector<TString> vs;
-    edm::Wrapper<std::vector<TString> > wvs;
+    std::vector<std::string> vs;
+    edm::Wrapper<std::vector<std::string> > wvs;
           
-    std::vector<std::vector<TString> > vs2d;
-    edm::Wrapper<std::vector<std::vector<TString> > > wvs2d;
+    std::vector<std::vector<std::string> > vs2d;
+    edm::Wrapper<std::vector<std::vector<std::string> > > wvs2d;
 
 
   };
