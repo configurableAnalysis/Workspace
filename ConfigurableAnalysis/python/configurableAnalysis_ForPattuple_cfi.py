@@ -710,7 +710,8 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
 
 
                   pfTypeImets = cms.PSet( 	 
-                           src = cms.InputTag("patPFMETsTypeIcorrectedPFLOW"),  
+#                           src = cms.InputTag("patMETsTypeIPF"),  
+                           src = cms.InputTag("patPFMETsTypeIcorrected"),  
 	                    leaves = cms.PSet( 	 
 	                     vars = cms.vstring('et:et', 	 
 	                         'phi:phi', 	 

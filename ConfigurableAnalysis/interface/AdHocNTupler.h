@@ -78,6 +78,7 @@ class AdHocNTupler : public NTupler {
     hbhefilter_decision_ = new int;
     cschalofilter_decision_ = new int;
     ecalTPfilter_decision_ = new int;
+    ecalBEfilter_decision_ = new int;
     scrapingVeto_decision_ = new int;
     trackingfailurefilter_decision_ = new int;
     greedymuonfilter_decision_ = new int;
@@ -140,6 +141,7 @@ class AdHocNTupler : public NTupler {
     delete hbhefilter_decision_;
     delete cschalofilter_decision_;
     delete ecalTPfilter_decision_;
+    delete ecalBEfilter_decision_;
     delete scrapingVeto_decision_;
     delete trackingfailurefilter_decision_;
     delete greedymuonfilter_decision_;
@@ -223,6 +225,7 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("trackingfailurefilter_decision",trackingfailurefilter_decision_,"trackingfailurefilter_decision/I");
 			tree_->Branch("cschalofilter_decision",cschalofilter_decision_,"cschalofilter_decision/I");
 			tree_->Branch("ecalTPfilter_decision",ecalTPfilter_decision_,"ecalTPfilter_decision/I");
+                        tree_->Branch("ecalBEfilter_decision",ecalBEfilter_decision_,"ecalBEfilter_decision/I");
 			tree_->Branch("scrapingVeto_decision",scrapingVeto_decision_,"scrapingVeto_decision/I");
       tree_->Branch("greedymuonfilter_decision",greedymuonfilter_decision_,"greedymuonfilter_decision/I");
       tree_->Branch("inconsistentPFmuonfilter_decision",inconsistentPFmuonfilter_decision_,"inconsistentPFmuonfilter_decision/I");
@@ -277,7 +280,7 @@ class AdHocNTupler : public NTupler {
 
 		// get hold of trigger names - based on TriggerResults object!
 		const edm::TriggerNames & triggerNames_ = iEvent.triggerNames(*hltresults);
-		int cschalofilterResult =1, trackingfailturefilterResult=1, ecaltpfilterResult=1, scrapingVetoResult=1;
+		int cschalofilterResult =1, trackingfailturefilterResult=1, ecaltpfilterResult=1, ecalbefilterResult=1, scrapingVetoResult=1;
 		int greedymuonfilterResult=1, inconsistentPFmuonfilterResult=1, eenoisefilterResult=1;
 		for (int itrig=0; itrig< ntrigs; itrig++) {
  			std::string trigName = triggerNames_.triggerName(itrig);
@@ -285,6 +288,7 @@ class AdHocNTupler : public NTupler {
 	 		if (trigName=="csctighthalofilter") cschalofilterResult = hltflag;
 	 		if (trigName=="trackingfailturefilter") trackingfailturefilterResult = hltflag;
 	 		if (trigName=="ecaltpfilter") ecaltpfilterResult = hltflag;
+                        if (trigName=="ecalbefilter") ecalbefilterResult = hltflag;
 	 		if (trigName=="scrapingveto") scrapingVetoResult = hltflag;
 			if (trigName=="greedymuonfilter") greedymuonfilterResult = hltflag;
                         if (trigName=="inconsistentPFmuonfilter") inconsistentPFmuonfilterResult = hltflag;
@@ -294,6 +298,7 @@ class AdHocNTupler : public NTupler {
     *cschalofilter_decision_ = cschalofilterResult;
     *trackingfailurefilter_decision_ = trackingfailturefilterResult;
     *ecalTPfilter_decision_ = ecaltpfilterResult;
+    *ecalBEfilter_decision_ = ecalbefilterResult;
     *scrapingVeto_decision_ = scrapingVetoResult;
     *greedymuonfilter_decision_ = greedymuonfilterResult;
     *inconsistentPFmuonfilter_decision_ = inconsistentPFmuonfilterResult;
@@ -685,6 +690,7 @@ class AdHocNTupler : public NTupler {
   int * hbhefilter_decision_;
   int * cschalofilter_decision_;
   int * ecalTPfilter_decision_;
+  int * ecalBEfilter_decision_;
   int * scrapingVeto_decision_;
   int * trackingfailurefilter_decision_;
   int * greedymuonfilter_decision_;
