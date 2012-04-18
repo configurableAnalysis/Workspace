@@ -19,6 +19,7 @@
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "FWCore/Common/interface/TriggerNames.h"
+#include "DataFormats/HcalRecHit/interface/HBHERecHit.h"
 
 using namespace std;
 
@@ -104,6 +105,7 @@ class AdHocNTupler : public NTupler {
     PU_ntrks_highpT_ = new std::vector<std::vector<int> >;
     PU_NumInteractions_ = new std::vector<int>;
     PU_bunchCrossing_ = new std::vector<int>;
+	PU_TrueNumInteractions_ = new std::vector<int>;
   }
 
   ~AdHocNTupler(){
@@ -167,6 +169,7 @@ class AdHocNTupler : public NTupler {
     delete PU_ntrks_highpT_;
     delete PU_NumInteractions_;
     delete PU_bunchCrossing_;
+	delete PU_TrueNumInteractions_;
   }
 
   uint registerleaves(edm::ProducerBase * producer){
@@ -250,6 +253,7 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("PU_ntrks_highpT",&PU_ntrks_highpT_);
       tree_->Branch("PU_NumInteractions",&PU_NumInteractions_);
       tree_->Branch("PU_bunchCrossing",&PU_bunchCrossing_);
+	  tree_->Branch("PU_TrueNumInteractions",&PU_TrueNumInteractions_);
     }
 
     else{
@@ -585,6 +589,7 @@ class AdHocNTupler : public NTupler {
   //    std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() <<"   "<< iEvent.id().event() << std::endl;
       (*PU_NumInteractions_).push_back(PVI->getPU_NumInteractions());
       (*PU_bunchCrossing_).push_back(PVI->getBunchCrossing());
+	  (*PU_TrueNumInteractions_).push_back(PVI->getTrueNumInteractions());
       (*PU_zpositions_).push_back(PVI->getPU_zpositions());
       (*PU_sumpT_lowpT_).push_back(PVI->getPU_sumpT_lowpT());
       (*PU_sumpT_highpT_).push_back(PVI->getPU_sumpT_highpT());
@@ -644,7 +649,8 @@ class AdHocNTupler : public NTupler {
     (*PU_ntrks_lowpT_).clear();
     (*PU_ntrks_highpT_).clear();
     (*PU_NumInteractions_).clear();
-    (*PU_bunchCrossing_).clear(); 
+    (*PU_bunchCrossing_).clear();
+	(*PU_TrueNumInteractions_).clear();
   }
 
   void callBack(){
@@ -716,4 +722,5 @@ class AdHocNTupler : public NTupler {
   std::vector<std::vector<int> > * PU_ntrks_highpT_;
   std::vector<int> * PU_NumInteractions_;
   std::vector<int> * PU_bunchCrossing_;
+  std::vector<int> * PU_TrueNumInteractions_;
 };
