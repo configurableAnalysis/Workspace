@@ -9,6 +9,7 @@
 #swith between MC and data
 isMC = False
 #isMC = True
+cfAFile = "configurableAnalysis.root"
 
 
 import FWCore.ParameterSet.Config as cms
@@ -28,13 +29,12 @@ process.MessageLogger.cerr.PATSummaryTables = cms.untracked.PSet(
 #-- Source information ------------------------------------------------------
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-			'file:/LVM/SATA/pbgeff/temp_52X_ntuple/MuHad_Run2012A-PromptReco-v1_AOD_709B4CB9-BF82-E111-BD9B-003048F1182E.root',
-                        #'file:/LVM/SATA/pbgeff/temp_52X_ntuple/TTJets_TuneZ2star_8TeV-madgraph-tauola_PU_S7_START52_V5-v1_AODSIM_FEC0CBA1-5A81-E111-8D3A-0018F3D0968E.root',
+			'file:/home/wto/cmssw/CMSSW_5_2_3/src/Workspace/ConfigurableAnalysis/python/MuHad2012APromptReco-v1_190645_AOD.root',
     )
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 #process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange(
-#  '166512:551-166512:551',
+#  '190645:10-190645:110',
 #)
 process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 
@@ -100,61 +100,12 @@ process.patPFMETsTypeIpIIcorrected = process.patPFMETs.clone(
     metSource = cms.InputTag('pfType1p2CorrectedMet')
     )
 
-
-##now for PF2PAT-no-tau-cleaning jets (postfix=PFLOW)
-#process.pfCandsNotInJetPFLOW = process.pfCandsNotInJet.clone(
-#    topCollection = cms.InputTag('pfJetsPFLOW')
-#   )
-#process.pfType2CandsPFLOW = process.pfType2Cands.clone(
-#    src = cms.InputTag('pfCandsNotInJetPFLOW'),
-#    )
-#process.pfJetMETcorrPFLOW = process.pfJetMETcorr.clone(
-#    src = cms.InputTag('pfJetsPFLOW'),
-#    )
-#process.pfCandMETcorrPFLOW = process.pfCandMETcorr.clone(
-#    src = cms.InputTag('pfCandsNotInJetPFLOW')
-#    )
-#process.pfType1CorrectedMetPFLOW = process.pfType1CorrectedMet.clone(
-#    src = cms.InputTag('pfMETPFLOW'),
-#    srcType1Corrections = cms.VInputTag(
-#        cms.InputTag('pfJetMETcorrPFLOW', 'type1')
-#        ),
-#    )
-#process.pfType1p2CorrectedMetPFLOW = process.pfType1p2CorrectedMet.clone(
-#    src = cms.InputTag('pfMETPFLOW'),
-#    srcType1Corrections = cms.VInputTag(
-#        cms.InputTag('pfJetMETcorrPFLOW', 'type1')
-#        ),
-#    srcUnclEnergySums = cms.VInputTag(
-#        cms.InputTag('pfJetMETcorrPFLOW', 'type2'),
-#        cms.InputTag('pfCandMETcorrPFLOW')
-#        ),          
-#    )
-#process.producePFMETCorrectionsPFLOW = cms.Sequence(
-#    process.pfCandsNotInJetPFLOW
-#    * process.pfType2CandsPFLOW
-#    * process.pfJetMETcorrPFLOW
-#    * process.pfCandMETcorrPFLOW
-#    * process.pfType1CorrectedMetPFLOW
-#    * process.pfType1p2CorrectedMetPFLOW
-#    )
-#process.patPFMETsPFLOW = process.patPFMETs.clone(
-#    metSource = cms.InputTag('pfMETPFLOW'),
-#    )
-#process.patPFMETsTypeIcorrectedPFLOW = process.patPFMETsPFLOW.clone(
-#    metSource = cms.InputTag('pfType1CorrectedMetPFLOW')
-#    )
-#process.patPFMETsTypeIpIIcorrectedPFLOW = process.patPFMETsPFLOW.clone(
-#    metSource = cms.InputTag('pfType1p2CorrectedMetPFLOW')
-#    )
-
-
-
 #Turn on trigger info
 from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
 switchOnTrigger(process, triggerProducer='patTrigger', triggerEventProducer='patTriggerEvent', sequence='patDefaultSequence', hltProcess="HLT")
 
 process.load("Workspace.ConfigurableAnalysis.configurableAnalysis_ForPattuple_cff")
+process.TFileService.fileName = cms.string(cfAFile)
 process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
 process.load('RecoMET.METAnalyzers.CSCHaloFilter_cfi')
 process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
