@@ -1728,7 +1728,7 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
 							'mass:mass'
         		)
         	),
-					selection = cms.string('pt*jecFactor(0)>10.0'),
+					selection = cms.string('pt*jecFactor(0)>10.0 | pt>20.0'),
 					Class = cms.string('pat::Jet')
 				),
 
@@ -1807,7 +1807,7 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
         			'mass:mass'
         		)
         	),
-			selection = cms.string('pt*jecFactor(0)>10.0'),
+			selection = cms.string('pt*jecFactor(0)>10.0 | pt>20.0'),
         	Class = cms.string('pat::Jet')
         ),
 			),
