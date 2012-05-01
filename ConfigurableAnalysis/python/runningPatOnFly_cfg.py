@@ -113,6 +113,7 @@ process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
 process.load('RecoMET.METFilters.inconsistentMuonPFCandidateFilter_cfi')
 process.load('RecoMET.METFilters.greedyMuonPFCandidateFilter_cfi')
 #process.load('Sandbox.Skims.eeNoiseFilter_cfi')
+process.load('MyAnalyzers.TriggerFilter.triggerFilter_cfi')
 
 process.scrapingVeto = cms.EDFilter("FilterOutScraping",
                                      applyfilter = cms.untracked.bool(True),
@@ -159,6 +160,7 @@ process.scrapingveto = cms.Path(process.scrapingVeto)
 process.greedymuonfilter = cms.Path(process.greedyMuonPFCandidateFilter)
 process.inconsistentPFmuonfilter = cms.Path(process.inconsistentMuonPFCandidateFilter)
 #process.eenoisefilter = cms.Path(process.eeNoiseFilter)
+process.passprescalePFHT350filter = cms.Path( process.pfht350PassPrescaleFilter )
 process.p = cms.Path(process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
 #process.p += process.patPF2PATSequencePFLOW
 process.p += process.producePFMETCorrections

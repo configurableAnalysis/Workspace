@@ -1,10 +1,10 @@
-#instructions for v56_1 of cfA
+#instructions for v56_2 of cfA
 setenv SCRAM_ARCH slc5_amd64_gcc462
 cmsrel CMSSW_5_2_3
 cd CMSSW_5_2_3/src
 cmsenv
 
-cvs co -r cfA_v56_1 -d Workspace UserCode/pbgeff/cmssw/Workspace
+cvs co -r cfA_v56_2 -d Workspace UserCode/pbgeff/cmssw/Workspace
 
 # packages for SUSY PAT
 # https://twiki.cern.ch/twiki/bin/viewauth/CMS/SusyPatLayer1DefV12
@@ -16,6 +16,9 @@ addpkg PhysicsTools/Configuration        V00-12-00
 
 # for CSC halo filter (not yet updated for 2012)
 cvs co -r V00-00-08 RecoMET/METAnalyzers
+
+#RA2b trigger prescale information
+cvs co -r V00-00-02 -d MyAnalyzers/TriggerFilter UserCode/Teo/MyAnalyzers/TriggerFilter
 
 # DataFormats/METReco not needed for release >=520
 #cvs co -r lhx_12JAN2012_v1 DataFormats/METReco
