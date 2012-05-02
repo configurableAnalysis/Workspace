@@ -1525,7 +1525,7 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
             		          'Nprongs:signalTracks.size'
             		          )
             		          ),
-						  selection = cms.string('pt<-1'),
+						  selection = cms.string('pt>10'),
             		      Class = cms.string('pat::Tau')
             		      ),
 
