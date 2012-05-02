@@ -6,9 +6,14 @@
 #  https://twiki.cern.ch/twiki/bin/view/CMS/SusyPatLayer1DefV12
 #
 
-#swith between MC and data
+#switch between MC and data
 isMC = False
 #isMC = True
+
+#switch between fastsim and fullsim/data
+isFastsim = False
+#isFastsim = True
+
 cfAFile = "configurableAnalysis.root"
 
 
@@ -32,7 +37,7 @@ process.source = cms.Source("PoolSource",
 			'file:/home/wto/cmssw/CMSSW_5_2_3/src/Workspace/ConfigurableAnalysis/python/MuHad2012APromptReco-v1_190645_AOD.root',
     )
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 #process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange(
 #  '190645:10-190645:110',
 #)
@@ -155,13 +160,16 @@ process.out.outputCommands.append('keep *_patPFMETsTypeIcorrected_*_PAT')
 process.ecaltpfilter = cms.Path(process.EcalDeadCellTriggerPrimitiveFilter)
 #Run both TP and BE filters; doesn't work right now
 #process.ecaltpfilter = cms.Path(process.EcalDeadCellTriggerPrimitiveFilter*process.EcalDeadCellBoundaryEnergyFilter)
-process.csctighthalofilter = cms.Path(process.CSCTightHaloFilter)
 process.scrapingveto = cms.Path(process.scrapingVeto)
 process.greedymuonfilter = cms.Path(process.greedyMuonPFCandidateFilter)
 process.inconsistentPFmuonfilter = cms.Path(process.inconsistentMuonPFCandidateFilter)
 #process.eenoisefilter = cms.Path(process.eeNoiseFilter)
 process.passprescalePFHT350filter = cms.Path( process.pfht350PassPrescaleFilter )
-process.p = cms.Path(process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
+if isFastsim:
+        process.p = cms.Path(process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
+else:
+	process.csctighthalofilter = cms.Path(process.CSCTightHaloFilter)
+        process.p = cms.Path(process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
 #process.p += process.patPF2PATSequencePFLOW
 process.p += process.producePFMETCorrections
 process.p += process.patPFMETsTypeIcorrected
