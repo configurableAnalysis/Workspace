@@ -1,18 +1,20 @@
-#instructions for v56_2 of cfA
+#instructions for v57 of cfA
 setenv SCRAM_ARCH slc5_amd64_gcc462
-cmsrel CMSSW_5_2_3
-cd CMSSW_5_2_3/src
+cmsrel CMSSW_5_2_4_patch1
+cd CMSSW_5_2_4_patch1/src/
 cmsenv
+addpkg DataFormats/PatCandidates   V06-05-01
+addpkg PhysicsTools/PatAlgos       V08-09-04
+addpkg PhysicsTools/PatUtils       V03-09-18-03
+addpkg FWCore/GuiBrowsers          V00-00-60
+addpkg CommonTools/ParticleFlow    V00-03-11
+addpkg RecoParticleFlow/PFProducer V15-01-06-01
+addpkg RecoBTag/ImpactParameter    V01-04-08
+addpkg RecoBTag/SecondaryVertex    V01-06-02
+addpkg PhysicsTools/Configuration  V00-12-00
+cvs up -r 1.77 PhysicsTools/PatAlgos/python/tools/pfTools.py
 
-cvs co -r cfA_v56_2 -d Workspace UserCode/pbgeff/cmssw/Workspace
-
-# packages for SUSY PAT
-# https://twiki.cern.ch/twiki/bin/viewauth/CMS/SusyPatLayer1DefV12
-addpkg PhysicsTools/PatAlgos       V08-08-25
-addpkg PhysicsTools/PatUtils      V03-09-18-03
-addpkg CommonTools/ParticleFlow    V00-03-07-01
-addpkg RecoParticleFlow/PFProducer V15-01-05
-addpkg PhysicsTools/Configuration        V00-12-00
+cvs co -r cfA_v57 -d Workspace UserCode/pbgeff/cmssw/Workspace
 
 # for CSC halo filter (not yet updated for 2012)
 cvs co -r V00-00-08 RecoMET/METAnalyzers
