@@ -1,4 +1,4 @@
-#instructions for v57 of cfA
+#instructions for v58 of cfA
 setenv SCRAM_ARCH slc5_amd64_gcc462
 cmsrel CMSSW_5_2_4_patch1
 cd CMSSW_5_2_4_patch1/src/
