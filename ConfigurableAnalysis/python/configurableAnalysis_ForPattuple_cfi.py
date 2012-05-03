@@ -1040,13 +1040,16 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                 Class = cms.string('reco::GenParticle')
             ),
 
-            pfcand_mus = cms.PSet(
+			pfcand = cms.PSet(
                 src = cms.InputTag("particleFlow"),
                 leaves = cms.PSet(
                     vars = cms.vstring(
-			'particleId:particleId',
+						'pdgId:pdgId',
+						'particleId:particleId',
                         'pt:pt',
                         'pz:pz',
+						'px:px',
+						'py:py',
                         'eta:eta',
                         'phi:phi',
                         'theta:theta',
@@ -1054,27 +1057,45 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                         'charge:charge'
                      )
                 ),
-                selection = cms.string('particleId=3'),
+                selection = cms.string('pt>10'),
                 Class = cms.string('reco::PFCandidate')
             ),
 
-            pfcand_els = cms.PSet(
-                src = cms.InputTag("particleFlow"),
-                leaves = cms.PSet(
-                    vars = cms.vstring(
-                        'particleId:particleId',
-                        'pt:pt',
-                        'pz:pz',
-                        'eta:eta',
-                        'phi:phi',
-                        'theta:theta',
-                        'energy:energy',
-                        'charge:charge'
-                     )
-                ),
-                selection = cms.string('particleId=2'),
-                Class = cms.string('reco::PFCandidate')
-            ),
+           # pfcand_mus = cms.PSet(
+           #     src = cms.InputTag("particleFlow"),
+           #     leaves = cms.PSet(
+           #         vars = cms.vstring(
+			#			'particleId:particleId',
+           #             'pt:pt',
+           #             'pz:pz',
+           #             'eta:eta',
+           #             'phi:phi',
+           #             'theta:theta',
+           #             'energy:energy',
+           #             'charge:charge'
+           #          )
+           #     ),
+           #     selection = cms.string('particleId=3'),
+           #     Class = cms.string('reco::PFCandidate')
+           # ),
+
+           # pfcand_els = cms.PSet(
+           #     src = cms.InputTag("particleFlow"),
+          #      leaves = cms.PSet(
+           #         vars = cms.vstring(
+           #             'particleId:particleId',
+           #             'pt:pt',
+          #              'pz:pz',
+           #             'eta:eta',
+           #             'phi:phi',
+           #             'theta:theta',
+           #             'energy:energy',
+           #             'charge:charge'
+           #          )
+           #     ),
+          #      selection = cms.string('particleId=2'),
+          #      Class = cms.string('reco::PFCandidate')
+          #  ),
 
             pf_mus = cms.PSet(
                 src = cms.InputTag("selectedPatMuonsPF"),
