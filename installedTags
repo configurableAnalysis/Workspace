@@ -14,7 +14,7 @@ addpkg RecoBTag/SecondaryVertex    V01-06-02
 addpkg PhysicsTools/Configuration  V00-12-00
 cvs up -r 1.77 PhysicsTools/PatAlgos/python/tools/pfTools.py
 
-cvs co -r cfA_v57 -d Workspace UserCode/pbgeff/cmssw/Workspace
+cvs co -r cfA_v58 -d Workspace UserCode/pbgeff/cmssw/Workspace
 
 # for CSC halo filter (not yet updated for 2012)
 cvs co -r V00-00-08 RecoMET/METAnalyzers
