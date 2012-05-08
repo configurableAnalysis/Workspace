@@ -7,13 +7,9 @@
 #
 
 #switch between MC and data
-isMC = False
-#isMC = True
-
+isMC = True #False
 #switch between fastsim and fullsim/data
-isFastsim = False
-#isFastsim = True
-
+isFastsim = False #True
 cfAFile = "configurableAnalysis.root"
 
 
@@ -34,10 +30,10 @@ process.MessageLogger.cerr.PATSummaryTables = cms.untracked.PSet(
 #-- Source information ------------------------------------------------------
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-			'file:/home/wto/cmssw/CMSSW_5_2_3/src/Workspace/ConfigurableAnalysis/python/MuHad2012APromptReco-v1_190645_AOD.root',
+			'file:/LVM/SATA/wto/AOD/TTJets_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S7_START52_V5-v1_AODSIM/output_1_1_as1.root',
     )
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 #process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange(
 #  '190645:10-190645:110',
 #)
