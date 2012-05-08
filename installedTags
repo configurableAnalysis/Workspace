@@ -5,7 +5,7 @@ cmsenv
 addpkg DataFormats/PatCandidates   V06-05-01
 addpkg PhysicsTools/PatAlgos       V08-09-05
 addpkg CommonTools/ParticleFlow    V00-03-11
-addpkg PhysicsTools/Configuration  V00-12-00    
+addpkg PhysicsTools/Configuration  V00-12-01    
 
 cvs co -r cfA_v59 -d Workspace UserCode/pbgeff/cmssw/Workspace
 
