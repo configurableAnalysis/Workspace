@@ -113,7 +113,7 @@ process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
 process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
 process.load('RecoMET.METFilters.inconsistentMuonPFCandidateFilter_cfi')
 process.load('RecoMET.METFilters.greedyMuonPFCandidateFilter_cfi')
-#process.load('Sandbox.Skims.eeNoiseFilter_cfi')
+process.load('RecoMET.METFilters.eeNoiseFilter_cfi')
 process.load('MyAnalyzers.TriggerFilter.triggerFilter_cfi')
 
 process.scrapingVeto = cms.EDFilter("FilterOutScraping",
@@ -141,14 +141,8 @@ process.out.fileName = "SUSYPAT.root"
 process.out.splitLevel = cms.untracked.int32(99)  # Turn on split level (smaller files???)
 process.out.overrideInputFileSplitLevels = cms.untracked.bool(True)
 process.out.dropMetaData = cms.untracked.string('DROPPED')   # Get rid of metadata related to dropped collections
-#process.out.outputCommands = cms.untracked.vstring('drop *',"keep *_HBHENoiseFilterResultProducer_*_*","keep *_BFieldColl_*_*","keep *_JetCorrectionColl_*_*", *SUSY_pattuple_outputCommands )
 process.out.outputCommands = cms.untracked.vstring('keep *',"keep *_HBHENoiseFilterResultProducer_*_*","keep *_BFieldColl_*_*","keep *_JetCorrectionColl_*_*", *SUSY_pattuple_outputCommands )
 process.out.outputCommands.append('keep *_patPFMETsTypeIcorrected_*_PAT')
-#process.out.outputCommands.append('keep *_selectedPatJetsPFLOW_*_PAT')
-#process.out.outputCommands.append('keep *_selectedPatElectronsPFLOW_*_PAT')
-#process.out.outputCommands.append('keep *_selectedPatMuonsPFLOW_*_PAT')
-#process.out.outputCommands.append('keep *_patPFMETsTypeIcorrectedPFLOW_*_PAT')
-#process.out.outputCommands.append('keep *_patPFMETsTypeIpIIcorrectedPFLOW_*_PAT')
 
 #-- Execution path ------------------------------------------------------------
 # Full path
@@ -159,7 +153,7 @@ process.ecaltpfilter = cms.Path(process.EcalDeadCellTriggerPrimitiveFilter)
 process.scrapingveto = cms.Path(process.scrapingVeto)
 process.greedymuonfilter = cms.Path(process.greedyMuonPFCandidateFilter)
 process.inconsistentPFmuonfilter = cms.Path(process.inconsistentMuonPFCandidateFilter)
-#process.eenoisefilter = cms.Path(process.eeNoiseFilter)
+process.eenoisefilter = cms.Path(process.eeNoiseFilter)
 process.passprescalePFHT350filter = cms.Path( process.pfht350PassPrescaleFilter )
 if isFastsim:
         process.p = cms.Path(process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
@@ -172,10 +166,9 @@ process.p += process.patPFMETsTypeIcorrected
 #process.p += process.producePFMETCorrectionsPFLOW
 #process.p += process.patPFMETsTypeIcorrectedPFLOW
 
-#process.trackingfailturefilter = cms.Path(process.goodVerticesRA4*process.trackingFailureFilter)
 process.trackingfailturefilter = cms.Path(process.trackingFailureFilter)
 process.outpath = cms.EndPath(cms.ignore(process.configurableAnalysis))
-#process.outpath = cms.EndPath(process.out)
+#process.outpath = cms.EndPath(process.out) #Output the SUSYPAT.root file
 
 #-- Dump config ------------------------------------------------------------
 file = open('SusyPAT_cfg.py','w')
