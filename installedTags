@@ -7,7 +7,7 @@ addpkg PhysicsTools/PatAlgos       V08-09-05
 addpkg CommonTools/ParticleFlow    V00-03-11
 addpkg PhysicsTools/Configuration  V00-12-01    
 
-cvs co -r cfA_v59 -d Workspace UserCode/pbgeff/cmssw/Workspace
+cvs co -r cfA_v60 -d Workspace UserCode/pbgeff/cmssw/Workspace
 
 # for CSC halo filter (not yet updated for 2012)
 cvs co -r V00-00-08 RecoMET/METAnalyzers
@@ -15,8 +15,7 @@ cvs co -r V00-00-08 RecoMET/METAnalyzers
 #RA2b trigger prescale information
 cvs co -r V00-00-02 -d MyAnalyzers/TriggerFilter UserCode/Teo/MyAnalyzers/TriggerFilter
 
-# DataFormats/METReco not needed for release >=520
-#cvs co -r lhx_12JAN2012_v1 DataFormats/METReco
-cvs co -r lhx_10APR2012_v1 RecoMET/METFilters
+# DataFormats/METReco not needed for release >=525
+cvs co -r lhx_11MAY2012_v1 RecoMET/METFilters
 
 scram b -rj4
