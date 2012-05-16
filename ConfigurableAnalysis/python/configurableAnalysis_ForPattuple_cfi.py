@@ -474,7 +474,6 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                         'gen_mother_theta:genLepton.mother.theta',
                         'gen_mother_et:genLepton.mother.et',                       
                         'tkHits:track.hitPattern.numberOfValidHits', 
-                        'numberOfMatchedStations:numberOfMatchedStations',
                         'cIso:caloIso', 
                         'tIso:trackIso',
                         'ecalIso:ecalIso',
@@ -609,7 +608,7 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                         'id_TMOneStationTight:isGood("TMOneStationTight")',
                         'id_TMLastStationOptimizedLowPtLoose:isGood("TMLastStationOptimizedLowPtLoose")',
                         'id_TMLastStationOptimizedLowPtTight:isGood("TMLastStationOptimizedLowPtTight")',
-												'tk_LayersWithMeasurement:track.hitPattern.trackerLayersWithMeasurement',
+						'tk_LayersWithMeasurement:track.hitPattern.trackerLayersWithMeasurement',
                        'tk_PixelLayersWithMeasurement:track.hitPattern.pixelLayersWithMeasurement',
                        'tk_ValidStripLayersWithMonoAndStereoHit:track.hitPattern.numberOfValidStripLayersWithMonoAndStereo',
                        'tk_LayersWithoutMeasurement:track.hitPattern.trackerLayersWithoutMeasurement',
@@ -680,7 +679,10 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                        'tpfms_ptErr:tpfmsMuon.ptError',
                        'tpfms_etaErr:tpfmsMuon.etaError',
                        'tpfms_phiErr:tpfmsMuon.phiError',
-                       'tpfms_numvalPixelhits:tpfmsMuon.hitPattern.numberOfValidPixelHits',   
+                       'tpfms_numvalPixelhits:tpfmsMuon.hitPattern.numberOfValidPixelHits',
+					   'dB:dB',
+						'numberOfMatchedStations:numberOfMatchedStations',
+						'isPFMuon:isPFMuon'
 												                                                                                                                                      )
                 ),
                 Class = cms.string('pat::Muon')
@@ -1342,8 +1344,11 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                         'pfIsolationR04_sumPhotonEt:pfIsolationR04.sumPhotonEt',
                         'pfIsolationR04_sumPhotonEtHighThreshold:pfIsolationR04.sumPhotonEtHighThreshold',
                         'pfIsolationR04_sumPUPt:pfIsolationR04.sumPUPt',
+					    'dB:dB',
+						'numberOfMatchedStations:numberOfMatchedStations',
+						'isPFMuon:isPFMuon'
                          
-									)
+					)
                 ),
                 Class = cms.string('pat::Muon')
             ),
