@@ -21,10 +21,17 @@
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/HcalRecHit/interface/HBHERecHit.h"
 
+#include "DataFormats/RecoCandidate/interface/IsoDeposit.h"
+#include "DataFormats/Common/interface/ValueMap.h"
+#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
+
 using namespace std;
 
 class AdHocNTupler : public NTupler {
  public:
+
+  typedef std::vector< edm::Handle< edm::ValueMap<double> > > IsoDepositVals;
+
   AdHocNTupler (const edm::ParameterSet& iConfig){
     edm::ParameterSet adHocPSet = iConfig.getParameter<edm::ParameterSet>("AdHocNPSet");
 
@@ -76,6 +83,14 @@ class AdHocNTupler : public NTupler {
     L1trigger_decision_nomask = new std::vector<float>;
     els_conversion_dist = new std::vector<float>;
     els_conversion_dcot = new std::vector<float>;
+    els_PFchargedHadronIsoR03 = new std::vector<float>;
+    els_PFphotonIsoR03 = new std::vector<float>;
+    els_PFneutralHadronIsoR03 = new std::vector<float>;
+    els_hasMatchedConversion = new std::vector<bool>;
+    pf_els_PFchargedHadronIsoR03 = new std::vector<float>;
+    pf_els_PFphotonIsoR03 = new std::vector<float>;
+    pf_els_PFneutralHadronIsoR03 = new std::vector<float>;
+    pf_els_hasMatchedConversion = new std::vector<bool>;
     hbhefilter_decision_ = new int;
     cschalofilter_decision_ = new int;
     ecalTPfilter_decision_ = new int;
@@ -141,6 +156,14 @@ class AdHocNTupler : public NTupler {
     delete L1trigger_decision_nomask;
     delete els_conversion_dist;
     delete els_conversion_dcot;
+    delete els_PFchargedHadronIsoR03;
+    delete els_PFphotonIsoR03;
+    delete els_PFneutralHadronIsoR03;
+    delete els_hasMatchedConversion;
+    delete pf_els_PFchargedHadronIsoR03;
+    delete pf_els_PFphotonIsoR03;
+    delete pf_els_PFneutralHadronIsoR03;
+    delete pf_els_hasMatchedConversion;
     delete hbhefilter_decision_;
     delete cschalofilter_decision_;
     delete ecalTPfilter_decision_;
@@ -226,6 +249,14 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("L1trigger_decision_nomask",&L1trigger_decision_nomask);
       tree_->Branch("els_conversion_dist",&els_conversion_dist);
       tree_->Branch("els_conversion_dcot",&els_conversion_dcot);
+      tree_->Branch("els_PFchargedHadronIsoR03",&els_PFchargedHadronIsoR03);
+      tree_->Branch("els_PFphotonIsoR03",&els_PFphotonIsoR03);
+      tree_->Branch("els_PFneutralHadronIsoR03",&els_PFneutralHadronIsoR03);
+      tree_->Branch("els_hasMatchedConversion",&els_hasMatchedConversion);
+      tree_->Branch("pf_els_PFchargedHadronIsoR03",&pf_els_PFchargedHadronIsoR03);
+      tree_->Branch("pf_els_PFphotonIsoR03",&pf_els_PFphotonIsoR03);
+      tree_->Branch("pf_els_PFneutralHadronIsoR03",&pf_els_PFneutralHadronIsoR03);
+      tree_->Branch("pf_els_hasMatchedConversion",&pf_els_hasMatchedConversion);
       tree_->Branch("hbhefilter_decision",hbhefilter_decision_,"hbhefilter_decision/I");
       tree_->Branch("trackingfailurefilter_decision",trackingfailurefilter_decision_,"trackingfailurefilter_decision/I");
 			tree_->Branch("cschalofilter_decision",cschalofilter_decision_,"cschalofilter_decision/I");
@@ -469,8 +500,18 @@ class AdHocNTupler : public NTupler {
     edm::Handle< std::vector<pat::Electron> > electrons;
     iEvent.getByLabel("cleanPatElectrons",electrons);
 
+    edm::Handle< std::vector<pat::Electron> > PFelectrons;
+    iEvent.getByLabel("selectedPatElectronsPF",PFelectrons);
+
     edm::Handle<reco::TrackCollection> tracks_h;
     iEvent.getByLabel("generalTracks", tracks_h);
+
+    edm::Handle<reco::BeamSpot> bsHandle;
+    iEvent.getByLabel("offlineBeamSpot", bsHandle);
+    const reco::BeamSpot &beamspot = *bsHandle.product();
+
+    edm::Handle<reco::ConversionCollection> hConversions;
+    iEvent.getByLabel("allConversions", hConversions);
 
     edm::Handle<DcsStatusCollection> dcsHandle;
     iEvent.getByLabel("scalersRawToDigi", dcsHandle);
@@ -511,12 +552,17 @@ class AdHocNTupler : public NTupler {
         //iSetup.get<IdealMagneticFieldRecord>().get(magneticField);        
         //evt_bField = magneticField->inTesla(GlobalPoint(0.,0.,0.)).z();
        
-       //****Temporary solution*******
-       //Must fix before running on MC
-      //       evt_bField = 3.8;
       evt_bField = (*bfield_)[0];
 
     }
+
+
+    //electron PFiso variables
+    IsoDepositVals electronIsoValPFId(3);
+    const IsoDepositVals * electronIsoVals = &electronIsoValPFId;
+    iEvent.getByLabel("elPFIsoValueCharged03PFIdPFIso", electronIsoValPFId[0]);
+    iEvent.getByLabel("elPFIsoValueGamma03PFIdPFIso", electronIsoValPFId[1]);
+    iEvent.getByLabel("elPFIsoValueNeutral03PFIdPFIso", electronIsoValPFId[2]);
 
 
     for(std::vector<pat::Electron>::const_iterator elec=electrons->begin(); elec!=electrons->end(); ++elec) {
@@ -538,6 +584,44 @@ class AdHocNTupler : public NTupler {
         (*els_conversion_dcot).push_back(convInfo.dcot());
         //double convradius = convInfo.radiusOfConversion();
         //math::XYZPoint convPoint = convInfo.pointOfConversion();
+
+	bool hasMatchedConversion = ConversionTools::hasMatchedConversion(*el,hConversions,beamspot.position());
+	(*els_hasMatchedConversion).push_back(hasMatchedConversion);
+
+	//get PF isolation
+        edm::Ptr< reco::GsfElectron > gsfel = (edm::Ptr< reco::GsfElectron >) elec->originalObjectRef();
+        double charged =  (*(*electronIsoVals)[0])[gsfel];
+        double photon = (*(*electronIsoVals)[1])[gsfel];
+        double neutral = (*(*electronIsoVals)[2])[gsfel];
+        //cout<<charged<<" "<<photon<<" "<<neutral<<endl;
+        (*els_PFchargedHadronIsoR03).push_back(charged);
+        (*els_PFphotonIsoR03).push_back(photon);
+        (*els_PFneutralHadronIsoR03).push_back(neutral);
+
+    }
+
+
+    //get PFelectron variables
+    for(std::vector<pat::Electron>::const_iterator elec=PFelectrons->begin(); elec!=PFelectrons->end(); ++elec) {
+
+        //Get Gsf electron
+        reco::GsfElectron* el = (reco::GsfElectron*) elec->originalObject();
+        if(el == NULL) {
+        throw cms::Exception("GsfElectron")<<"No GsfElectron matched to pat::Electron.\n";
+        }
+
+        bool hasMatchedConversion = ConversionTools::hasMatchedConversion(*el,hConversions,beamspot.position());
+        (*pf_els_hasMatchedConversion).push_back(hasMatchedConversion);
+
+        //get PF isolation
+        edm::Ptr< reco::GsfElectron > gsfel = (edm::Ptr< reco::GsfElectron >) elec->originalObjectRef();
+        double charged =  (*(*electronIsoVals)[0])[gsfel];
+        double photon = (*(*electronIsoVals)[1])[gsfel];
+        double neutral = (*(*electronIsoVals)[2])[gsfel];
+        (*pf_els_PFchargedHadronIsoR03).push_back(charged);
+        (*pf_els_PFphotonIsoR03).push_back(photon);
+        (*pf_els_PFneutralHadronIsoR03).push_back(neutral);
+
     }
 
 
@@ -636,6 +720,14 @@ class AdHocNTupler : public NTupler {
     (*L1trigger_decision_nomask).clear();
     (*els_conversion_dist).clear();
     (*els_conversion_dcot).clear();
+    (*els_PFchargedHadronIsoR03).clear();
+    (*els_PFphotonIsoR03).clear();
+    (*els_PFneutralHadronIsoR03).clear();
+    (*els_hasMatchedConversion).clear();
+    (*pf_els_PFchargedHadronIsoR03).clear();
+    (*pf_els_PFphotonIsoR03).clear();
+    (*pf_els_PFneutralHadronIsoR03).clear();
+    (*pf_els_hasMatchedConversion).clear();
     (*jets_AK5PFclean_corrL2L3_).clear();
     (*jets_AK5PFclean_corrL2L3Residual_).clear();
     (*jets_AK5PFclean_corrL1FastL2L3_).clear();
@@ -698,6 +790,14 @@ class AdHocNTupler : public NTupler {
   std::vector<float> * L1trigger_decision_nomask;
   std::vector<float> * els_conversion_dist;
   std::vector<float> * els_conversion_dcot;
+  std::vector<float> * els_PFchargedHadronIsoR03;
+  std::vector<float> * els_PFphotonIsoR03;
+  std::vector<float> * els_PFneutralHadronIsoR03;
+  std::vector<bool> * els_hasMatchedConversion;
+  std::vector<float> * pf_els_PFchargedHadronIsoR03;
+  std::vector<float> * pf_els_PFphotonIsoR03;
+  std::vector<float> * pf_els_PFneutralHadronIsoR03;
+  std::vector<bool> * pf_els_hasMatchedConversion;
   int * hbhefilter_decision_;
   int * cschalofilter_decision_;
   int * ecalTPfilter_decision_;
