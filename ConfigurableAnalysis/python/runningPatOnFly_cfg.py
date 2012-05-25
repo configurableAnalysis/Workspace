@@ -7,15 +7,28 @@
 #
 
 #switch between MC and data
-isMC = True #False
 #switch between fastsim and fullsim/data
-isFastsim = False #True
-cfAFile = "configurableAnalysis.root"
-
 
 import FWCore.ParameterSet.Config as cms
+from FWCore.ParameterSet.VarParsing import VarParsing
 
 process = cms.Process("PAT")
+options = VarParsing ('standard')
+options.register ('isMC','',
+				  VarParsing.multiplicity.singleton,
+				  VarParsing.varType.bool,
+				  "Switch between MC and Data")
+options.register ('isFastSim','',
+				  VarParsing.multiplicity.singleton,
+				  VarParsing.varType.bool,
+				  "Switch between Full and FastSim")
+
+options.isFastSim = False
+options.isMC = True
+options.output='configurableAnalysis.root'
+options.files='file:/LVM/SATA/wto/AOD/TTJets_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S7_START52_V5-v1_AODSIM/output_1_1_as1.root'
+#options.maxEvents=10
+options.parseArguments()
 
 #-- Message Logger ------------------------------------------------------------
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
@@ -29,11 +42,9 @@ process.MessageLogger.cerr.PATSummaryTables = cms.untracked.PSet(
 
 #-- Source information ------------------------------------------------------
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(
-			'file:/LVM/SATA/wto/AOD/TTJets_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S7_START52_V5-v1_AODSIM/output_1_1_as1.root',
-    )
+    fileNames = cms.untracked.vstring(options.files)
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 #process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange(
 #  '190645:10-190645:110',
 #)
@@ -66,7 +77,7 @@ process.out = cms.OutputModule("PoolOutputModule",
 #-- SUSYPAT and GlobalTag Settings -----------------------------------------------------------
 from PhysicsTools.Configuration.SUSY_pattuple_cff import addDefaultSUSYPAT, getSUSY_pattuple_outputCommands
 
-if isMC:
+if options.isMC:
 	process.GlobalTag.globaltag = 'START52_V9::All' # MC Setting
 	addDefaultSUSYPAT(process,True,'HLT',['L1FastJet','L2Relative','L3Absolute'],'',['AK5PF'])
 else:
@@ -83,7 +94,7 @@ SUSY_pattuple_outputCommands = getSUSY_pattuple_outputCommands( process )
 process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
 
 # NOTE: use "ak5PFL1FastL2L3" for MC / "ak5PFL1FastL2L3Residual" for Data
-if isMC:
+if options.isMC:
 	process.pfJetMETcorr.jetCorrLabel = "ak5PFL1FastL2L3"
 else:
 	process.pfJetMETcorr.jetCorrLabel = "ak5PFL1FastL2L3Residual"
@@ -106,7 +117,7 @@ from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
 switchOnTrigger(process, triggerProducer='patTrigger', triggerEventProducer='patTriggerEvent', sequence='patDefaultSequence', hltProcess="HLT")
 
 process.load("Workspace.ConfigurableAnalysis.configurableAnalysis_ForPattuple_cff")
-process.TFileService.fileName = cms.string(cfAFile)
+process.TFileService.fileName = cms.string(options.output)
 process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
 process.load('RecoMET.METAnalyzers.CSCHaloFilter_cfi')
 process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
@@ -155,7 +166,7 @@ process.greedymuonfilter = cms.Path(process.greedyMuonPFCandidateFilter)
 process.inconsistentPFmuonfilter = cms.Path(process.inconsistentMuonPFCandidateFilter)
 process.eenoisefilter = cms.Path(process.eeNoiseFilter)
 process.passprescalePFHT350filter = cms.Path( process.pfht350PassPrescaleFilter )
-if isFastsim:
+if options.isFastSim:
         process.p = cms.Path(process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
 else:
 	process.csctighthalofilter = cms.Path(process.CSCTightHaloFilter)
@@ -171,6 +182,6 @@ process.outpath = cms.EndPath(cms.ignore(process.configurableAnalysis))
 #process.outpath = cms.EndPath(process.out) #Output the SUSYPAT.root file
 
 #-- Dump config ------------------------------------------------------------
-file = open('SusyPAT_cfg.py','w')
-file.write(str(process.dumpPython()))
-file.close()
+#file = open('SusyPAT_cfg.py','w')
+#file.write(str(process.dumpPython()))
+#file.close()
