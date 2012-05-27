@@ -146,6 +146,10 @@ process.EcalDeadCellBoundaryEnergyFilter.limitDeadCellToChannelStatusEB = cms.vi
 process.EcalDeadCellBoundaryEnergyFilter.limitDeadCellToChannelStatusEE = cms.vint32(12,14)
 # End of Boundary Energy filter configuration 
 
+#compute rho for 2011 effective area Egamma isolation corrections
+from RecoJets.JetProducers.kt4PFJets_cfi import *
+process.kt6PFJetsForIsolation = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+process.kt6PFJetsForIsolation.Rho_EtaMax = cms.double(2.5)
 
 #-- Output module configuration -----------------------------------------------
 process.out.fileName = "SUSYPAT.root" 
@@ -171,6 +175,7 @@ if options.isFastSim:
 else:
 	process.csctighthalofilter = cms.Path(process.CSCTightHaloFilter)
         process.p = cms.Path(process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
+process.p += process.kt6PFJetsForIsolation
 #process.p += process.patPF2PATSequencePFLOW
 process.p += process.producePFMETCorrections
 process.p += process.patPFMETsTypeIcorrected

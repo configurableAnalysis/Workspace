@@ -121,7 +121,10 @@ class AdHocNTupler : public NTupler {
     PU_ntrks_highpT_ = new std::vector<std::vector<int> >;
     PU_NumInteractions_ = new std::vector<int>;
     PU_bunchCrossing_ = new std::vector<int>;
-	PU_TrueNumInteractions_ = new std::vector<int>;
+    PU_TrueNumInteractions_ = new std::vector<int>;
+    rho_kt6PFJetsForIsolation_ = new float;
+    rho_kt6PFJetsCentral_ = new float;
+
   }
 
   ~AdHocNTupler(){
@@ -194,7 +197,10 @@ class AdHocNTupler : public NTupler {
     delete PU_ntrks_highpT_;
     delete PU_NumInteractions_;
     delete PU_bunchCrossing_;
-	delete PU_TrueNumInteractions_;
+    delete PU_TrueNumInteractions_;
+    delete rho_kt6PFJetsForIsolation_;
+    delete rho_kt6PFJetsCentral_;
+
   }
 
   uint registerleaves(edm::ProducerBase * producer){
@@ -287,7 +293,10 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("PU_ntrks_highpT",&PU_ntrks_highpT_);
       tree_->Branch("PU_NumInteractions",&PU_NumInteractions_);
       tree_->Branch("PU_bunchCrossing",&PU_bunchCrossing_);
-	  tree_->Branch("PU_TrueNumInteractions",&PU_TrueNumInteractions_);
+      tree_->Branch("PU_TrueNumInteractions",&PU_TrueNumInteractions_);
+      tree_->Branch("rho_kt6PFJetsForIsolation",rho_kt6PFJetsForIsolation_,"rho_kt6PFJetsForIsolation/F");
+      tree_->Branch("rho_kt6PFJetsCentral",rho_kt6PFJetsCentral_,"rho_kt6PFJetsCentral/F");
+
     }
 
     else{
@@ -678,7 +687,7 @@ class AdHocNTupler : public NTupler {
   //    std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() <<"   "<< iEvent.id().event() << std::endl;
       (*PU_NumInteractions_).push_back(PVI->getPU_NumInteractions());
       (*PU_bunchCrossing_).push_back(PVI->getBunchCrossing());
-	  (*PU_TrueNumInteractions_).push_back(PVI->getTrueNumInteractions());
+      (*PU_TrueNumInteractions_).push_back(PVI->getTrueNumInteractions());
       (*PU_zpositions_).push_back(PVI->getPU_zpositions());
       (*PU_sumpT_lowpT_).push_back(PVI->getPU_sumpT_lowpT());
       (*PU_sumpT_highpT_).push_back(PVI->getPU_sumpT_highpT());
@@ -687,7 +696,20 @@ class AdHocNTupler : public NTupler {
     }
   }
 
-    //fill the tree    
+
+    edm::Handle< double > rho_;
+    // Might have to update rho_kt6PFJetsCentral_ to correct value
+    *rho_kt6PFJetsCentral_ = 0;
+    iEvent.getByLabel("kt6PFJetsCentralNeutral","rho", rho_);
+    *rho_kt6PFJetsCentral_ += (*rho_);
+    iEvent.getByLabel("kt6PFJetsCentralChargedPileUp","rho", rho_);
+    *rho_kt6PFJetsCentral_ += (*rho_);
+
+    iEvent.getByLabel("kt6PFJetsForIsolation","rho", rho_);
+    *rho_kt6PFJetsForIsolation_ = (*rho_);
+
+
+	    //fill the tree    
     if (ownTheTree_){ tree_->Fill(); }
     (*trigger_prescalevalue).clear();
     (*trigger_name).clear();
@@ -747,7 +769,8 @@ class AdHocNTupler : public NTupler {
     (*PU_ntrks_highpT_).clear();
     (*PU_NumInteractions_).clear();
     (*PU_bunchCrossing_).clear();
-	(*PU_TrueNumInteractions_).clear();
+    (*PU_TrueNumInteractions_).clear();
+
   }
 
   void callBack(){
@@ -829,4 +852,6 @@ class AdHocNTupler : public NTupler {
   std::vector<int> * PU_NumInteractions_;
   std::vector<int> * PU_bunchCrossing_;
   std::vector<int> * PU_TrueNumInteractions_;
+  float * rho_kt6PFJetsCentral_;
+  float * rho_kt6PFJetsForIsolation_;
 };
