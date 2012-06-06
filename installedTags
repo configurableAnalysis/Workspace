@@ -3,9 +3,9 @@ cmsrel CMSSW_5_2_5
 cd CMSSW_5_2_5/src/
 cmsenv
 addpkg DataFormats/PatCandidates   V06-05-01
-addpkg PhysicsTools/PatAlgos       V08-09-05
+addpkg PhysicsTools/PatAlgos       V08-09-06
 addpkg CommonTools/ParticleFlow    V00-03-11
-addpkg PhysicsTools/Configuration  V00-12-01    
+addpkg PhysicsTools/Configuration  V00-12-02   
 
 cvs co -r cfA_v60 -d Workspace UserCode/pbgeff/cmssw/Workspace
 
@@ -16,6 +16,6 @@ cvs co -r V00-00-08 RecoMET/METAnalyzers
 cvs co -r V00-00-02 -d MyAnalyzers/TriggerFilter UserCode/Teo/MyAnalyzers/TriggerFilter
 
 # DataFormats/METReco not needed for release >=525
-cvs co -r lhx_11MAY2012_v1 RecoMET/METFilters
+cvs co -r V00-00-07 RecoMET/METFilters
 
 scram b -rj4

@@ -99,7 +99,9 @@ class AdHocNTupler : public NTupler {
     trackingfailurefilter_decision_ = new int;
     greedymuonfilter_decision_ = new int;
     inconsistentPFmuonfilter_decision_ = new int;
+    hcallaserfilter_decision_ = new int;
     eenoisefilter_decision_ = new int;
+    eebadscfilter_decision_ = new int;
     passprescalePFHT350filter_decision_ = new int;
     MPT_ = new float;
     jets_AK5PFclean_corrL2L3_ = new std::vector<float>; 
@@ -175,7 +177,9 @@ class AdHocNTupler : public NTupler {
     delete trackingfailurefilter_decision_;
     delete greedymuonfilter_decision_;
     delete inconsistentPFmuonfilter_decision_;
+    delete hcallaserfilter_decision_;
     delete eenoisefilter_decision_;
+    delete eebadscfilter_decision_;
     delete passprescalePFHT350filter_decision_;
     delete MPT_;
     delete jets_AK5PFclean_corrL2L3_;
@@ -271,7 +275,9 @@ class AdHocNTupler : public NTupler {
 			tree_->Branch("scrapingVeto_decision",scrapingVeto_decision_,"scrapingVeto_decision/I");
       tree_->Branch("greedymuonfilter_decision",greedymuonfilter_decision_,"greedymuonfilter_decision/I");
       tree_->Branch("inconsistentPFmuonfilter_decision",inconsistentPFmuonfilter_decision_,"inconsistentPFmuonfilter_decision/I");
+      tree_->Branch("hcallaserfilter_decision",hcallaserfilter_decision_,"hcallaserfilter_decision/I");
       tree_->Branch("eenoisefilter_decision",eenoisefilter_decision_,"eenoisefilter_decision/I");
+      tree_->Branch("eebadscfilter_decision",eebadscfilter_decision_,"eebadscfilter_decision/I");
       tree_->Branch("passprescalePFHT350filter_decision",passprescalePFHT350filter_decision_,"passprescalePFHT350filter_decision/I");
       tree_->Branch("MPT",MPT_,"MPT/F");
       tree_->Branch("jets_AK5PFclean_corrL2L3",&jets_AK5PFclean_corrL2L3_);
@@ -328,7 +334,7 @@ class AdHocNTupler : public NTupler {
 		// get hold of trigger names - based on TriggerResults object!
 		const edm::TriggerNames & triggerNames_ = iEvent.triggerNames(*hltresults);
 		int cschalofilterResult =1, trackingfailturefilterResult=1, ecaltpfilterResult=1, ecalbefilterResult=1, scrapingVetoResult=1;
-		int greedymuonfilterResult=1, inconsistentPFmuonfilterResult=1, eenoisefilterResult=1, passprescalePFHT350filterResult=1;
+		int greedymuonfilterResult=1, inconsistentPFmuonfilterResult=1, hcallaserfilterResult=1,  eenoisefilterResult=1, eebadscfilterResult=1, passprescalePFHT350filterResult=1;
 		for (int itrig=0; itrig< ntrigs; itrig++) {
  			std::string trigName = triggerNames_.triggerName(itrig);
   		int hltflag = (*hltresults)[itrig].accept();
@@ -339,7 +345,9 @@ class AdHocNTupler : public NTupler {
 	 		if (trigName=="scrapingveto") scrapingVetoResult = hltflag;
 			if (trigName=="greedymuonfilter") greedymuonfilterResult = hltflag;
                         if (trigName=="inconsistentPFmuonfilter") inconsistentPFmuonfilterResult = hltflag;
+                        if (trigName=="hcallaserfilter") hcallaserfilterResult = hltflag;
                         if (trigName=="eenoisefilter") eenoisefilterResult = hltflag;
+                        if (trigName=="eebadscfilter") eebadscfilterResult = hltflag;
                         if (trigName=="passprescalePFHT350filter") passprescalePFHT350filterResult = hltflag;
 	 	}
 		
@@ -350,7 +358,9 @@ class AdHocNTupler : public NTupler {
     *scrapingVeto_decision_ = scrapingVetoResult;
     *greedymuonfilter_decision_ = greedymuonfilterResult;
     *inconsistentPFmuonfilter_decision_ = inconsistentPFmuonfilterResult;
+    *hcallaserfilter_decision_ = hcallaserfilterResult;
     *eenoisefilter_decision_ = eenoisefilterResult;
+    *eebadscfilter_decision_ = eebadscfilterResult;
     *passprescalePFHT350filter_decision_ = passprescalePFHT350filterResult;	
 
 	
@@ -829,7 +839,9 @@ class AdHocNTupler : public NTupler {
   int * trackingfailurefilter_decision_;
   int * greedymuonfilter_decision_;
   int * inconsistentPFmuonfilter_decision_;
+  int * hcallaserfilter_decision_;
   int * eenoisefilter_decision_;
+  int * eebadscfilter_decision_;
   int * passprescalePFHT350filter_decision_;
   float * MPT_;
   std::vector<float> * jets_AK5PFclean_corrL2L3_;

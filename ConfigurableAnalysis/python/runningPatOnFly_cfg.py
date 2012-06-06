@@ -146,6 +146,13 @@ process.EcalDeadCellBoundaryEnergyFilter.limitDeadCellToChannelStatusEB = cms.vi
 process.EcalDeadCellBoundaryEnergyFilter.limitDeadCellToChannelStatusEE = cms.vint32(12,14)
 # End of Boundary Energy filter configuration 
 
+## The HCAL laser filter _____________________________________________________||
+process.load("RecoMET.METFilters.hcalLaserEventFilter_cfi")
+process.hcalLaserEventFilter.vetoByRunEventNumber=cms.untracked.bool(False)
+process.hcalLaserEventFilter.vetoByHBHEOccupancy=cms.untracked.bool(True)
+
+## The EE bad SuperCrystal filter ____________________________________________||
+process.load('RecoMET.METFilters.eeBadScFilter_cfi')
 #compute rho for 2011 effective area Egamma isolation corrections
 from RecoJets.JetProducers.kt4PFJets_cfi import *
 process.kt6PFJetsForIsolation = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
@@ -162,6 +169,8 @@ process.out.outputCommands.append('keep *_patPFMETsTypeIcorrected_*_PAT')
 #-- Execution path ------------------------------------------------------------
 # Full path
 #This is to run on full sim or data
+process.hcallaserfilter = cms.Path(process.hcalLaserEventFilter)
+process.eebadscfilter = cms.Path(process.eeBadScFilter)
 process.ecaltpfilter = cms.Path(process.EcalDeadCellTriggerPrimitiveFilter)
 #Run both TP and BE filters; doesn't work right now
 #process.ecaltpfilter = cms.Path(process.EcalDeadCellTriggerPrimitiveFilter*process.EcalDeadCellBoundaryEnergyFilter)
