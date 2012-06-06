@@ -25,6 +25,8 @@
 #include "DataFormats/Common/interface/ValueMap.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+
 using namespace std;
 
 class AdHocNTupler : public NTupler {
@@ -104,6 +106,7 @@ class AdHocNTupler : public NTupler {
     eebadscfilter_decision_ = new int;
     passprescalePFHT350filter_decision_ = new int;
     MPT_ = new float;
+    genHT_ = new float;
     jets_AK5PFclean_corrL2L3_ = new std::vector<float>; 
     jets_AK5PFclean_corrL2L3Residual_ = new std::vector<float>;
     jets_AK5PFclean_corrL1FastL2L3_ = new std::vector<float>;
@@ -182,6 +185,7 @@ class AdHocNTupler : public NTupler {
     delete eebadscfilter_decision_;
     delete passprescalePFHT350filter_decision_;
     delete MPT_;
+    delete genHT_;
     delete jets_AK5PFclean_corrL2L3_;
     delete jets_AK5PFclean_corrL2L3Residual_;
     delete jets_AK5PFclean_corrL1FastL2L3_;
@@ -280,6 +284,7 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("eebadscfilter_decision",eebadscfilter_decision_,"eebadscfilter_decision/I");
       tree_->Branch("passprescalePFHT350filter_decision",passprescalePFHT350filter_decision_,"passprescalePFHT350filter_decision/I");
       tree_->Branch("MPT",MPT_,"MPT/F");
+      tree_->Branch("genHT",genHT_,"genHT/F");
       tree_->Branch("jets_AK5PFclean_corrL2L3",&jets_AK5PFclean_corrL2L3_);
       tree_->Branch("jets_AK5PFclean_corrL2L3Residual",&jets_AK5PFclean_corrL2L3Residual_);
       tree_->Branch("jets_AK5PFclean_corrL1FastL2L3",&jets_AK5PFclean_corrL1FastL2L3_);
@@ -719,6 +724,26 @@ class AdHocNTupler : public NTupler {
     *rho_kt6PFJetsForIsolation_ = (*rho_);
 
 
+   edm::Handle<LHEEventProduct> product;
+   iEvent.getByLabel("source", product);
+
+   const lhef::HEPEUP hepeup_ = product->hepeup();
+   const std::vector<lhef::HEPEUP::FiveVector> pup_ = hepeup_.PUP;
+
+   double htEvent = 0.0;
+   size_t iMax = hepeup_.NUP;
+   for(size_t i = 2; i < iMax; ++i) {
+      if( hepeup_.ISTUP[i] != 1 ) continue;
+      int idabs = abs( hepeup_.IDUP[i] );
+      if( idabs != 21 && (idabs<1 || idabs>6) ) continue;
+      double ptPart = sqrt( pow(hepeup_.PUP[i][0],2) + pow(hepeup_.PUP[i][1],2) );
+      std::cout << ptPart << std::endl;
+      htEvent += ptPart;
+   }
+   std::cout <<"Total: " << htEvent << std::endl;
+   *genHT_ = htEvent;
+
+
 	    //fill the tree    
     if (ownTheTree_){ tree_->Fill(); }
     (*trigger_prescalevalue).clear();
@@ -844,6 +869,7 @@ class AdHocNTupler : public NTupler {
   int * eebadscfilter_decision_;
   int * passprescalePFHT350filter_decision_;
   float * MPT_;
+  float * genHT_;
   std::vector<float> * jets_AK5PFclean_corrL2L3_;
   std::vector<float> * jets_AK5PFclean_corrL2L3Residual_;
   std::vector<float> * jets_AK5PFclean_corrL1FastL2L3_;
