@@ -26,7 +26,7 @@ options.register ('isFastSim','',
 options.isFastSim = False
 options.isMC = True
 options.output='configurableAnalysis.root'
-options.files='file:/LVM/SATA/wto/AOD/TTJets_TuneZ2star_8TeV-madgraph-tauola_Summer12-PU_S7_START52_V5-v1_AODSIM/output_1_1_as1.root'
+options.files='file:/LVM/SATA/wto/AOD/TTJets8TeVSummer12-PU_S7_START52_V5/output_1_1_as1.root'
 #options.maxEvents=10
 options.parseArguments()
 
@@ -153,10 +153,16 @@ process.hcalLaserEventFilter.vetoByHBHEOccupancy=cms.untracked.bool(True)
 
 ## The EE bad SuperCrystal filter ____________________________________________||
 process.load('RecoMET.METFilters.eeBadScFilter_cfi')
+
 #compute rho for 2011 effective area Egamma isolation corrections
 from RecoJets.JetProducers.kt4PFJets_cfi import *
-process.kt6PFJetsForIsolation = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
-process.kt6PFJetsForIsolation.Rho_EtaMax = cms.double(2.5)
+process.kt6PFJetsForIsolation2011 = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+process.kt6PFJetsForIsolation2011.Rho_EtaMax = cms.double(2.5)
+#compute rho for 2012 effective area Egamma isolation corrections
+process.kt6PFJetsForIsolation2012 = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+process.kt6PFJetsForIsolation2012.Rho_EtaMax = cms.double(4.4)
+process.kt6PFJetsForIsolation2012.voronoiRfact = cms.double(0.9)
+
 
 #-- Output module configuration -----------------------------------------------
 process.out.fileName = "SUSYPAT.root" 
@@ -184,7 +190,8 @@ if options.isFastSim:
 else:
 	process.csctighthalofilter = cms.Path(process.CSCTightHaloFilter)
         process.p = cms.Path(process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
-process.p += process.kt6PFJetsForIsolation
+process.p += process.kt6PFJetsForIsolation2011
+process.p += process.kt6PFJetsForIsolation2012
 #process.p += process.patPF2PATSequencePFLOW
 process.p += process.producePFMETCorrections
 process.p += process.patPFMETsTypeIcorrected
@@ -196,6 +203,6 @@ process.outpath = cms.EndPath(cms.ignore(process.configurableAnalysis))
 #process.outpath = cms.EndPath(process.out) #Output the SUSYPAT.root file
 
 #-- Dump config ------------------------------------------------------------
-#file = open('SusyPAT_cfg.py','w')
-#file.write(str(process.dumpPython()))
-#file.close()
+file = open('SusyPAT_cfg.py','w')
+file.write(str(process.dumpPython()))
+file.close()
