@@ -78,10 +78,10 @@ process.out = cms.OutputModule("PoolOutputModule",
 from PhysicsTools.Configuration.SUSY_pattuple_cff import addDefaultSUSYPAT, getSUSY_pattuple_outputCommands
 
 if options.isMC:
-	process.GlobalTag.globaltag = 'START52_V9::All' # MC Setting
+	process.GlobalTag.globaltag = 'START52_V9B::All' # MC Setting
 	addDefaultSUSYPAT(process,True,'HLT',['L1FastJet','L2Relative','L3Absolute'],'',['AK5PF'])
 else:
-	process.GlobalTag.globaltag = 'GR_R_52_V7::All'   # Data Setting
+	process.GlobalTag.globaltag = 'GR_R_52_V9::All'   # Data Setting
 	addDefaultSUSYPAT(process,False,'HLT',['L1FastJet','L2Relative','L3Absolute','L2L3Residual'],'',['AK5PF'])
 	#process.metJESCorAK5PFTypeI.corrector = cms.string('ak5PFL2L3Residual') # Type1PFMET Residual for data only.
 
@@ -107,9 +107,6 @@ process.patPFMETs = process.patMETs.clone(
     )
 process.patPFMETsTypeIcorrected = process.patPFMETs.clone(
     metSource = cms.InputTag('pfType1CorrectedMet')
-    )
-process.patPFMETsTypeIpIIcorrected = process.patPFMETs.clone(
-    metSource = cms.InputTag('pfType1p2CorrectedMet')
     )
 
 #Turn on trigger info
@@ -158,11 +155,6 @@ process.load('RecoMET.METFilters.eeBadScFilter_cfi')
 from RecoJets.JetProducers.kt4PFJets_cfi import *
 process.kt6PFJetsForIsolation2011 = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
 process.kt6PFJetsForIsolation2011.Rho_EtaMax = cms.double(2.5)
-#compute rho for 2012 effective area Egamma isolation corrections
-process.kt6PFJetsForIsolation2012 = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
-process.kt6PFJetsForIsolation2012.Rho_EtaMax = cms.double(4.4)
-process.kt6PFJetsForIsolation2012.voronoiRfact = cms.double(0.9)
-
 
 #-- Output module configuration -----------------------------------------------
 process.out.fileName = "SUSYPAT.root" 
@@ -191,12 +183,9 @@ else:
 	process.csctighthalofilter = cms.Path(process.CSCTightHaloFilter)
         process.p = cms.Path(process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
 process.p += process.kt6PFJetsForIsolation2011
-process.p += process.kt6PFJetsForIsolation2012
-#process.p += process.patPF2PATSequencePFLOW
 process.p += process.producePFMETCorrections
 process.p += process.patPFMETsTypeIcorrected
-#process.p += process.producePFMETCorrectionsPFLOW
-#process.p += process.patPFMETsTypeIcorrectedPFLOW
+
 
 process.trackingfailturefilter = cms.Path(process.trackingFailureFilter)
 process.outpath = cms.EndPath(cms.ignore(process.configurableAnalysis))

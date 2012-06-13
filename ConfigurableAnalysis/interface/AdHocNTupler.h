@@ -717,7 +717,7 @@ class AdHocNTupler : public NTupler {
    iEvent.getByLabel("kt6PFJetsForIsolation2011","rho", rho_);
    *rho_kt6PFJetsForIsolation2011_ = (*rho_);
 
-   iEvent.getByLabel("kt6PFJetsForIsolation2012","rho", rho_);
+   iEvent.getByLabel(edm::InputTag("kt6PFJets:rho:RECO"), rho_);
    *rho_kt6PFJetsForIsolation2012_ = (*rho_);
 
 
