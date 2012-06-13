@@ -721,23 +721,24 @@ class AdHocNTupler : public NTupler {
    *rho_kt6PFJetsForIsolation2012_ = (*rho_);
 
 
-   edm::Handle<LHEEventProduct> product;
-   iEvent.getByLabel("source", product);
-
-   const lhef::HEPEUP hepeup_ = product->hepeup();
-   const std::vector<lhef::HEPEUP::FiveVector> pup_ = hepeup_.PUP;
-
    double htEvent = 0.0;
-   size_t iMax = hepeup_.NUP;
-   for(size_t i = 2; i < iMax; ++i) {
-      if( hepeup_.ISTUP[i] != 1 ) continue;
-      int idabs = abs( hepeup_.IDUP[i] );
-      if( idabs != 21 && (idabs<1 || idabs>6) ) continue;
-      double ptPart = sqrt( pow(hepeup_.PUP[i][0],2) + pow(hepeup_.PUP[i][1],2) );
-      //std::cout << ptPart << std::endl;
-      htEvent += ptPart;
+   edm::Handle<LHEEventProduct> product;
+   if(!iEvent.isRealData()){
+     iEvent.getByLabel("source", product);
+     const lhef::HEPEUP hepeup_ = product->hepeup();
+     const std::vector<lhef::HEPEUP::FiveVector> pup_ = hepeup_.PUP;
+
+     size_t iMax = hepeup_.NUP;
+     for(size_t i = 2; i < iMax; ++i) {
+        if( hepeup_.ISTUP[i] != 1 ) continue;
+        int idabs = abs( hepeup_.IDUP[i] );
+        if( idabs != 21 && (idabs<1 || idabs>6) ) continue;
+        double ptPart = sqrt( pow(hepeup_.PUP[i][0],2) + pow(hepeup_.PUP[i][1],2) );
+        //std::cout << ptPart << std::endl;
+        htEvent += ptPart;
+     } 
+     //std::cout <<"Total: " << htEvent << std::endl;
    }
-   //std::cout <<"Total: " << htEvent << std::endl;
    *genHT_ = htEvent;
 
 
