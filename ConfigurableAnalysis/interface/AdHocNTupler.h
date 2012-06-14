@@ -723,7 +723,7 @@ class AdHocNTupler : public NTupler {
 
    double htEvent = 0.0;
    edm::Handle<LHEEventProduct> product;
-   if(!iEvent.isRealData()){
+   if(iEvent.getByLabel("source", product)){
      iEvent.getByLabel("source", product);
      const lhef::HEPEUP hepeup_ = product->hepeup();
      const std::vector<lhef::HEPEUP::FiveVector> pup_ = hepeup_.PUP;
