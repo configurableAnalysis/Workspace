@@ -155,6 +155,10 @@ process.load('RecoMET.METFilters.eeBadScFilter_cfi')
 from RecoJets.JetProducers.kt4PFJets_cfi import *
 process.kt6PFJetsForIsolation2011 = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
 process.kt6PFJetsForIsolation2011.Rho_EtaMax = cms.double(2.5)
+#compute rho for 2012 effective area Egamma isolation corrections
+process.kt6PFJetsForIsolation2012 = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+process.kt6PFJetsForIsolation2012.Rho_EtaMax = cms.double(4.4)
+process.kt6PFJetsForIsolation2012.voronoiRfact = cms.double(0.9)
 
 #-- Output module configuration -----------------------------------------------
 process.out.fileName = "SUSYPAT.root" 
@@ -179,6 +183,7 @@ process.eenoisefilter = cms.Path(process.eeNoiseFilter)
 process.passprescalePFHT350filter = cms.Path( process.pfht350PassPrescaleFilter )
 if options.isFastSim:
         process.p = cms.Path(process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
+	process.p += process.kt6PFJetsForIsolation2012
 else:
 	process.csctighthalofilter = cms.Path(process.CSCTightHaloFilter)
         process.p = cms.Path(process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)

@@ -726,12 +726,18 @@ class AdHocNTupler : public NTupler {
 
 
    edm::Handle< double > rho_;
-   //iEvent.getByLabel("kt6PFJets","rho", rho_);
    iEvent.getByLabel("kt6PFJetsForIsolation2011","rho", rho_);
    *rho_kt6PFJetsForIsolation2011_ = (*rho_);
 
-   iEvent.getByLabel(edm::InputTag("kt6PFJets:rho:RECO"), rho_);
-   *rho_kt6PFJetsForIsolation2012_ = (*rho_);
+   if(iEvent.getByLabel(edm::InputTag("kt6PFJets:rho:RECO"), rho_)){
+     iEvent.getByLabel(edm::InputTag("kt6PFJets:rho:RECO"), rho_);
+     *rho_kt6PFJetsForIsolation2012_ = (*rho_);
+   }
+   else if(iEvent.getByLabel("kt6PFJetsForIsolation2012","rho", rho_)){ //in case kt6PFJets:rho:RECO isn't present, as in FastSim
+     iEvent.getByLabel("kt6PFJetsForIsolation2012","rho", rho_);
+     *rho_kt6PFJetsForIsolation2012_ = (*rho_);
+   }
+   else *rho_kt6PFJetsForIsolation2012_ = -999;
 
 
    double htEvent = 0.0;
