@@ -25,6 +25,8 @@
 #include "DataFormats/Common/interface/ValueMap.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 
+#include "DataFormats/PatCandidates/interface/MET.h"
+
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 
 using namespace std;
@@ -129,7 +131,10 @@ class AdHocNTupler : public NTupler {
     PU_TrueNumInteractions_ = new std::vector<float>;
     rho_kt6PFJetsForIsolation2011_ = new float;
     rho_kt6PFJetsForIsolation2012_ = new float;
-
+    pfmets_fullSignif_ = new float;
+    pfmets_fullSignifCov00_ = new float;
+    pfmets_fullSignifCov10_ = new float;
+    pfmets_fullSignifCov11_ = new float;
   }
 
   ~AdHocNTupler(){
@@ -209,6 +214,10 @@ class AdHocNTupler : public NTupler {
     delete rho_kt6PFJetsForIsolation2011_;
     delete rho_kt6PFJetsForIsolation2012_;
 
+    delete  pfmets_fullSignif_;
+    delete  pfmets_fullSignifCov00_;
+    delete  pfmets_fullSignifCov10_;
+    delete  pfmets_fullSignifCov11_;
   }
 
   uint registerleaves(edm::ProducerBase * producer){
@@ -308,6 +317,10 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("rho_kt6PFJetsForIsolation2011",rho_kt6PFJetsForIsolation2011_,"rho_kt6PFJetsForIsolation2011/F");
       tree_->Branch("rho_kt6PFJetsForIsolation2012",rho_kt6PFJetsForIsolation2012_,"rho_kt6PFJetsForIsolation2012/F");
 
+      tree_->Branch("pfmets_fullSignif",pfmets_fullSignif_,"pfmets_fullSignif/F");
+      tree_->Branch("pfmets_fullSignifCov00",pfmets_fullSignifCov00_,"pfmets_fullSignifCov00/F");
+      tree_->Branch("pfmets_fullSignifCov10",pfmets_fullSignifCov10_,"pfmets_fullSignifCov10/F");
+      tree_->Branch("pfmets_fullSignifCov11",pfmets_fullSignifCov11_,"pfmets_fullSignifCov11/F");
     }
 
     else{
@@ -741,8 +754,21 @@ class AdHocNTupler : public NTupler {
    }
    *genHT_ = htEvent;
 
+   //met significance
+   edm::Handle< edm::View<pat::MET> > pfMEThandle;
+   iEvent.getByLabel("patMETsPF", pfMEThandle);
+   double sigmaX2= (pfMEThandle->front() ).getSignificanceMatrix()(0,0);
+   double sigmaY2= (pfMEThandle->front() ).getSignificanceMatrix()(1,1);
+   float significance = -1;
+   //required sanity check according to https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMETSignificance?rev=5#Known_Issues
+   if(sigmaX2<1.e10 && sigmaY2<1.e10) significance = (pfMEThandle->front() ).significance();
+   *pfmets_fullSignif_ = significance;
+   *pfmets_fullSignifCov00_ = (float) sigmaX2;
+   *pfmets_fullSignifCov10_ = (pfMEThandle->front() ).getSignificanceMatrix()(1,0);
+   *pfmets_fullSignifCov11_ = (float) sigmaY2;
 
-	    //fill the tree    
+
+   //fill the tree    
     if (ownTheTree_){ tree_->Fill(); }
     (*trigger_prescalevalue).clear();
     (*trigger_name).clear();
@@ -890,4 +916,10 @@ class AdHocNTupler : public NTupler {
   std::vector<float> * PU_TrueNumInteractions_;
   float * rho_kt6PFJetsForIsolation2011_;
   float * rho_kt6PFJetsForIsolation2012_;
+
+  float *  pfmets_fullSignif_;
+  float *  pfmets_fullSignifCov00_;
+  float *  pfmets_fullSignifCov10_;
+  float *  pfmets_fullSignifCov11_;
+
 };
