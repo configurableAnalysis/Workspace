@@ -28,7 +28,7 @@ options.isMC = True
 options.output='configurableAnalysis.root'
 options.files='file:/LVM/SATA/wto/AOD/TTJets8TeVSummer12-PU_S7_START52_V5/output_1_1_as1.root'
 #options.maxEvents=10
-options.parseArguments()
+#options.parseArguments()
 
 #-- Message Logger ------------------------------------------------------------
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
