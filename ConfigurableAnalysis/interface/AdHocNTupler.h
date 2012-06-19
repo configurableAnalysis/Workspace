@@ -109,6 +109,7 @@ class AdHocNTupler : public NTupler {
     passprescalePFHT350filter_decision_ = new int;
     passprescaleHT250filter_decision_ = new int;
     passprescaleHT300filter_decision_ = new int;
+    passprescaleHT350filter_decision_ = new int;
     passprescaleHT400filter_decision_ = new int;
     passprescaleHT450filter_decision_ = new int;
     MPT_ = new float;
@@ -195,6 +196,7 @@ class AdHocNTupler : public NTupler {
     delete passprescalePFHT350filter_decision_;
     delete passprescaleHT250filter_decision_;
     delete passprescaleHT300filter_decision_;
+    delete passprescaleHT350filter_decision_;
     delete passprescaleHT400filter_decision_;
     delete passprescaleHT450filter_decision_;
     delete MPT_;
@@ -302,6 +304,7 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("passprescalePFHT350filter_decision",passprescalePFHT350filter_decision_,"passprescalePFHT350filter_decision/I");
       tree_->Branch("passprescaleHT250filter_decision",passprescaleHT250filter_decision_,"passprescaleHT250filter_decision/I");
       tree_->Branch("passprescaleHT300filter_decision",passprescaleHT300filter_decision_,"passprescaleHT300filter_decision/I");
+      tree_->Branch("passprescaleHT350filter_decision",passprescaleHT350filter_decision_,"passprescaleHT350filter_decision/I");
       tree_->Branch("passprescaleHT400filter_decision",passprescaleHT400filter_decision_,"passprescaleHT400filter_decision/I");
       tree_->Branch("passprescaleHT450filter_decision",passprescaleHT450filter_decision_,"passprescaleHT450filter_decision/I");
       tree_->Branch("MPT",MPT_,"MPT/F");
@@ -364,7 +367,7 @@ class AdHocNTupler : public NTupler {
 		// get hold of trigger names - based on TriggerResults object!
 		const edm::TriggerNames & triggerNames_ = iEvent.triggerNames(*hltresults);
 		int cschalofilterResult =1, trackingfailturefilterResult=1, ecaltpfilterResult=1, ecalbefilterResult=1, scrapingVetoResult=1;
-		int greedymuonfilterResult=1, inconsistentPFmuonfilterResult=1, hcallaserfilterResult=1,  eenoisefilterResult=1, eebadscfilterResult=1, passprescalePFHT350filterResult=1, passprescaleHT250filterResult=1, passprescaleHT300filterResult=1, passprescaleHT400filterResult=1, passprescaleHT450filterResult=1;
+		int greedymuonfilterResult=1, inconsistentPFmuonfilterResult=1, hcallaserfilterResult=1,  eenoisefilterResult=1, eebadscfilterResult=1, passprescalePFHT350filterResult=1, passprescaleHT250filterResult=1, passprescaleHT300filterResult=1, passprescaleHT350filterResult=1, passprescaleHT400filterResult=1, passprescaleHT450filterResult=1;
 		for (int itrig=0; itrig< ntrigs; itrig++) {
  			std::string trigName = triggerNames_.triggerName(itrig);
   		int hltflag = (*hltresults)[itrig].accept();
@@ -381,6 +384,7 @@ class AdHocNTupler : public NTupler {
                         if (trigName=="passprescalePFHT350filter") passprescalePFHT350filterResult = hltflag;
 			if (trigName=="passprescaleHT250filter") passprescaleHT250filterResult = hltflag;
                         if (trigName=="passprescaleHT300filter") passprescaleHT300filterResult = hltflag;
+                        if (trigName=="passprescaleHT350filter") passprescaleHT350filterResult = hltflag;
                         if (trigName=="passprescaleHT400filter") passprescaleHT400filterResult = hltflag;
                         if (trigName=="passprescaleHT450filter") passprescaleHT450filterResult = hltflag;
 
@@ -399,6 +403,7 @@ class AdHocNTupler : public NTupler {
     *passprescalePFHT350filter_decision_ = passprescalePFHT350filterResult;	
     *passprescaleHT250filter_decision_ = passprescaleHT250filterResult;
     *passprescaleHT300filter_decision_ = passprescaleHT300filterResult;
+    *passprescaleHT350filter_decision_ = passprescaleHT350filterResult;
     *passprescaleHT400filter_decision_ = passprescaleHT400filterResult;
     *passprescaleHT450filter_decision_ = passprescaleHT450filterResult;
 
@@ -921,6 +926,7 @@ class AdHocNTupler : public NTupler {
   int * passprescalePFHT350filter_decision_;
   int * passprescaleHT250filter_decision_;
   int * passprescaleHT300filter_decision_;
+  int * passprescaleHT350filter_decision_;
   int * passprescaleHT400filter_decision_;
   int * passprescaleHT450filter_decision_;
   float * MPT_;
