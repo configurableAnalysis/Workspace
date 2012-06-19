@@ -683,7 +683,6 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                        'tpfms_numvalPixelhits:tpfmsMuon.hitPattern.numberOfValidPixelHits',
 					   'dB:dB',
 						'numberOfMatchedStations:numberOfMatchedStations',
-						'isPFMuon:isPFMuon'
 												                                                                                                                                      )
                 ),
                 Class = cms.string('pat::Muon')
