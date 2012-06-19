@@ -24,9 +24,11 @@ options.register ('isFastSim','',
 				  "Switch between Full and FastSim")
 
 options.isFastSim = False
-options.isMC = True
+#options.isMC = True
+options.isMC = False
 options.output='configurableAnalysis.root'
-options.files='file:/LVM/SATA/wto/AOD/TTJets8TeVSummer12-PU_S7_START52_V5/output_1_1_as1.root'
+#options.files='file:/LVM/SATA/wto/AOD/TTJets8TeVSummer12-PU_S7_START52_V5/output_1_1_as1.root'
+options.files='file:/tmp/nguyenh/3C3C88B7-12A2-E111-93FE-001D09F290BF.root'
 #options.maxEvents=10
 #options.parseArguments()
 
@@ -191,6 +193,11 @@ process.triggerFilterHT300 = process.pfht350PassPrescaleFilter.clone(
     HLTPaths = cms.vstring('HLT_HT300_v[0-9]')
     )
 process.passprescaleHT300filter = cms.Path( process.triggerFilterHT300 )
+
+process.triggerFilterHT350 = process.pfht350PassPrescaleFilter.clone(
+    HLTPaths = cms.vstring('HLT_HT350_v[0-9]')
+    )
+process.passprescaleHT350filter = cms.Path( process.triggerFilterHT350 )
 
 process.triggerFilterHT400 = process.pfht350PassPrescaleFilter.clone(
     HLTPaths = cms.vstring('HLT_HT400_v[0-9]')
