@@ -181,6 +181,27 @@ process.greedymuonfilter = cms.Path(process.greedyMuonPFCandidateFilter)
 process.inconsistentPFmuonfilter = cms.Path(process.inconsistentMuonPFCandidateFilter)
 process.eenoisefilter = cms.Path(process.eeNoiseFilter)
 process.passprescalePFHT350filter = cms.Path( process.pfht350PassPrescaleFilter )
+## Adding more HT "active trigger" variables
+process.triggerFilterHT250 = process.pfht350PassPrescaleFilter.clone(
+    HLTPaths = cms.vstring('HLT_HT250_v[0-9]')
+    )
+process.passprescaleHT250filter = cms.Path( process.triggerFilterHT250 )
+
+process.triggerFilterHT300 = process.pfht350PassPrescaleFilter.clone(
+    HLTPaths = cms.vstring('HLT_HT300_v[0-9]')
+    )
+process.passprescaleHT300filter = cms.Path( process.triggerFilterHT300 )
+
+process.triggerFilterHT400 = process.pfht350PassPrescaleFilter.clone(
+    HLTPaths = cms.vstring('HLT_HT400_v[0-9]')
+    )
+process.passprescaleHT400filter = cms.Path( process.triggerFilterHT400 )
+
+process.triggerFilterHT450 = process.pfht350PassPrescaleFilter.clone(
+    HLTPaths = cms.vstring('HLT_HT450_v[0-9]')
+    )
+process.passprescaleHT450filter = cms.Path( process.triggerFilterHT450 )
+
 if options.isFastSim:
         process.p = cms.Path(process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
 	process.p += process.kt6PFJetsForIsolation2012
