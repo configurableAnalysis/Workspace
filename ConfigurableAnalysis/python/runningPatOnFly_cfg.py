@@ -28,7 +28,7 @@ options.isFastSim = False
 options.isMC = False
 options.output='configurableAnalysis.root'
 #options.files='file:/LVM/SATA/wto/AOD/TTJets8TeVSummer12-PU_S7_START52_V5/output_1_1_as1.root'
-options.files='file:/tmp/nguyenh/3C3C88B7-12A2-E111-93FE-001D09F290BF.root'
+options.files='file:/LVM/SATA/pbgeff/temp_52X_ntuple/MuHad_Run2012A-PromptReco-v1_AOD_709B4CB9-BF82-E111-BD9B-003048F1182E.root'
 #options.maxEvents=10
 #options.parseArguments()
 
@@ -46,7 +46,7 @@ process.MessageLogger.cerr.PATSummaryTables = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(options.files)
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 #process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange(
 #  '190645:10-190645:110',
 #)
@@ -90,6 +90,19 @@ else:
 process.pfNoTauPF.enable = cms.bool(False)
 SUSY_pattuple_outputCommands = getSUSY_pattuple_outputCommands( process )
 ############################## END SUSYPAT specifics ####################################
+
+
+######## configure charged hadron subtraction for selectedPatJetsPF ###########
+from PhysicsTools.SelectorUtils.pvSelector_cfi import pvSelector
+
+process.goodOfflinePrimaryVertices = cms.EDFilter(
+    "PrimaryVertexObjectFilter",
+    filterParams = pvSelector.clone( minNdof = cms.double(4.0), maxZ = cms.double(24.0) ),
+    src=cms.InputTag('offlinePrimaryVertices')
+    )
+
+process.pfPileUpPF.checkClosestZVertex = cms.bool(False)
+process.pfPileUpPF.Vertices = cms.InputTag('goodOfflinePrimaryVertices')
 
 
 ################### Add Type-I PFMET (for default RECO-PF jets) ########################
@@ -210,11 +223,14 @@ process.triggerFilterHT450 = process.pfht350PassPrescaleFilter.clone(
 process.passprescaleHT450filter = cms.Path( process.triggerFilterHT450 )
 
 if options.isFastSim:
-        process.p = cms.Path(process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
+        process.p = cms.Path(process.goodOfflinePrimaryVertices + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
+        #process.p = cms.Path(process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
 	process.p += process.kt6PFJetsForIsolation2012
 else:
 	process.csctighthalofilter = cms.Path(process.CSCTightHaloFilter)
-        process.p = cms.Path(process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
+        process.p = cms.Path(process.goodOfflinePrimaryVertices + process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
+        #process.p = cms.Path(process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
+
 process.p += process.kt6PFJetsForIsolation2011
 process.p += process.producePFMETCorrections
 process.p += process.patPFMETsTypeIcorrected
