@@ -13,21 +13,19 @@ def addDefaultSUSYPAT(process,mcInfo=True,HLTMenu='HLT',jetMetCorrections=['L2Re
     addTagInfos(process,jetMetCorrections)
     if not mcInfo:
 	removeMCDependence(process)
-    loadMCVersion(process,mcVersion,mcInfo)
     loadPAT(process,jetMetCorrections,extMatch)
     addJetMET(process,theJetNames,jetMetCorrections,mcVersion)
-    useDAVertices(process)
     #loadPATTriggers(process,HLTMenu,theJetNames,electronMatches,muonMatches,tauMatches,jetMatches,photonMatches)
 
     #-- Counter for the number of processed events --------------------------------
     process.eventCountProducer = cms.EDProducer("EventCountProducer")
 
     # Full path
-    process.load('RecoTauTag.Configuration.RecoPFTauTag_cff')
+    #process.load('RecoTauTag.Configuration.RecoPFTauTag_cff')
     process.susyPatDefaultSequence = cms.Sequence( process.eventCountProducer
-                                                   * process.daVertices
-                                                   * process.PFTau
-                                                   * process.patDefaultSequence 
+    #                                               * process.PFTau
+                                                   * process.patPF2PATSequence
+#                                                   * process.patDefaultSequence #(included in process.patPF2PATSequence - needed for PF isolation)
                                                    * process.patPF2PATSequencePF
                                                    )
 
@@ -38,32 +36,6 @@ def addDefaultSUSYPAT(process,mcInfo=True,HLTMenu='HLT',jetMetCorrections=['L2Re
     if doValidation:
         loadSusyValidation(process)
         process.susyPatDefaultSequence.replace(process.patPF2PATSequencePF, process.patPF2PATSequencePF * process.ak5CaloJetsL2L3 * process.metJESCorAK5CaloJet  * process.RecoSusyValidation * process.PatSusyValidation*process.MEtoEDMConverter)
-
-def useDAVertices(process):
-    #-- Deterministic Annealing Vertices ---------------------------------------------------
-    from RecoVertex.PrimaryVertexProducer.OfflinePrimaryVerticesDA_cfi import offlinePrimaryVerticesDA
-    from RecoVertex.PrimaryVertexProducer.OfflinePrimaryVerticesDAWithBS_cfi import offlinePrimaryVerticesDA as offlinePrimaryVerticesDAWithBS
-    process.offlinePrimaryVertices = offlinePrimaryVerticesDA.clone()
-    process.offlinePrimaryVerticesWithBS = offlinePrimaryVerticesDAWithBS.clone()
-
-    #-- Keep Gap Method Vertices for Comparison --------------------------------------------
-    try:
-        from RecoVertex.PrimaryVertexProducer.OfflinePrimaryVerticesGap_cfi import offlinePrimaryVerticesGap
-        from RecoVertex.PrimaryVertexProducer.OfflinePrimaryVerticesGapWithBS_cfi import offlinePrimaryVerticesGapWithBS
-    except ImportError:
-        from RecoVertex.PrimaryVertexProducer.OfflinePrimaryVertices_cfi import offlinePrimaryVertices as offlinePrimaryVerticesGap
-        from RecoVertex.PrimaryVertexProducer.OfflinePrimaryVerticesWithBS_cfi import offlinePrimaryVerticesWithBS as offlinePrimaryVerticesGapWithBS
-        print "Could not find OfflinePrimaryVerticesGap. (Please ignore this warning if using CMSSW_4_1_X or lower)"
-        
-    process.offlinePrimaryVerticesGap = offlinePrimaryVerticesGap.clone()
-    process.offlinePrimaryVerticesGapWithBS = offlinePrimaryVerticesGapWithBS.clone()
-
-    process.daVertices = cms.Sequence(
-        process.offlinePrimaryVertices
-        + process.offlinePrimaryVerticesWithBS
-        + process.offlinePrimaryVerticesGap
-        + process.offlinePrimaryVerticesGapWithBS
-        )
 
 
 def extensiveMatching(process):
@@ -84,18 +56,27 @@ def extensiveMatching(process):
     process.extensiveMatching = cms.Sequence(process.mergedTruth+process.muonClassificationByHits)
 
 
-def loadMCVersion(process, mcVersion, mcInfo):
-    #-- To be able to run on 311X input samples ---------------------------------------
-    if not mcVersion:
-	return
-    elif mcVersion == '311x':
-        from PhysicsTools.PatAlgos.tools.cmsswVersionTools import run42xOn3yzMcInput
-        run42xOn3yzMcInput(process)
-    else: raise ValueError, "Unknown MC version: %s" % (mcVersion)
-
-
 def loadPAT(process,jetMetCorrections,extMatch):
     #-- Changes for electron and photon ID ----------------------------------------
+    from PhysicsTools.PatAlgos.tools.pfTools import usePFIso
+    usePFIso( process )
+    process.patElectrons.isolationValues = cms.PSet(
+        pfNeutralHadrons = cms.InputTag("elPFIsoValueNeutral03PFIdPFIso"),
+        pfChargedAll = cms.InputTag("elPFIsoValueChargedAll03PFIdPFIso"),
+        pfPUChargedHadrons = cms.InputTag("elPFIsoValuePU03PFIdPFIso"),
+        pfPhotons = cms.InputTag("elPFIsoValueGamma03PFIdPFIso"),
+        pfChargedHadrons = cms.InputTag("elPFIsoValueCharged03PFIdPFIso")
+        )
+    process.patElectrons.isolationValuesNoPFId = cms.PSet(
+        pfNeutralHadrons = cms.InputTag("elPFIsoValueNeutral03NoPFIdPFIso"),
+        pfChargedAll = cms.InputTag("elPFIsoValueChargedAll03NoPFIdPFIso"),
+        pfPUChargedHadrons = cms.InputTag("elPFIsoValuePU03NoPFIdPFIso"),
+        pfPhotons = cms.InputTag("elPFIsoValueGamma03NoPFIdPFIso"),
+        pfChargedHadrons = cms.InputTag("elPFIsoValueCharged03NoPFIdPFIso")
+        )
+    process.patDefaultSequence.replace(process.patElectrons,process.eleIsoSequence+process.patElectrons)
+    process.patDefaultSequence.replace(process.patMuons,process.muIsoSequence+process.patMuons)
+    
     # Turn off photon-electron cleaning (i.e., flag only)
     process.cleanPatPhotons.checkOverlaps.electrons.requireNoOverlaps = False
 
@@ -138,8 +119,8 @@ def loadPAT(process,jetMetCorrections,extMatch):
     process.muonMatch.checkCharge     = False
     process.muonMatch.maxDeltaR       = cms.double(0.2)
     process.muonMatch.maxDPtRel       = cms.double(999999.)
-    process.tauMatch.checkCharge      = False
-    process.tauMatch.maxDeltaR        = cms.double(0.3)
+    #process.tauMatch.checkCharge      = False
+    #process.tauMatch.maxDeltaR        = cms.double(0.3)
     process.patJetPartonMatch.maxDeltaR  = cms.double(0.25)
     process.patJetPartonMatch.maxDPtRel  = cms.double(999999.)
     process.patJetGenJetMatch.maxDeltaR  = cms.double(0.25)
@@ -152,46 +133,34 @@ def loadPAT(process,jetMetCorrections,extMatch):
         process.patJetPartonMatch.matched = "mergedTruth"
         process.patJetPartons.src = "mergedTruth"
         process.photonMatch.matched = "mergedTruth"
-        process.tauGenJets.GenParticles = "mergedTruth"
-        process.tauMatch.matched = "mergedTruth"
+        #process.tauGenJets.GenParticles = "mergedTruth"
+        #process.tauMatch.matched = "mergedTruth"
 
 
     #-- Taus ----------------------------------------------------------------------
     #some tau discriminators have been switched off during development. They can be switched on again...
-    setattr(process.patTaus.tauIDSources, "trackIsolation", cms.InputTag("shrinkingConePFTauDiscriminationByTrackIsolation"))
-    setattr(process.patTaus.tauIDSources, "ecalIsolation", cms.InputTag("shrinkingConePFTauDiscriminationByECALIsolation"))
-    setattr(process.patTaus.tauIDSources, "byIsolation", cms.InputTag("shrinkingConePFTauDiscriminationByIsolation"))
-    setattr(process.patTaus.tauIDSources, "leadingPionPtCut", cms.InputTag("shrinkingConePFTauDiscriminationByLeadingPionPtCut"))
-    setattr(process.patTaus.tauIDSources, "trackIsolationUsingLeadingPion", cms.InputTag("shrinkingConePFTauDiscriminationByTrackIsolationUsingLeadingPion"))
-    setattr(process.patTaus.tauIDSources, "ecalIsolationUsingLeadingPion", cms.InputTag("shrinkingConePFTauDiscriminationByECALIsolationUsingLeadingPion"))
-    setattr(process.patTaus.tauIDSources, "byIsolationUsingLeadingPion", cms.InputTag("shrinkingConePFTauDiscriminationByIsolationUsingLeadingPion"))
-    setattr(process.patTaus.tauIDSources, "byTaNC", cms.InputTag("shrinkingConePFTauDiscriminationByTaNC"))
-    setattr(process.patTaus.tauIDSources, "byTaNCfrOnePercent", cms.InputTag("shrinkingConePFTauDiscriminationByTaNCfrOnePercent"))
-    setattr(process.patTaus.tauIDSources, "byTaNCfrHalfPercent", cms.InputTag("shrinkingConePFTauDiscriminationByTaNCfrHalfPercent"))
-    setattr(process.patTaus.tauIDSources, "byTaNCfrQuarterPercent", cms.InputTag("shrinkingConePFTauDiscriminationByTaNCfrQuarterPercent"))
-    setattr(process.patTaus.tauIDSources, "byTaNCfrTenthPercent", cms.InputTag("shrinkingConePFTauDiscriminationByTaNCfrTenthPercent"))
+    #setattr(process.patTaus.tauIDSources, "trackIsolation", cms.InputTag("shrinkingConePFTauDiscriminationByTrackIsolation"))
+    #setattr(process.patTaus.tauIDSources, "ecalIsolation", cms.InputTag("shrinkingConePFTauDiscriminationByECALIsolation"))
+    #setattr(process.patTaus.tauIDSources, "byIsolation", cms.InputTag("shrinkingConePFTauDiscriminationByIsolation"))
+    #setattr(process.patTaus.tauIDSources, "leadingPionPtCut", cms.InputTag("shrinkingConePFTauDiscriminationByLeadingPionPtCut"))
+    #setattr(process.patTaus.tauIDSources, "trackIsolationUsingLeadingPion", cms.InputTag("shrinkingConePFTauDiscriminationByTrackIsolationUsingLeadingPion"))
+    #setattr(process.patTaus.tauIDSources, "ecalIsolationUsingLeadingPion", cms.InputTag("shrinkingConePFTauDiscriminationByECALIsolationUsingLeadingPion"))
+    #setattr(process.patTaus.tauIDSources, "byIsolationUsingLeadingPion", cms.InputTag("shrinkingConePFTauDiscriminationByIsolationUsingLeadingPion"))
+    #setattr(process.patTaus.tauIDSources, "byTaNC", cms.InputTag("shrinkingConePFTauDiscriminationByTaNC"))
+    #setattr(process.patTaus.tauIDSources, "byTaNCfrOnePercent", cms.InputTag("shrinkingConePFTauDiscriminationByTaNCfrOnePercent"))
+    #setattr(process.patTaus.tauIDSources, "byTaNCfrHalfPercent", cms.InputTag("shrinkingConePFTauDiscriminationByTaNCfrHalfPercent"))
+    #setattr(process.patTaus.tauIDSources, "byTaNCfrQuarterPercent", cms.InputTag("shrinkingConePFTauDiscriminationByTaNCfrQuarterPercent"))
+    #setattr(process.patTaus.tauIDSources, "byTaNCfrTenthPercent", cms.InputTag("shrinkingConePFTauDiscriminationByTaNCfrTenthPercent"))
 
 
     #-- Jet corrections -----------------------------------------------------------
     # L1 FastJet jet corrections
-    # kt jets for fastjet corrections (needed for CMSSW < 4_2_0)
-    process.load('RecoJets.Configuration.RecoPFJets_cff')
-    process.kt6PFJets.doRhoFastjet = True
-    #process.kt6PFJets.Rho_EtaMax = cms.double(3.0)
-
+    # kt6PFJets for FastJet corrections are already run and placed before jetCorrection calculation
     # apply FastJet corrections only if demanded
-    #print jetMetCorrections
+    # TODO: Check if still necessary to switch here
     if ("L1FastJet" in jetMetCorrections):
         process.pfJets.doAreaFastjet = True
-        #process.pfJets.Rho_EtaMax = cms.double(3.0)
-
         process.pfJetsPF.doAreaFastjet = True
-        #process.pfJetsPF.Rho_EtaMax = cms.double(3.0)
-
-    # place kt6jets before jet corrections in default sequence
-    process.patJetCorrFactors.levels = jetMetCorrections 
-    process.patDefaultSequence.replace(process.patJetCorrFactors,
-                                       process.kt6PFJets + process.patJetCorrFactors)
 
 
 def loadPF2PAT(process,mcInfo,jetMetCorrections,extMatch,doSusyTopProjection,postfix):
@@ -201,7 +170,15 @@ def loadPF2PAT(process,mcInfo,jetMetCorrections,extMatch,doSusyTopProjection,pos
     process.patJetCorrFactors.levels = jetMetCorrections 
     #-- PF2PAT config -------------------------------------------------------------
     from PhysicsTools.PatAlgos.tools.pfTools import usePF2PAT
-    usePF2PAT(process,runPF2PAT=True, jetAlgo='AK5',runOnMC=(mcInfo==1),postfix=postfix, jetCorrections=('AK5PFchs', jetMetCorrections))
+    usePF2PAT(process,runPF2PAT=True, jetAlgo='AK5',runOnMC=(mcInfo==1),postfix=postfix, jetCorrections=('AK5PFchs', jetMetCorrections), pvCollection=cms.InputTag('goodOfflinePrimaryVertices'))
+
+    # Get a list of good primary vertices, in 42x, these are DAF vertices
+    from PhysicsTools.SelectorUtils.pvSelector_cfi import pvSelector
+    process.goodOfflinePrimaryVertices = cms.EDFilter(
+    	"PrimaryVertexObjectFilter",
+    	filterParams = pvSelector.clone( minNdof = cms.double(4.0), maxZ = cms.double(24.0) ),
+    	src=cms.InputTag('offlinePrimaryVertices')
+    	)
 
     #process.patJetsPF.embedGenJetMatch = False
     #process.patJetsPF.embedPFCandidates = False
@@ -214,6 +191,7 @@ def loadPF2PAT(process,mcInfo,jetMetCorrections,extMatch,doSusyTopProjection,pos
     process.muonMatchPF.maxDeltaR   = cms.double(0.2)
     process.muonMatchPF.maxDPtRel   = cms.double(999999.)
     process.muonMatchPF.checkCharge = False
+    process.pfPileUpPF.checkClosestZVertex = False
     if extMatch:
         process.electronMatchPF.mcStatus = cms.vint32(1,5)
         process.electronMatchPF.matched = "mergedTruth"
@@ -225,8 +203,8 @@ def loadPF2PAT(process,mcInfo,jetMetCorrections,extMatch,doSusyTopProjection,pos
         process.patJetPartonMatchPF.matched = "mergedTruth"
         process.patJetPartonsPF.src = "mergedTruth"
         process.photonMatchPF.matched = "mergedTruth"
-        process.tauGenJetsPF.GenParticles = "mergedTruth"
-        process.tauMatchPF.matched = "mergedTruth"
+        #process.tauGenJetsPF.GenParticles = "mergedTruth"
+        #process.tauMatchPF.matched = "mergedTruth"
         
     #Remove jet pt cut
     #process.pfJetsPF.ptMin = 0.
@@ -234,17 +212,35 @@ def loadPF2PAT(process,mcInfo,jetMetCorrections,extMatch,doSusyTopProjection,pos
     #process.patTausPF.addDecayMode = True
     #process.patTausPF.decayModeSrc = "shrinkingConePFTauDecayModeProducerPF" 
 
+    #Set isolation cone to 0.3 for PF leptons
+    # TODO: fix this for electrons and muons
+    #process.pfElectrons.isolationValueMapsCharged = cms.VInputTag(cms.InputTag("elPFIsoValueCharged03PFId"))
+    #process.pfElectrons.deltaBetaIsolationValueMap = cms.InputTag("elPFIsoValuePU03PFId")
+    #process.pfElectrons.isolationValueMapsNeutral = cms.VInputTag(cms.InputTag("elPFIsoValueNeutral03PFId"), cms.InputTag("elPFIsoValueGamma03PFId"))
+    #process.pfIsolatedElectrons.isolationValueMapsCharged = cms.VInputTag(cms.InputTag("elPFIsoValueCharged03PFId"))
+    #process.pfIsolatedElectrons.deltaBetaIsolationValueMap = cms.InputTag("elPFIsoValuePU03PFId")
+    #process.pfIsolatedElectrons.isolationValueMapsNeutral = cms.VInputTag(cms.InputTag("elPFIsoValueNeutral03PFId"), cms.InputTag("elPFIsoValueGamma03PFId"))
+    
+    #process.pfElectronsPF.isolationValueMapsCharged = cms.VInputTag(cms.InputTag("elPFIsoValueCharged03PFIdPF"))
+    #process.pfElectronsPF.deltaBetaIsolationValueMap = cms.InputTag("elPFIsoValuePU03PFIdPF")
+    #process.pfElectronsPF.isolationValueMapsNeutral = cms.VInputTag(cms.InputTag("elPFIsoValueNeutral03PFIdPF"), cms.InputTag("elPFIsoValueGamma03PFIdPF"))
+    #process.pfIsolatedElectronsPF.isolationValueMapsCharged = cms.VInputTag(cms.InputTag("elPFIsoValueCharged03PFIdPF"))
+    #process.pfIsolatedElectronsPF.deltaBetaIsolationValueMap = cms.InputTag("elPFIsoValuePU03PFIdPF")
+    #process.pfIsolatedElectronsPF.isolationValueMapsNeutral = cms.VInputTag(cms.InputTag("elPFIsoValueNeutral03PFIdPF"), cms.InputTag("elPFIsoValueGamma03PFIdPF"))
 
-    #PF type I corrected MET
-    #addPFTypeIMet(process)
+    #process.pfMuons.isolationValueMapsCharged = cms.VInputTag(cms.InputTag("muPFIsoValueCharged03mu03"))
+    #process.pfMuons.deltaBetaIsolationValueMap = cms.InputTag("muPFIsoValuePU03")
+    #process.pfMuons.isolationValueMapsNeutral = cms.VInputTag(cms.InputTag("muPFIsoValueNeutral03"), cms.InputTag("muPFIsoValueGamma03"))
+    #process.pfIsolatedMuons.isolationValueMapsCharged = cms.VInputTag(cms.InputTag("muPFIsoValueCharged03mu03"))
+    #process.pfIsolatedMuons.deltaBetaIsolationValueMap = cms.InputTag("muPFIsoValuePU03")
+    #process.pfIsolatedMuons.isolationValueMapsNeutral = cms.VInputTag(cms.InputTag("muPFIsoValueNeutral03"), cms.InputTag("muPFIsoValueGamma03"))
 
-    #Set isolation cone to 0.3
-    process.isoValElectronWithChargedPF.deposits[0].deltaR = 0.3
-    process.isoValElectronWithNeutralPF.deposits[0].deltaR = 0.3
-    process.isoValElectronWithPhotonsPF.deposits[0].deltaR = 0.3
-    process.isoValMuonWithChargedPF.deposits[0].deltaR = 0.3
-    process.isoValMuonWithNeutralPF.deposits[0].deltaR = 0.3
-    process.isoValMuonWithPhotonsPF.deposits[0].deltaR = 0.3
+    #process.pfMuonsPF.isolationValueMapsCharged = cms.VInputTag(cms.InputTag("muPFIsoValueCharged03mu03PF"))
+    #process.pfMuonsPF.deltaBetaIsolationValueMap = cms.InputTag("muPFIsoValuePU03PF")
+    #process.pfMuonsPF.isolationValueMapsNeutral = cms.VInputTag(cms.InputTag("muPFIsoValueNeutral03PF"), cms.InputTag("muPFIsoValueGamma03PF"))
+    #process.pfIsolatedMuonsPF.isolationValueMapsCharged = cms.VInputTag(cms.InputTag("muPFIsoValueCharged03mu03PF"))
+    #process.pfIsolatedMuonsPF.deltaBetaIsolationValueMap = cms.InputTag("muPFIsoValuePU03PF")
+    #process.pfIsolatedMuonsPF.isolationValueMapsNeutral = cms.VInputTag(cms.InputTag("muPFIsoValueNeutral03PF"), cms.InputTag("muPFIsoValueGamma03PF"))
 
     #-- Enable pileup sequence -------------------------------------------------------------
     #Vertices
@@ -268,9 +264,9 @@ def loadPF2PAT(process,mcInfo,jetMetCorrections,extMatch,doSusyTopProjection,pos
     process.pfElectronsFromVertexPF.dzCut = 9999.0
     process.pfElectronsFromVertexPF.d0Cut = 9999.0
     process.pfSelectedElectronsPF.cut = ""
-    process.pfRelaxedElectronsPF = process.pfIsolatedElectronsPF.clone(combinedIsolationCut = 3.)
+    process.pfRelaxedElectronsPF = process.pfIsolatedElectronsPF.clone(isolationCut = 3.)
+    process.pfIsolatedElectronsPF.isolationCut = 0.15
     
-    process.pfIsolatedElectronsPF.combinedIsolationCut = 0.15
     process.pfElectronsFromGoodVertex = cms.EDFilter(
         "IPCutPFCandidateSelector",
         src = cms.InputTag("pfIsolatedElectronsPF"),  # PFCandidate source
@@ -301,9 +297,9 @@ def loadPF2PAT(process,mcInfo,jetMetCorrections,extMatch,doSusyTopProjection,pos
     process.pfMuonsFromVertexPF.dzCut = 9999.0
     process.pfMuonsFromVertexPF.d0Cut = 9999.0
     process.pfSelectedMuonsPF.cut = ""
-    process.pfRelaxedMuonsPF = process.pfIsolatedMuonsPF.clone(combinedIsolationCut = 3)
+    process.pfRelaxedMuonsPF = process.pfIsolatedMuonsPF.clone(isolationCut = 3)
+    process.pfIsolatedMuonsPF.isolationCut = 0.15
     
-    process.pfIsolatedMuonsPF.combinedIsolationCut = 0.15
     process.pfMuonsFromGoodVertex = cms.EDFilter(
         "IPCutPFCandidateSelector",
         src = cms.InputTag("pfIsolatedMuonsPF"),  # PFCandidate source
@@ -332,12 +328,13 @@ def loadPF2PAT(process,mcInfo,jetMetCorrections,extMatch,doSusyTopProjection,pos
     process.patMuonsPF.pfMuonSource  = "pfRelaxedMuonsPF"
     process.pfNoMuonPF.topCollection = "pfUnclusteredMuonsPF"
     #Taus
-    process.pfTausPF.discriminators = cms.VPSet()
-    process.pfUnclusteredTausPF = process.pfTausPF.clone(
-        cut = cms.string("pt < 0")
-    )
-    process.pfTauSequencePF.replace(process.pfTausPF, process.pfTausPF+ process.pfUnclusteredTausPF)
-    process.pfNoTauPF.topCollection = "pfUnclusteredTausPF"
+    # TODO: Fix taus in 52X
+    #process.pfTausPF.discriminators = cms.VPSet()
+    #process.pfUnclusteredTausPF = process.pfTausPF.clone(
+    #    cut = cms.string("pt < 0")
+    #)
+    #process.pfTauSequencePF.replace(process.pfTausPF, process.pfTausPF+ process.pfUnclusteredTausPF)
+    #process.pfNoTauPF.topCollection = "pfUnclusteredTausPF"
     
 
 def loadPATTriggers(process,HLTMenu,theJetNames,electronMatches,muonMatches,tauMatches,jetMatches,photonMatches):
@@ -418,31 +415,13 @@ def addTypeIIMet(process) :
         process.patMETsAK5CaloTypeII
         )
 
-def addPFTypeIMet(process):
-    from JetMETCorrections.Type1MET.MetType1Corrections_cff import metJESCorAK5PFJet 
-    process.metJESCorAK5PFTypeI = metJESCorAK5PFJet.clone( 
-        inputUncorJetsLabel = "patJetsPF", 
-        metType = "pat",                  
-        inputUncorMetLabel = "pfMet",
-    )
-    process.patMETsTypeIPF = process.patMETsPF.clone(
-        metSource = cms.InputTag("metJESCorAK5PFTypeI")
-    )
-    # Add to producersLayer1 sequence
-    process.patDefaultSequencePF.replace(
-        process.patMETsPF,
-        process.patMETsPF+
-        process.metJESCorAK5PFTypeI+
-        process.patMETsTypeIPF
-        )
-
 def addTagInfos(process,jetMetCorrections):
     from PhysicsTools.PatAlgos.tools.jetTools import switchJetCollection
     switchJetCollection( process,
                      jetCollection=cms.InputTag('ak5CaloJets'),
                      jetCorrLabel=('AK5Calo', jetMetCorrections))
 
-def addSUSYJetCollection(process,jetMetCorrections,jets = 'IC5Calo',mcVersion='',doJTA=True,doType1MET=False,doJetID=True,jetIdLabel=None):
+def addSUSYJetCollection(process,jetMetCorrections,jets = 'IC5Calo',mcVersion='',doJTA=True,doType1MET=True,doJetID=True,jetIdLabel=None):
     from PhysicsTools.PatAlgos.tools.jetTools import addJetCollection
     algorithm = jets[0:3]
     type = jets[3:len(jets)]
@@ -485,15 +464,6 @@ def addSUSYJetCollection(process,jetMetCorrections,jets = 'IC5Calo',mcVersion=''
                      genJetCollection = cms.InputTag('%(collection)sGenJets' % locals())
                      )
 
-    if (type == 'PF'):
-        if ("L1FastJet" in jetMetCorrections):
-            setattr(getattr(process, jetCollection), "doAreaFastjet", True)
-            process.patDefaultSequence.replace(
-                process.kt6PFJets,
-                process.kt6PFJets + getattr(process, jetCollection)
-                )
-        else:
-            setattr(getattr(process, jetCollection), "doAreaFastjet", False)
 
 def addJetMET(process,theJetNames,jetMetCorrections,mcVersion):
     #-- Extra Jet/MET collections -------------------------------------------------
@@ -518,7 +488,9 @@ def addJetMET(process,theJetNames,jetMetCorrections,mcVersion):
     # Rename default jet collection for uniformity
     process.cleanPatJetsAK5Calo = process.cleanPatJets
     process.patMETsAK5Calo      = process.patMETs
-    addTypeIIMet(process)
+    
+    # TODO: fix type2 MET in 52X
+    #addTypeIIMet(process)
 
     # Modify subsequent modules
     process.patHemispheres.patJets = process.cleanPatJetsAK5Calo.label()
