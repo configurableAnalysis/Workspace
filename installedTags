@@ -10,7 +10,10 @@ addpkg PhysicsTools/PatUtils V03-09-22
 addpkg CommonTools/RecoUtils V00-00-09
 addpkg PhysicsTools/Configuration        V00-12-03
 
-cvs co -r cfA_v61 -d Workspace UserCode/pbgeff/cmssw/Workspace
+cvs co -r cfA_v62 -d Workspace UserCode/pbgeff/cmssw/Workspace
+
+#patch PFjet charged hadron subtraction
+cp Workspace/Patches/SUSY_pattuple_cff.py PhysicsTools/Configuration/python/SUSY_pattuple_cff.py
 
 # for May25th version of electron isolation
 addpkg  RecoParticleFlow/PFProducer V15-01-11
