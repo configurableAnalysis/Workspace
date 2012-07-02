@@ -746,7 +746,25 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
 	                 ),	 
 	                 Class = cms.string('pat::MET') 	 
 	             ), 	 
-	 
+	
+                  pfTypeIType0mets = cms.PSet(
+#                           src = cms.InputTag("patMETsTypeIPF"),  
+                           src = cms.InputTag("patPFMETsTypeIType0corrected"),
+                            leaves = cms.PSet(
+                             vars = cms.vstring('et:et',
+                                 'phi:phi',
+                                 'ex:px',
+                                 'ey:py',
+                                 'gen_et:genMET.et',
+                                 'gen_phi:genMET.phi',
+                                 'sign:metSignificance',
+                                 'sumEt:sumEt',
+                                 'unCPhi:uncorrectedPhi',
+                                 'unCPt:uncorrectedPt')
+                         ),
+                         Class = cms.string('pat::MET')
+                     ),
+ 
 
             tcmets = cms.PSet(
                   src = cms.InputTag("patMETsTC"),
