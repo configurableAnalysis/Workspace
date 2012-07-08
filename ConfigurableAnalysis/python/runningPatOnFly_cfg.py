@@ -24,12 +24,10 @@ options.register ('isFastSim','',
 				  "Switch between Full and FastSim")
 
 options.isFastSim = False
-options.isMC = True
 #options.isMC = False
+options.isMC = True
 options.output='configurableAnalysis.root'
 options.files='file:/LVM/SATA/wto/AOD/TTJets8TeVSummer12-PU_S7_START52_V5/output_1_1_as1.root'
-#options.files='file:/LVM/SATA/pbgeff/temp_52X_ntuple/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_Summer12-PU_S7_START52_V9-v2_AODSIM_event26278361.root'
-#options.files='file:/LVM/SATA/pbgeff/temp_52X_ntuple/MuHad_Run2012A-PromptReco-v1_AOD_709B4CB9-BF82-E111-BD9B-003048F1182E.root'
 #options.maxEvents=10
 #options.parseArguments()
 
@@ -109,21 +107,25 @@ process.patPFMETs = process.patMETs.clone(
     #addGenMET = cms.bool(True)
     )
 
-
-process.pfType1Type0CorrectedMet = process.pfType1CorrectedMet.clone(
-	applyType0Corrections = cms.bool(True),
-    )
-
-process.patPFMETsTypeIType0corrected = process.patPFMETs.clone(
-    metSource = cms.InputTag('pfType1Type0CorrectedMet'),
-    )
-
-
 process.pfType1CorrectedMet.applyType0Corrections = cms.bool(False)
 
 process.patPFMETsTypeIcorrected = process.patPFMETs.clone(
     metSource = cms.InputTag('pfType1CorrectedMet'),
     )
+
+process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
+process.pfType1Type0PFCandidateCorrectedMet = process.pfType1CorrectedMet.clone(
+	applyType0Corrections = cms.bool(False),
+	srcType1Corrections = cms.VInputTag(
+	cms.InputTag('pfMETcorrType0'),
+	cms.InputTag('pfJetMETcorr', 'type1')        
+	)
+    )
+
+process.patPFMETsTypeIType0PFCandcorrected = process.patPFMETs.clone(
+    metSource = cms.InputTag('pfType1Type0PFCandidateCorrectedMet'),
+   )
+
 
 #Turn on trigger info
 from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
@@ -233,8 +235,9 @@ else:
 process.p += process.kt6PFJetsForIsolation2011
 process.p += process.producePFMETCorrections
 process.p += process.patPFMETsTypeIcorrected
-process.p += process.pfType1Type0CorrectedMet
-process.p += process.patPFMETsTypeIType0corrected
+process.p += process.type0PFMEtCorrection
+process.p += process.pfType1Type0PFCandidateCorrectedMet
+process.p += process.patPFMETsTypeIType0PFCandcorrected
 
 
 process.trackingfailturefilter = cms.Path(process.trackingFailureFilter)
