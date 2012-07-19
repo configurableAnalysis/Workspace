@@ -9,6 +9,7 @@
 #include "DataFormats/TrackReco/interface/TrackExtra.h"
 #include "DataFormats/Scalers/interface/DcsStatus.h"
 #include "FWCore/Framework/interface/ESHandle.h"
+#include "FWCore/Utilities/interface/Exception.h"
 
 #include "DataFormats/Common/interface/ConditionsInEdm.h"
 #include "FWCore/Framework/interface/Run.h"
@@ -793,7 +794,16 @@ class AdHocNTupler : public NTupler {
    double sigmaY2= (pfMEThandle->front() ).getSignificanceMatrix()(1,1);
    float significance = -1;
    //required sanity check according to https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMETSignificance?rev=5#Known_Issues
-   if(sigmaX2<1.e10 && sigmaY2<1.e10) significance = (pfMEThandle->front() ).significance();
+   try {
+     if(sigmaX2<1.e10 && sigmaY2<1.e10) significance = (pfMEThandle->front() ).significance();
+   }
+   catch (cms::Exception &e) {
+     std::cout << "Caught exception in MET significance calculation:\n" 
+	       << e.what() 
+	       << "Setting MET significance to -1.0\n" 
+	       << std::endl;
+     significance = -1.;
+   }
    *pfmets_fullSignif_ = significance;
    *pfmets_fullSignifCov00_ = (float) sigmaX2;
    *pfmets_fullSignifCov10_ = (pfMEThandle->front() ).getSignificanceMatrix()(1,0);
