@@ -40,6 +40,7 @@ process.MessageLogger.cerr.PATSummaryTables = cms.untracked.PSet(
     limit = cms.untracked.int32(-1),
     reportEvery = cms.untracked.int32(100)
 )
+process.MessageLogger.suppressError = cms.untracked.vstring('patElectronsPF', 'patMuonsPF')
 
 #-- Source information ------------------------------------------------------
 process.source = cms.Source("PoolSource",
