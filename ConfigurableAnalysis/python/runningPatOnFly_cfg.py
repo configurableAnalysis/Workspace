@@ -27,7 +27,7 @@ options.isFastSim = False
 #options.isMC = False
 options.isMC = True
 options.output='configurableAnalysis.root'
-options.files='file:/LVM/SATA/wto/AOD/TTJets8TeVSummer12-PU_S7_START52_V5/output_1_1_as1.root'
+options.files='file:/cmsdata/RelValTTbar_CMSSW_5_3_2_patch1-START53_V7A-v1_GEN-SIM-RECO/D80E86FF-7EC7-E111-BB09-003048678DD6.root'
 #options.maxEvents=10
 #options.parseArguments()
 
@@ -53,7 +53,10 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 
 ## Geometry and Detector Conditions (needed for a few patTuple production steps)
-process.load("Configuration.StandardSequences.Geometry_cff")
+process.load("Configuration.Geometry.GeometryIdeal_cff")
+## The geometry sequence now generates a deprecation warning
+## and so has been replaced by the one above
+#process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
@@ -80,10 +83,10 @@ process.out = cms.OutputModule("PoolOutputModule",
 from PhysicsTools.Configuration.SUSY_pattuple_cff import addDefaultSUSYPAT, getSUSY_pattuple_outputCommands
 
 if options.isMC:
-	process.GlobalTag.globaltag = 'START52_V9B::All' # MC Setting
+	process.GlobalTag.globaltag = 'START53_V7E::All' # MC Setting
 	addDefaultSUSYPAT(process,True,'HLT',['L1FastJet','L2Relative','L3Absolute'],'',['AK5PF'])
 else:
-	process.GlobalTag.globaltag = 'GR_R_52_V9::All'   # Data Setting
+	process.GlobalTag.globaltag = 'GR_P_V40_AN1::All'   # Data Setting
 	addDefaultSUSYPAT(process,False,'HLT',['L1FastJet','L2Relative','L3Absolute','L2L3Residual'],'',['AK5PF'])
 	#process.metJESCorAK5PFTypeI.corrector = cms.string('ak5PFL2L3Residual') # Type1PFMET Residual for data only.
 
@@ -94,13 +97,17 @@ SUSY_pattuple_outputCommands = getSUSY_pattuple_outputCommands( process )
 
 ################### Add Type-I PFMET (for default RECO-PF jets) ########################
 process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
+process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
 
 # NOTE: use "ak5PFL1FastL2L3" for MC / "ak5PFL1FastL2L3Residual" for Data
 if options.isMC:
 	process.pfJetMETcorr.jetCorrLabel = "ak5PFL1FastL2L3"
+	process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
 else:
 	process.pfJetMETcorr.jetCorrLabel = "ak5PFL1FastL2L3Residual"
+	process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
 
+## generate typeI corrected pfMET (no Type0 correction)
 process.patPFMETs = process.patMETs.clone(
     metSource = cms.InputTag('pfMet'),
     addMuonCorrections = cms.bool(False),
@@ -114,6 +121,7 @@ process.patPFMETsTypeIcorrected = process.patPFMETs.clone(
     metSource = cms.InputTag('pfType1CorrectedMet'),
     )
 
+## generate typeI corrected pfMET (with Type0 correction)
 process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
 process.pfType1Type0PFCandidateCorrectedMet = process.pfType1CorrectedMet.clone(
 	applyType0Corrections = cms.bool(False),
@@ -127,6 +135,18 @@ process.patPFMETsTypeIType0PFCandcorrected = process.patPFMETs.clone(
     metSource = cms.InputTag('pfType1Type0PFCandidateCorrectedMet'),
    )
 
+## generate typeI corrected MET with x/y shift
+process.pfType1XYCorrectedMet = process.pfType1CorrectedMet.clone(
+	applyType0Corrections = cms.bool(False),
+	srcType1Corrections = cms.VInputTag(
+	cms.InputTag('pfJetMETcorr', 'type1'),        
+	cms.InputTag('pfMEtSysShiftCorr')
+	)
+   )
+
+process.patPFMETsTypeIXYcorrected = process.patPFMETs.clone(
+    metSource = cms.InputTag('pfType1XYCorrectedMet'),
+   )
 
 #Turn on trigger info
 from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
@@ -231,14 +251,19 @@ if options.isFastSim:
 	process.p += process.kt6PFJetsForIsolation2012
 else:
 	process.csctighthalofilter = cms.Path(process.CSCTightHaloFilter)
-        process.p = cms.Path(process.goodOfflinePrimaryVertices + process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
+        process.p = cms.Path(process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
 
 process.p += process.kt6PFJetsForIsolation2011
-process.p += process.producePFMETCorrections
-process.p += process.patPFMETsTypeIcorrected
+
+process.p += process.pfMEtSysShiftCorrSequence
 process.p += process.type0PFMEtCorrection
+process.p += process.producePFMETCorrections
+
+process.p += process.patPFMETsTypeIcorrected
 process.p += process.pfType1Type0PFCandidateCorrectedMet
 process.p += process.patPFMETsTypeIType0PFCandcorrected
+process.p += process.pfType1XYCorrectedMet
+process.p += process.patPFMETsTypeIXYcorrected
 
 
 process.trackingfailturefilter = cms.Path(process.trackingFailureFilter)
