@@ -1,30 +1,31 @@
 setenv SCRAM_ARCH slc5_amd64_gcc462
-cmsrel CMSSW_5_2_5
-cd CMSSW_5_2_5/src/
+cmsrel CMSSW_5_3_3_patch2
+cd CMSSW_5_3_3_patch2/src/
 cmsenv
-addpkg DataFormats/PatCandidates V06-05-01
-addpkg PhysicsTools/PatAlgos V08-09-11-00
-addpkg CommonTools/ParticleFlow V00-03-14
-addpkg JetMETCorrections/Type1MET V04-06-05
-addpkg PhysicsTools/PatUtils V03-09-22
-addpkg CommonTools/RecoUtils V00-00-09
-addpkg PhysicsTools/Configuration        V00-12-03
+addpkg CommonTools/ParticleFlow V00-03-16
+addpkg CommonTools/RecoAlgos V00-03-23
+addpkg CommonTools/RecoUtils V00-00-13
+addpkg DataFormats/ParticleFlowCandidate V15-03-02
+addpkg DataFormats/StdDictionaries V00-02-14
+addpkg DataFormats/TrackReco V10-02-02
+addpkg DataFormats/VertexReco V02-00-04
+addpkg PhysicsTools/PatAlgos V08-09-23
+addpkg PhysicsTools/PatUtils V03-09-23
 
-cvs co -r cfA_v63a -d Workspace UserCode/pbgeff/cmssw/Workspace
+addpkg RecoParticleFlow/PFProducer V15-01-11                    
+addpkg JetMETCorrections/Type1MET V04-06-09
 
-#patch PFjet charged hadron subtraction
-cp Workspace/Patches/SUSY_pattuple_cff.py PhysicsTools/Configuration/python/SUSY_pattuple_cff.py
+addpkg PhysicsTools/Configuration V00-12-03
 
-# for May25th version of electron isolation
-addpkg  RecoParticleFlow/PFProducer V15-01-11
+cvs co -r HEAD -d Workspace UserCode/pbgeff/cmssw/Workspace
 
 # for CSC halo filter (not yet updated for 2012)
 cvs co -r V00-00-08 RecoMET/METAnalyzers
 
+cvs co -r V00-00-08 RecoMET/METFilters
+
 #RA2b trigger prescale information
 cvs co -r V00-00-02 -d MyAnalyzers/TriggerFilter UserCode/Teo/MyAnalyzers/TriggerFilter
 
-# DataFormats/METReco not needed for release >=525
-cvs co -r V00-00-07 RecoMET/METFilters
 
 scram b -rj4
