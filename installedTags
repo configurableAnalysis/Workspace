@@ -17,7 +17,7 @@ addpkg JetMETCorrections/Type1MET V04-06-09
 
 addpkg PhysicsTools/Configuration V00-12-03
 
-cvs co -r HEAD -d Workspace UserCode/pbgeff/cmssw/Workspace
+cvs co -r cfA_v64 -d Workspace UserCode/pbgeff/cmssw/Workspace
 
 # for CSC halo filter (not yet updated for 2012)
 cvs co -r V00-00-08 RecoMET/METAnalyzers
