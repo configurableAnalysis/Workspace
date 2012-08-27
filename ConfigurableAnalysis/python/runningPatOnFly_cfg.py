@@ -27,7 +27,7 @@ options.isFastSim = False
 #options.isMC = False
 options.isMC = True
 options.output='configurableAnalysis.root'
-options.files='file:/cmsdata/RelValTTbar_CMSSW_5_3_2_patch1-START53_V7A-v1_GEN-SIM-RECO/D80E86FF-7EC7-E111-BB09-003048678DD6.root'
+options.files='file:/cmsdata/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_PU_S10_START53_V7A_AODSIM/ECDEFDB7-AAE1-E111-B576-003048C68A88.root'
 #options.maxEvents=10
 #options.parseArguments()
 
@@ -247,7 +247,7 @@ process.triggerFilterHT450 = process.pfht350PassPrescaleFilter.clone(
 process.passprescaleHT450filter = cms.Path( process.triggerFilterHT450 )
 
 if options.isFastSim:
-        process.p = cms.Path(process.goodOfflinePrimaryVertices + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
+        process.p = cms.Path( process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
 	process.p += process.kt6PFJetsForIsolation2012
 else:
 	process.csctighthalofilter = cms.Path(process.CSCTightHaloFilter)
