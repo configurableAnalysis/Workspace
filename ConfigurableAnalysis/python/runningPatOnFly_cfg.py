@@ -107,6 +107,12 @@ else:
 	process.pfJetMETcorr.jetCorrLabel = "ak5PFL1FastL2L3Residual"
 	process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
 
+##fix for Fastsim
+if options.isFastSim:
+	process.pfCandsNotInJet.bottomCollection = cms.InputTag("FSparticleFlow")
+	process.pfJetMETcorr.skipMuons = cms.bool(False)
+
+
 ## generate typeI corrected pfMET (no Type0 correction)
 process.patPFMETs = process.patMETs.clone(
     metSource = cms.InputTag('pfMet'),
