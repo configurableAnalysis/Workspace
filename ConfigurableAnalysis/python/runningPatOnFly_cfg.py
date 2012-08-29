@@ -22,7 +22,12 @@ options.register ('isFastSim','',
 				  VarParsing.multiplicity.singleton,
 				  VarParsing.varType.bool,
 				  "Switch between Full and FastSim")
+options.register ('ispre526FastSim','',
+                                  VarParsing.multiplicity.singleton,
+                                  VarParsing.varType.bool,
+                                  "When running on pre CMSSW_5_2_6 FastSim")
 
+options.ispre526FastSim = False
 options.isFastSim = False
 #options.isMC = False
 options.isMC = True
@@ -108,7 +113,7 @@ else:
 	process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
 
 ##fix for Fastsim
-if options.isFastSim:
+if options.isFastSim and options.ispre526FastSim:
 	process.pfCandsNotInJet.bottomCollection = cms.InputTag("FSparticleFlow")
 	process.pfJetMETcorr.skipMuons = cms.bool(False)
 
