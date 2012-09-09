@@ -1515,10 +1515,11 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
             ),
 
 
-#            tracks = cms.PSet(
-#                src = cms.InputTag("generalTracks"),
-#                leaves = cms.PSet(
-#                    vars = cms.vstring('chi2:chi2', 
+            tracks = cms.PSet(
+                src = cms.InputTag("generalTracks"),
+                leaves = cms.PSet(
+                    vars = cms.vstring(
+#			 'chi2:chi2', 
 #                        'trkExptHitsInner:trackerExpectedHitsInner.numberOfHits',
 #                        'trkExptHitsOuter:trackerExpectedHitsOuter.numberOfHits',
 #                        'trks_nlayerslost:hitPattern.trackerLayersWithoutMeasurement',
@@ -1526,44 +1527,45 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
 #                        'trksvalidpixelhits:hitPattern.numberOfValidPixelHits',
 #                        'trkslostpixelhits:hitPattern.numberOfLostPixelHits',
 #                        'ndof:ndof', 
-#                        'chg:charge', 
-#                        'pt:pt', 
-#                        'px:px', 
-#                        'py:py', 
-#                        'pz:pz', 
-#                        'eta:eta', 
-#                        'phi:phi', 
+                        'chg:charge', 
+                        'pt:pt', 
+                        'px:px', 
+                        'py:py', 
+                        'pz:pz', 
+                        'eta:eta', 
+                        'phi:phi', 
 #                        'theta:theta', 
-#                        'd0dum:d0', 
-#                        'dz:dz', 
-#                        'vx:vx', 
-#                        'vy:vy', 
-#                        'vz:vz',
+                        'd0dum:d0', 
+                        'dz:dz', 
+                        'vx:vx', 
+                        'vy:vy', 
+                        'vz:vz',
 #												'validFraction:validFraction', 
-#                        'numvalhits:numberOfValidHits', 
-#                        'numlosthits:numberOfLostHits', 
-#                        'd0dumErr:d0Error', 
-#                        'dzErr:dzError',
-#                        'ptErr:ptError', 
-#                        'etaErr:etaError', 
-#                        'phiErr:phiError', 
+                        'numvalhits:numberOfValidHits', 
+                        'numlosthits:numberOfLostHits', 
+                        'd0dumErr:d0Error', 
+                        'dzErr:dzError',
+                        'ptErr:ptError', 
+                        'etaErr:etaError', 
+                        'phiErr:phiError', 
 #                        'Nrechits:recHitsSize', 
 #                        'innerHitX:innerPosition.x', 
 #                        'innerHitY:innerPosition.y', 
 #                        'innerHitZ:innerPosition.z', 
 #                        'outerHitX:outerPosition.x', 
 #                        'outerHitY:outerPosition.y', 
-#                        'outerHitZ:outerPosition.z',												
+#                        'outerHitZ:outerPosition.z',			
 #												'outerPx:outerPx',
 #												'outerPy:outerPy',
 #												'outerPz:outerPz',
 #												'algo:algo',
-#                        'highPurity:quality("highPurity")'
-#                                       )
-#                ),
-#                selection = cms.string('pt>0.7'),
-#                Class = cms.string('reco::Track')
-#            ),
+                        'highPurity:quality("highPurity")'
+                                       )
+                ),
+                selection = cms.string('pt>2.0'),
+                Class = cms.string('reco::Track')
+            ),
+
 
             taus = cms.PSet(
                #               src = cms.InputTag("cleanPatTaus"),
@@ -1918,7 +1920,8 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
         			'mass:mass'
         		)
         	),
-			selection = cms.string('pt*jecFactor(0)>10.0 | pt>20.0'),
+#			selection = cms.string('pt*jecFactor(0)>10.0 | pt>10.0'),
+                       selection = cms.string('pt>10.0'),
         	Class = cms.string('pat::Jet')
         ),
 			),
