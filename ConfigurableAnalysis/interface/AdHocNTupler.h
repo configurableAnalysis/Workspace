@@ -27,6 +27,7 @@
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 
 #include "DataFormats/PatCandidates/interface/MET.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
 
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 
@@ -121,12 +122,7 @@ class AdHocNTupler : public NTupler {
     jets_AK5PFclean_corrL1L2L3_ = new std::vector<float>;
     jets_AK5PFclean_corrL1FastL2L3Residual_ = new std::vector<float>;
     jets_AK5PFclean_corrL1L2L3Residual_ = new std::vector<float>;
-    jets_AK5clean_corrL2L3_ = new std::vector<float>;
-    jets_AK5clean_corrL2L3Residual_ = new std::vector<float>;
-    jets_AK5clean_corrL1FastL2L3_ = new std::vector<float>;
-    jets_AK5clean_corrL1L2L3_ = new std::vector<float>;
-    jets_AK5clean_corrL1FastL2L3Residual_ = new std::vector<float>;
-    jets_AK5clean_corrL1L2L3Residual_ = new std::vector<float>;
+    jets_AK5PFclean_Uncert_ = new std::vector<float>;
     PU_zpositions_ = new std::vector<std::vector<float> >;
     PU_sumpT_lowpT_ = new std::vector<std::vector<float> >;
     PU_sumpT_highpT_ = new std::vector<std::vector<float> >;
@@ -141,6 +137,9 @@ class AdHocNTupler : public NTupler {
     pfmets_fullSignifCov00_ = new float;
     pfmets_fullSignifCov10_ = new float;
     pfmets_fullSignifCov11_ = new float;
+    softjetUp_dMEx_ = new float;
+    softjetUp_dMEy_ = new float;
+
   }
 
   ~AdHocNTupler(){
@@ -208,12 +207,7 @@ class AdHocNTupler : public NTupler {
     delete jets_AK5PFclean_corrL1L2L3_;
     delete jets_AK5PFclean_corrL1FastL2L3Residual_;
     delete jets_AK5PFclean_corrL1L2L3Residual_;
-    delete jets_AK5clean_corrL2L3_;
-    delete jets_AK5clean_corrL2L3Residual_;
-    delete jets_AK5clean_corrL1FastL2L3_;
-    delete jets_AK5clean_corrL1L2L3_;
-    delete jets_AK5clean_corrL1FastL2L3Residual_;
-    delete jets_AK5clean_corrL1L2L3Residual_;
+    delete jets_AK5PFclean_Uncert_;
     delete PU_zpositions_;
     delete PU_sumpT_lowpT_;
     delete PU_sumpT_highpT_;
@@ -224,11 +218,13 @@ class AdHocNTupler : public NTupler {
     delete PU_TrueNumInteractions_;
     delete rho_kt6PFJetsForIsolation2011_;
     delete rho_kt6PFJetsForIsolation2012_;
-
     delete  pfmets_fullSignif_;
     delete  pfmets_fullSignifCov00_;
     delete  pfmets_fullSignifCov10_;
     delete  pfmets_fullSignifCov11_;
+    delete softjetUp_dMEx_;
+    delete softjetUp_dMEy_;
+
   }
 
   uint registerleaves(edm::ProducerBase * producer){
@@ -316,12 +312,7 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("jets_AK5PFclean_corrL1L2L3",&jets_AK5PFclean_corrL1L2L3_);
       tree_->Branch("jets_AK5PFclean_corrL1FastL2L3Residual",&jets_AK5PFclean_corrL1FastL2L3Residual_);
       tree_->Branch("jets_AK5PFclean_corrL1L2L3Residual",&jets_AK5PFclean_corrL1L2L3Residual_);
-      tree_->Branch("jets_AK5_corrL2L3",&jets_AK5clean_corrL2L3_);
-      tree_->Branch("jets_AK5_corrL2L3Residual",&jets_AK5clean_corrL2L3Residual_);
-      tree_->Branch("jets_AK5_corrL1FastL2L3",&jets_AK5clean_corrL1FastL2L3_);
-      tree_->Branch("jets_AK5_corrL1L2L3",&jets_AK5clean_corrL1L2L3_);
-      tree_->Branch("jets_AK5_corrL1FastL2L3Residual",&jets_AK5clean_corrL1FastL2L3Residual_);
-      tree_->Branch("jets_AK5_corrL1L2L3Residual",&jets_AK5clean_corrL1L2L3Residual_);
+      tree_->Branch("jets_AK5PFclean_Uncert",&jets_AK5PFclean_Uncert_);
       tree_->Branch("PU_zpositions",&PU_zpositions_);
       tree_->Branch("PU_sumpT_lowpT",&PU_sumpT_lowpT_);
       tree_->Branch("PU_sumpT_highpT",&PU_sumpT_highpT_);
@@ -332,11 +323,13 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("PU_TrueNumInteractions",&PU_TrueNumInteractions_);
       tree_->Branch("rho_kt6PFJetsForIsolation2011",rho_kt6PFJetsForIsolation2011_,"rho_kt6PFJetsForIsolation2011/F");
       tree_->Branch("rho_kt6PFJetsForIsolation2012",rho_kt6PFJetsForIsolation2012_,"rho_kt6PFJetsForIsolation2012/F");
-
       tree_->Branch("pfmets_fullSignif",pfmets_fullSignif_,"pfmets_fullSignif/F");
       tree_->Branch("pfmets_fullSignifCov00",pfmets_fullSignifCov00_,"pfmets_fullSignifCov00/F");
       tree_->Branch("pfmets_fullSignifCov10",pfmets_fullSignifCov10_,"pfmets_fullSignifCov10/F");
       tree_->Branch("pfmets_fullSignifCov11",pfmets_fullSignifCov11_,"pfmets_fullSignifCov11/F");
+      tree_->Branch("softjetUp_dMEx",softjetUp_dMEx_,"softjetUp_dMEx/F");
+      tree_->Branch("softjetUp_dMEy",softjetUp_dMEy_,"softjetUp_dMEy/F");
+
     }
 
     else{
@@ -689,6 +682,10 @@ class AdHocNTupler : public NTupler {
     }
 
 
+   //Get PF jets---------------------------
+    edm::Handle< std::vector<pat::Jet> > jets;
+    //iEvent.getByLabel("selectedPatJetsPF",jets);
+    iEvent.getByLabel("cleanPatJetsAK5PF",jets);
 
     edm::Handle< std::vector<double> > ak5PFL2L3_;
     iEvent.getByLabel("JetCorrColl","ak5PFL2L3", ak5PFL2L3_);
@@ -702,36 +699,34 @@ class AdHocNTupler : public NTupler {
     iEvent.getByLabel("JetCorrColl","ak5PFL1FastL2L3Residual", ak5PFL1FastL2L3Residual_);
     edm::Handle< std::vector<double> > ak5PFL1L2L3Residual_;
     iEvent.getByLabel("JetCorrColl","ak5PFL1L2L3Residual", ak5PFL1L2L3Residual_);
-    edm::Handle< std::vector<double> > ak5CaloL2L3_;
-    iEvent.getByLabel("JetCorrColl","ak5CaloL2L3", ak5CaloL2L3_);
-    edm::Handle< std::vector<double> > ak5CaloL2L3Residual_;
-    iEvent.getByLabel("JetCorrColl","ak5CaloL2L3Residual", ak5CaloL2L3Residual_);
-    edm::Handle< std::vector<double> > ak5CaloL1FastL2L3_;
-    iEvent.getByLabel("JetCorrColl","ak5CaloL1FastL2L3", ak5CaloL1FastL2L3_);
-    edm::Handle< std::vector<double> > ak5CaloL1L2L3_;
-    iEvent.getByLabel("JetCorrColl","ak5CaloL1L2L3", ak5CaloL1L2L3_);
-    edm::Handle< std::vector<double> > ak5CaloL1FastL2L3Residual_;
-    iEvent.getByLabel("JetCorrColl","ak5CaloL1FastL2L3Residual", ak5CaloL1FastL2L3Residual_);
-    edm::Handle< std::vector<double> > ak5CaloL1L2L3Residual_;
-    iEvent.getByLabel("JetCorrColl","ak5CaloL1L2L3Residual", ak5CaloL1L2L3Residual_);
+    edm::Handle< std::vector<double> > ak5PFUncert_;
+    iEvent.getByLabel("JetCorrColl","ak5PFUncert", ak5PFUncert_);
+
+    if(jets->size() != (*ak5PFL2L3_).size()) {
+      throw cms::Exception("JetCorrProblem")
+         << "cleanPatJetsAK5PF collection different size than JetCorrColl.\n";
+    }
+
+    *softjetUp_dMEx_ = 0;
+    *softjetUp_dMEy_ = 0;
 
     for(uint it=0; it<(*ak5PFL2L3_).size(); it++){
-      (*jets_AK5PFclean_corrL2L3_).push_back((*ak5PFL2L3_)[it]);
-      (*jets_AK5PFclean_corrL2L3Residual_).push_back((*ak5PFL2L3Residual_)[it]);
-      (*jets_AK5PFclean_corrL1FastL2L3_).push_back((*ak5PFL1FastL2L3_)[it]);
-      (*jets_AK5PFclean_corrL1L2L3_).push_back((*ak5PFL1L2L3_)[it]);
-      (*jets_AK5PFclean_corrL1FastL2L3Residual_).push_back((*ak5PFL1FastL2L3Residual_)[it]);
-      (*jets_AK5PFclean_corrL1L2L3Residual_).push_back((*ak5PFL1L2L3Residual_)[it]);
+      if((jets->at(it)).pt()>10) { //only save jets with pT>10 GeV
+        (*jets_AK5PFclean_corrL2L3_).push_back((*ak5PFL2L3_)[it]);
+        (*jets_AK5PFclean_corrL2L3Residual_).push_back((*ak5PFL2L3Residual_)[it]);
+        (*jets_AK5PFclean_corrL1FastL2L3_).push_back((*ak5PFL1FastL2L3_)[it]);
+        (*jets_AK5PFclean_corrL1L2L3_).push_back((*ak5PFL1L2L3_)[it]);
+        (*jets_AK5PFclean_corrL1FastL2L3Residual_).push_back((*ak5PFL1FastL2L3Residual_)[it]);
+        (*jets_AK5PFclean_corrL1L2L3Residual_).push_back((*ak5PFL1L2L3Residual_)[it]);
+        (*jets_AK5PFclean_Uncert_).push_back((*ak5PFUncert_)[it]);
+      }
+      else { //save change in MET when soft jet energy increased by 10%
+	//subtract because MET opposite the extra jet energy 
+	*softjetUp_dMEx_ -= 0.1*(jets->at(it)).px();
+	*softjetUp_dMEy_ -= 0.1*(jets->at(it)).py();
+      }
     }
 
-    for(uint it=0; it<(*ak5CaloL2L3_).size(); it++){
-      (*jets_AK5clean_corrL2L3_).push_back((*ak5CaloL2L3_)[it]);
-      (*jets_AK5clean_corrL2L3Residual_).push_back((*ak5CaloL2L3Residual_)[it]);
-      (*jets_AK5clean_corrL1FastL2L3_).push_back((*ak5CaloL1FastL2L3_)[it]);
-      (*jets_AK5clean_corrL1L2L3_).push_back((*ak5CaloL1L2L3_)[it]);
-      (*jets_AK5clean_corrL1FastL2L3Residual_).push_back((*ak5CaloL1FastL2L3Residual_)[it]);
-      (*jets_AK5clean_corrL1L2L3Residual_).push_back((*ak5CaloL1L2L3Residual_)[it]);
-    }
 
   if(!iEvent.isRealData()) { //Access PU info in MC
     edm::Handle<std::vector< PileupSummaryInfo > >  PupInfo;
@@ -857,12 +852,7 @@ class AdHocNTupler : public NTupler {
     (*jets_AK5PFclean_corrL1L2L3_).clear();
     (*jets_AK5PFclean_corrL1FastL2L3Residual_).clear();
     (*jets_AK5PFclean_corrL1L2L3Residual_).clear();
-    (*jets_AK5clean_corrL2L3_).clear();
-    (*jets_AK5clean_corrL2L3Residual_).clear();
-    (*jets_AK5clean_corrL1FastL2L3_).clear();
-    (*jets_AK5clean_corrL1L2L3_).clear();
-    (*jets_AK5clean_corrL1FastL2L3Residual_).clear();
-    (*jets_AK5clean_corrL1L2L3Residual_).clear();
+    (*jets_AK5PFclean_Uncert_).clear();
     (*PU_zpositions_).clear();
     (*PU_sumpT_lowpT_).clear();
     (*PU_sumpT_highpT_).clear();
@@ -947,12 +937,7 @@ class AdHocNTupler : public NTupler {
   std::vector<float> * jets_AK5PFclean_corrL1L2L3_;
   std::vector<float> * jets_AK5PFclean_corrL1FastL2L3Residual_;
   std::vector<float> * jets_AK5PFclean_corrL1L2L3Residual_;
-  std::vector<float> * jets_AK5clean_corrL2L3_;
-  std::vector<float> * jets_AK5clean_corrL2L3Residual_;
-  std::vector<float> * jets_AK5clean_corrL1FastL2L3_;
-  std::vector<float> * jets_AK5clean_corrL1L2L3_;
-  std::vector<float> * jets_AK5clean_corrL1FastL2L3Residual_;
-  std::vector<float> * jets_AK5clean_corrL1L2L3Residual_;
+  std::vector<float> * jets_AK5PFclean_Uncert_;
   std::vector<std::vector<float> > * PU_zpositions_;
   std::vector<std::vector<float> > * PU_sumpT_lowpT_;
   std::vector<std::vector<float> > * PU_sumpT_highpT_;
@@ -963,10 +948,11 @@ class AdHocNTupler : public NTupler {
   std::vector<float> * PU_TrueNumInteractions_;
   float * rho_kt6PFJetsForIsolation2011_;
   float * rho_kt6PFJetsForIsolation2012_;
-
   float *  pfmets_fullSignif_;
   float *  pfmets_fullSignifCov00_;
   float *  pfmets_fullSignifCov10_;
   float *  pfmets_fullSignifCov11_;
+  float *  softjetUp_dMEx_;
+  float *  softjetUp_dMEy_;
 
 };

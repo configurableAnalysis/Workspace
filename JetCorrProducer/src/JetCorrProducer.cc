@@ -13,15 +13,16 @@
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDProducer.h"
-
+#include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-
+#include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "DataFormats/PatCandidates/interface/PFParticle.h"
@@ -45,7 +46,7 @@ class JetCorrProducer : public edm::EDProducer {
       
       // ----------member data ---------------------------
   typedef std::vector<double> JetCorrCollection;
-
+  typedef std::vector<double> JetEnergyUncert;
 
 
 };
@@ -61,14 +62,15 @@ JetCorrProducer::JetCorrProducer(const edm::ParameterSet& iConfig)
   produces<JetCorrCollection>( "ak5PFL1L2L3" ).setBranchAlias( "ak5PFL1L2L3s");
   produces<JetCorrCollection>( "ak5PFL1FastL2L3Residual" ).setBranchAlias( "ak5PFL1FastL2L3Residuals");
   produces<JetCorrCollection>( "ak5PFL1L2L3Residual" ).setBranchAlias( "ak5PFL1L2L3Residuals");
-
+  /*
   produces<JetCorrCollection>( "ak5CaloL2L3" ).setBranchAlias( "ak5CaloL2L3s");
   produces<JetCorrCollection>( "ak5CaloL2L3Residual" ).setBranchAlias( "ak5CaloL2L3Residuals");
   produces<JetCorrCollection>( "ak5CaloL1FastL2L3" ).setBranchAlias( "ak5CaloL1FastL2L3s");
   produces<JetCorrCollection>( "ak5CaloL1L2L3" ).setBranchAlias( "ak5CaloL1L2L3s");
   produces<JetCorrCollection>( "ak5CaloL1FastL2L3Residual" ).setBranchAlias( "ak5CaloL1FastL2L3Residuals");
   produces<JetCorrCollection>( "ak5CaloL1L2L3Residual" ).setBranchAlias( "ak5CaloL1L2L3Residuals");
-
+  */
+  produces<JetEnergyUncert>( "ak5PFUncert" ).setBranchAlias( "ak5PFUncerts");
 
 }
 
@@ -102,6 +104,7 @@ JetCorrProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    auto_ptr<JetCorrCollection> ak5PFL1FastL2L3Residuals( new JetCorrCollection );
    auto_ptr<JetCorrCollection> ak5PFL1L2L3Residuals( new JetCorrCollection );
 
+/*
 //Calo jet corrections
    auto_ptr<JetCorrCollection> ak5CaloL2L3s( new JetCorrCollection );
    auto_ptr<JetCorrCollection> ak5CaloL2L3Residuals( new JetCorrCollection );
@@ -109,6 +112,11 @@ JetCorrProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    auto_ptr<JetCorrCollection> ak5CaloL1L2L3s( new JetCorrCollection );
    auto_ptr<JetCorrCollection> ak5CaloL1FastL2L3Residuals( new JetCorrCollection );
    auto_ptr<JetCorrCollection> ak5CaloL1L2L3Residuals( new JetCorrCollection );
+*/
+
+//PF jet energy uncertainty
+   auto_ptr<JetEnergyUncert> ak5PFUncerts( new JetEnergyUncert );
+
 
    bool useResiduals = true;
    if(!iEvent.isRealData()) useResiduals = false; //No residual corrections in MC
@@ -117,11 +125,12 @@ JetCorrProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    std::string name1 = "ak5PFL2L3Residual"; 
    std::string name2 = "ak5PFL1FastL2L3Residual";
    std::string name3 = "ak5PFL1L2L3Residual";
-   std::string name4 = "ak5CaloL2L3Residual";
-   std::string name5 = "ak5CaloL1FastL2L3Residual";
-   std::string name6 = "ak5CaloL1L2L3Residual";
+   //std::string name4 = "ak5CaloL2L3Residual";
+   //std::string name5 = "ak5CaloL1FastL2L3Residual";
+   //std::string name6 = "ak5CaloL1L2L3Residual";
    if(!useResiduals) {//No residual corrections in MC
-     name1 = name2 = name3 = name4 = name5 = name6 = dummy;
+     name1 = name2 = name3 = dummy;
+     //name4 = name5 = name6 = dummy;
    }
 
 
@@ -132,12 +141,20 @@ JetCorrProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    const JetCorrector& ak5PFL1FastL2L3ResidualCorrector_ = * JetCorrector::getJetCorrector (name2, iSetup);
    const JetCorrector& ak5PFL1L2L3ResidualCorrector_ = * JetCorrector::getJetCorrector (name3, iSetup);
 
+/*
    const JetCorrector& ak5CaloL2L3Corrector_ = * JetCorrector::getJetCorrector ("ak5CaloL2L3", iSetup);
    const JetCorrector& ak5CaloL1FastL2L3Corrector_ = * JetCorrector::getJetCorrector ("ak5CaloL1FastL2L3", iSetup);
    const JetCorrector& ak5CaloL1L2L3Corrector_ = * JetCorrector::getJetCorrector ("ak5CaloL1L2L3", iSetup);
    const JetCorrector& ak5CaloL2L3ResidualCorrector_ = * JetCorrector::getJetCorrector (name4, iSetup);
    const JetCorrector& ak5CaloL1FastL2L3ResidualCorrector_ = * JetCorrector::getJetCorrector (name5, iSetup);
    const JetCorrector& ak5CaloL1L2L3ResidualCorrector_ = * JetCorrector::getJetCorrector (name6, iSetup);
+*/
+
+   //Get object used to calculate jet energy uncertainty
+   edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
+   iSetup.get<JetCorrectionsRecord>().get("AK5PF",JetCorParColl);
+   JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
+   JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(JetCorPar);
 
 
    //Get PF jet corrections---------------------------
@@ -158,24 +175,28 @@ JetCorrProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    for(  std::vector<pat::Jet>::const_iterator ijet = jets->begin(); ijet != jets->end(); ++ijet, ++iuncorrjet )
    {
 
-      pat::Jet uncorrJet = ijet->correctedJet("Uncorrected");
+      //int index = iuncorrjet-uncorJets.begin();
+      //const edm::RefToBase<reco::Jet> uncorjetRef(edm::Ref<std::vector<pat::Jet> >(&uncorJets,index));
 
-      int index = iuncorrjet-uncorJets.begin();
-      const edm::RefToBase<reco::Jet> uncorjetRef(edm::Ref<std::vector<pat::Jet> >(&uncorJets,index));
-
-      ak5PFL2L3s->push_back( ak5PFL2L3Corrector_.correction( *iuncorrjet, /*uncorjetRef,*/ iEvent,iSetup ) );
-      ak5PFL1FastL2L3s->push_back( ak5PFL1FastL2L3Corrector_.correction( *iuncorrjet, /*uncorjetRef,*/ iEvent,iSetup ) );
-      ak5PFL1L2L3s->push_back( ak5PFL1L2L3Corrector_.correction( *iuncorrjet, /*uncorjetRef,*/ iEvent,iSetup ) );
+      ak5PFL2L3s->push_back( ak5PFL2L3Corrector_.correction( *iuncorrjet,  iEvent,iSetup ) );
+      ak5PFL1FastL2L3s->push_back( ak5PFL1FastL2L3Corrector_.correction( *iuncorrjet,  iEvent,iSetup ) );
+      ak5PFL1L2L3s->push_back( ak5PFL1L2L3Corrector_.correction( *iuncorrjet,  iEvent,iSetup ) );
       if(useResiduals) {
-	ak5PFL2L3Residuals->push_back( ak5PFL2L3ResidualCorrector_.correction( *iuncorrjet, /*uncorjetRef,*/ iEvent,iSetup ) );
-	ak5PFL1FastL2L3Residuals->push_back( ak5PFL1FastL2L3ResidualCorrector_.correction( *iuncorrjet, /*uncorjetRef,*/ iEvent,iSetup ) );
-	ak5PFL1L2L3Residuals->push_back( ak5PFL1L2L3ResidualCorrector_.correction( *iuncorrjet, /*uncorjetRef,*/ iEvent,iSetup ) );
+	ak5PFL2L3Residuals->push_back( ak5PFL2L3ResidualCorrector_.correction( *iuncorrjet,  iEvent,iSetup ) );
+	ak5PFL1FastL2L3Residuals->push_back( ak5PFL1FastL2L3ResidualCorrector_.correction( *iuncorrjet,  iEvent,iSetup ) );
+	ak5PFL1L2L3Residuals->push_back( ak5PFL1L2L3ResidualCorrector_.correction( *iuncorrjet,  iEvent,iSetup ) );
       }
       else {
 	ak5PFL2L3Residuals->push_back(0);
 	ak5PFL1FastL2L3Residuals->push_back(0);
 	ak5PFL1L2L3Residuals->push_back(0);
       }
+
+      //Get jet energy uncertainty
+      jecUnc->setJetEta(ijet->eta());
+      jecUnc->setJetPt(ijet->pt()); // here you must use the CORRECTED jet pt
+      ak5PFUncerts->push_back( jecUnc->getUncertainty(true) );
+      
    }
 
    iEvent.put( ak5PFL2L3s, "ak5PFL2L3" );
@@ -184,9 +205,11 @@ JetCorrProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.put( ak5PFL1L2L3s, "ak5PFL1L2L3" );
    iEvent.put( ak5PFL1FastL2L3Residuals, "ak5PFL1FastL2L3Residual" );
    iEvent.put( ak5PFL1L2L3Residuals, "ak5PFL1L2L3Residual" );
+   iEvent.put( ak5PFUncerts, "ak5PFUncert" );
 
+   delete jecUnc;
 
-
+/*
    //Get Calo jet corrections---------------------------
     edm::Handle< std::vector<pat::Jet> > Calojets;
     iEvent.getByLabel("cleanPatJetsAK5Calo",Calojets);
@@ -209,13 +232,13 @@ JetCorrProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       int index = iuncorrCalojet-uncorCaloJets.begin();
       const edm::RefToBase<reco::Jet> uncorjetRef(edm::Ref<std::vector<pat::Jet> >(&uncorCaloJets,index));
 
-      ak5CaloL2L3s->push_back( ak5CaloL2L3Corrector_.correction( *iuncorrCalojet, /*uncorjetRef,*/ iEvent,iSetup ) );
-      ak5CaloL1FastL2L3s->push_back( ak5CaloL1FastL2L3Corrector_.correction( *iuncorrCalojet, /*uncorjetRef,*/ iEvent,iSetup ) );
-      ak5CaloL1L2L3s->push_back( ak5CaloL1L2L3Corrector_.correction( *iuncorrCalojet, /*uncorjetRef,*/ iEvent,iSetup ) );
+      ak5CaloL2L3s->push_back( ak5CaloL2L3Corrector_.correction( *iuncorrCalojet,  iEvent,iSetup ) );
+      ak5CaloL1FastL2L3s->push_back( ak5CaloL1FastL2L3Corrector_.correction( *iuncorrCalojet,  iEvent,iSetup ) );
+      ak5CaloL1L2L3s->push_back( ak5CaloL1L2L3Corrector_.correction( *iuncorrCalojet,  iEvent,iSetup ) );
       if(useResiduals) {
-	ak5CaloL2L3Residuals->push_back( ak5CaloL2L3ResidualCorrector_.correction( *iuncorrCalojet, /*uncorjetRef,*/ iEvent,iSetup ) );
-	ak5CaloL1FastL2L3Residuals->push_back( ak5CaloL1FastL2L3ResidualCorrector_.correction( *iuncorrCalojet, /*uncorjetRef,*/ iEvent,iSetup ) );
-	ak5CaloL1L2L3Residuals->push_back( ak5CaloL1L2L3ResidualCorrector_.correction( *iuncorrCalojet, /*uncorjetRef,*/ iEvent,iSetup ) );
+	ak5CaloL2L3Residuals->push_back( ak5CaloL2L3ResidualCorrector_.correction( *iuncorrCalojet,  iEvent,iSetup ) );
+	ak5CaloL1FastL2L3Residuals->push_back( ak5CaloL1FastL2L3ResidualCorrector_.correction( *iuncorrCalojet,  iEvent,iSetup ) );
+	ak5CaloL1L2L3Residuals->push_back( ak5CaloL1L2L3ResidualCorrector_.correction( *iuncorrCalojet,  iEvent,iSetup ) );
       }
       else {
 	ak5CaloL2L3Residuals->push_back(0);
@@ -230,7 +253,7 @@ JetCorrProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.put( ak5CaloL1L2L3s, "ak5CaloL1L2L3" );
    iEvent.put( ak5CaloL1FastL2L3Residuals, "ak5CaloL1FastL2L3Residual" );
    iEvent.put( ak5CaloL1L2L3Residuals, "ak5CaloL1L2L3Residual" );
-
+*/
 
  
 }
