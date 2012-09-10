@@ -1507,8 +1507,9 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                         'vpz:trackMomentumAtVtx.z',
                         'cx:TrackPositionAtCalo.x',
                         'cy:TrackPositionAtCalo.y',
-                        'cz:TrackPositionAtCalo.z'#,
+                        'cz:TrackPositionAtCalo.z',
                         #'IDRobust:electronIDRobust'
+                        'PATpassConversionVeto:passConversionVeto'
 									)
                 ),
                 Class = cms.string('pat::Electron')
@@ -1519,14 +1520,14 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                 src = cms.InputTag("generalTracks"),
                 leaves = cms.PSet(
                     vars = cms.vstring(
-#			 'chi2:chi2', 
+			 'chi2:chi2', 
 #                        'trkExptHitsInner:trackerExpectedHitsInner.numberOfHits',
 #                        'trkExptHitsOuter:trackerExpectedHitsOuter.numberOfHits',
 #                        'trks_nlayerslost:hitPattern.trackerLayersWithoutMeasurement',
 #                        'trks_nlayers:hitPattern.trackerLayersWithMeasurement',
 #                        'trksvalidpixelhits:hitPattern.numberOfValidPixelHits',
 #                        'trkslostpixelhits:hitPattern.numberOfLostPixelHits',
-#                        'ndof:ndof', 
+                        'ndof:ndof', 
                         'chg:charge', 
                         'pt:pt', 
                         'px:px', 
@@ -1756,8 +1757,9 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                         'vpz:trackMomentumAtVtx.z',
                         'cx:TrackPositionAtCalo.x', 
                         'cy:TrackPositionAtCalo.y', 
-                        'cz:TrackPositionAtCalo.z'#, 
+                        'cz:TrackPositionAtCalo.z', 
                         #'IDRobust:electronIDRobust'
+                        'PATpassConversionVeto:passConversionVeto'
                         )
                 ),
                 Class = cms.string('pat::Electron')
