@@ -97,6 +97,23 @@ else:
 
 process.pfNoTauPF.enable = cms.bool(False)
 SUSY_pattuple_outputCommands = getSUSY_pattuple_outputCommands( process )
+
+# make loose clones of the original electron collection
+process.pfRelaxedElectronsPF = process.pfIsolatedElectronsPF.clone()
+process.pfRelaxedElectronsPF.isolationCut = 9999.0
+process.patElectronsPF.pfElectronSource  = "pfRelaxedElectronsPF"
+process.pfElectronSequencePF.replace(process.pfIsolatedElectronsPF,
+                                     process.pfIsolatedElectronsPF +
+                                     process.pfRelaxedElectronsPF)
+
+# make loose clones of the original muon collection
+process.pfRelaxedMuonsPF = process.pfIsolatedMuonsPF.clone()
+process.pfRelaxedMuonsPF.isolationCut = 9999.0
+process.patMuonsPF.pfMuonSource  = "pfRelaxedMuonsPF"
+process.pfMuonSequencePF.replace(process.pfIsolatedMuonsPF,
+                                 process.pfIsolatedMuonsPF +
+                                 process.pfRelaxedMuonsPF)
+
 ############################## END SUSYPAT specifics ####################################
 
 
@@ -169,6 +186,8 @@ process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
 process.load('RecoMET.METAnalyzers.CSCHaloFilter_cfi')
 process.load('RecoMET.METFilters.trackingFailureFilter_cfi')
 process.load('RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi')
+## For AOD and RECO recommendation to use recovered rechits
+process.EcalDeadCellTriggerPrimitiveFilter.tpDigiCollection = cms.InputTag("ecalTPSkimNA")
 process.load('RecoMET.METFilters.inconsistentMuonPFCandidateFilter_cfi')
 process.load('RecoMET.METFilters.greedyMuonPFCandidateFilter_cfi')
 process.load('RecoMET.METFilters.eeNoiseFilter_cfi')
@@ -178,7 +197,7 @@ process.scrapingVeto = cms.EDFilter("FilterOutScraping",
                                      applyfilter = cms.untracked.bool(True),
                                      debugOn = cms.untracked.bool(False),
                                      numtrack = cms.untracked.uint32(10),
-                                     thresh = cms.untracked.double(0.2)
+                                     thresh = cms.untracked.double(0.25)
 )
 
 # The section below is for the filter on Boundary Energy. Available in AOD in CMSSW>44x
