@@ -28,6 +28,9 @@ options.register ('ispre526FastSim','',
                                   "When running on pre CMSSW_5_2_6 FastSim")
 
 options.ispre526FastSim = False
+options.isAug24ReReco = False
+options.isAug06ReReco = False
+options.isJuly13ReReco = False
 options.isFastSim = False
 #options.isMC = False
 options.isMC = True
@@ -91,7 +94,14 @@ if options.isMC:
 	process.GlobalTag.globaltag = 'START53_V7E::All' # MC Setting
 	addDefaultSUSYPAT(process,True,'HLT',['L1FastJet','L2Relative','L3Absolute'],'',['AK5PF'])
 else:
-	process.GlobalTag.globaltag = 'GR_P_V40_AN1::All'   # Data Setting
+	if options.isAug24ReReco:
+		process.GlobalTag.globaltag = 'FT_53_V10_AN2' 
+	elif options.isAug06ReReco:
+		process.GlobalTag.globaltag = 'FT_53_V6C_AN2' 
+	elif options.isJuly13ReReco:
+		process.GlobalTag.globaltag = 'FT_53_V6_AN2' 
+	else:
+		process.GlobalTag.globaltag = 'GR_P_V40_AN1::All'   # Data Setting
 	addDefaultSUSYPAT(process,False,'HLT',['L1FastJet','L2Relative','L3Absolute','L2L3Residual'],'',['AK5PF'])
 	#process.metJESCorAK5PFTypeI.corrector = cms.string('ak5PFL2L3Residual') # Type1PFMET Residual for data only.
 
