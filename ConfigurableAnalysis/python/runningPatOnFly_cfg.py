@@ -27,7 +27,26 @@ options.register ('ispre526FastSim','',
                                   VarParsing.varType.bool,
                                   "When running on pre CMSSW_5_2_6 FastSim")
 
+options.register ('isAug24ReReco','',
+                                  VarParsing.multiplicity.singleton,
+                                  VarParsing.varType.bool,
+                                  "When running on Aug24ReReco")
+
+options.register ('isAug06ReReco','',
+                                  VarParsing.multiplicity.singleton,
+                                  VarParsing.varType.bool,
+                                  "When running on Aug6ReReco")
+
+options.register ('isJuly13ReReco','',
+                                  VarParsing.multiplicity.singleton,
+                                  VarParsing.varType.bool,
+                                  "When running on July13ReReco")
+
+
 options.ispre526FastSim = False
+# The following three options select the correct global tag
+# as of the 14Sep2012 version of
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Summary_of_Global_Tags_used_in_o
 options.isAug24ReReco = False
 options.isAug06ReReco = False
 options.isJuly13ReReco = False
@@ -95,11 +114,11 @@ if options.isMC:
 	addDefaultSUSYPAT(process,True,'HLT',['L1FastJet','L2Relative','L3Absolute'],'',['AK5PF'])
 else:
 	if options.isAug24ReReco:
-		process.GlobalTag.globaltag = 'FT_53_V10_AN2' 
+		process.GlobalTag.globaltag = 'FT_53_V10_AN2::All' 
 	elif options.isAug06ReReco:
-		process.GlobalTag.globaltag = 'FT_53_V6C_AN2' 
+		process.GlobalTag.globaltag = 'FT_53_V6C_AN2::All' 
 	elif options.isJuly13ReReco:
-		process.GlobalTag.globaltag = 'FT_53_V6_AN2' 
+		process.GlobalTag.globaltag = 'FT_53_V6_AN2::All' 
 	else:
 		process.GlobalTag.globaltag = 'GR_P_V40_AN1::All'   # Data Setting
 	addDefaultSUSYPAT(process,False,'HLT',['L1FastJet','L2Relative','L3Absolute','L2L3Residual'],'',['AK5PF'])
