@@ -110,7 +110,7 @@ process.out = cms.OutputModule("PoolOutputModule",
 from PhysicsTools.Configuration.SUSY_pattuple_cff import addDefaultSUSYPAT, getSUSY_pattuple_outputCommands
 
 if options.isMC:
-	process.GlobalTag.globaltag = 'START53_V7E::All' # MC Setting
+	process.GlobalTag.globaltag = 'START53_V7F::All' # MC Setting
 	addDefaultSUSYPAT(process,True,'HLT',['L1FastJet','L2Relative','L3Absolute'],'',['AK5PF'])
 else:
 	if options.isAug24ReReco:
