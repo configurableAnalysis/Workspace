@@ -14,49 +14,28 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 
 process = cms.Process("PAT")
 options = VarParsing ('standard')
-options.register ('isMC','',
-				  VarParsing.multiplicity.singleton,
-				  VarParsing.varType.bool,
-				  "Switch between MC and Data")
-options.register ('isFastSim','',
-				  VarParsing.multiplicity.singleton,
-				  VarParsing.varType.bool,
-				  "Switch between Full and FastSim")
-options.register ('ispre526FastSim','',
-                                  VarParsing.multiplicity.singleton,
-                                  VarParsing.varType.bool,
-                                  "When running on pre CMSSW_5_2_6 FastSim")
 
-options.register ('isAug24ReReco','',
-                                  VarParsing.multiplicity.singleton,
-                                  VarParsing.varType.bool,
-                                  "When running on Aug24ReReco")
+globalTags = {"Data": "GR_P_V40_AN1::All", "Aug24ReReco": "FT_53_V10_AN2::All" , "Aug06ReReco": "FT_53_V6C_AN2::All", "July13ReReco": "FT_53_V6_AN2::All",
+	      "pre526FastSim": "START53_V7F::All", "526andLaterFastSim": "START53_V7F::All", "MC": "START53_V7F::All"}
+## ************************************************************
+## The following line must be configured properly
+## datasetType must be one of the options above in "globalTags"
+## ************************************************************
+datasetType = "MC"
 
-options.register ('isAug06ReReco','',
-                                  VarParsing.multiplicity.singleton,
-                                  VarParsing.varType.bool,
-                                  "When running on Aug6ReReco")
-
-options.register ('isJuly13ReReco','',
-                                  VarParsing.multiplicity.singleton,
-                                  VarParsing.varType.bool,
-                                  "When running on July13ReReco")
-
-
-options.ispre526FastSim = False
-# The following three options select the correct global tag
-# as of the 14Sep2012 version of
-# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Summary_of_Global_Tags_used_in_o
-options.isAug24ReReco = False
-options.isAug06ReReco = False
-options.isJuly13ReReco = False
-options.isFastSim = False
-#options.isMC = False
-options.isMC = True
+## options for testing
 options.output='configurableAnalysis.root'
 options.files='file:/cmsdata/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_PU_S10_START53_V7A_AODSIM/ECDEFDB7-AAE1-E111-B576-003048C68A88.root'
-#options.maxEvents=10
-#options.parseArguments()
+maxEvents=10
+
+## determine if we are running on an MC dataset
+isMC = False
+if globalTags[datasetType]=="MC" or globalTags[datasetType]=="pre526FastSim" or globalTags[datasetType]=="526andLaterFastSim":
+	isMC = True
+
+## Print out the cfA configuration information
+print "Using global tag " + globalTags[datasetType] + " selected from datasetType=" + datasetType
+print "isMC: " + str(isMC)
 
 #-- Message Logger ------------------------------------------------------------
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
@@ -73,7 +52,7 @@ process.MessageLogger.suppressError = cms.untracked.vstring('patElectronsPF', 'p
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(options.files)
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(maxEvents) )
 #process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange(
 #  '190645:10-190645:110',
 #)
@@ -109,20 +88,12 @@ process.out = cms.OutputModule("PoolOutputModule",
 #-- SUSYPAT and GlobalTag Settings -----------------------------------------------------------
 from PhysicsTools.Configuration.SUSY_pattuple_cff import addDefaultSUSYPAT, getSUSY_pattuple_outputCommands
 
-if options.isMC:
-	process.GlobalTag.globaltag = 'START53_V7F::All' # MC Setting
+process.GlobalTag.globaltag = globalTags[datasetType]
+
+if isMC:
 	addDefaultSUSYPAT(process,True,'HLT',['L1FastJet','L2Relative','L3Absolute'],'',['AK5PF'])
 else:
-	if options.isAug24ReReco:
-		process.GlobalTag.globaltag = 'FT_53_V10_AN2::All' 
-	elif options.isAug06ReReco:
-		process.GlobalTag.globaltag = 'FT_53_V6C_AN2::All' 
-	elif options.isJuly13ReReco:
-		process.GlobalTag.globaltag = 'FT_53_V6_AN2::All' 
-	else:
-		process.GlobalTag.globaltag = 'GR_P_V40_AN1::All'   # Data Setting
 	addDefaultSUSYPAT(process,False,'HLT',['L1FastJet','L2Relative','L3Absolute','L2L3Residual'],'',['AK5PF'])
-	#process.metJESCorAK5PFTypeI.corrector = cms.string('ak5PFL2L3Residual') # Type1PFMET Residual for data only.
 
 process.pfNoTauPF.enable = cms.bool(False)
 SUSY_pattuple_outputCommands = getSUSY_pattuple_outputCommands( process )
@@ -151,7 +122,7 @@ process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
 process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
 
 # NOTE: use "ak5PFL1FastL2L3" for MC / "ak5PFL1FastL2L3Residual" for Data
-if options.isMC:
+if isMC:
 	process.pfJetMETcorr.jetCorrLabel = "ak5PFL1FastL2L3"
 	process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
 else:
@@ -159,7 +130,7 @@ else:
 	process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
 
 ##fix for Fastsim
-if options.isFastSim and options.ispre526FastSim:
+if datasetType=="pre526FastSim":
 	process.pfCandsNotInJet.bottomCollection = cms.InputTag("FSparticleFlow")
 	process.pfJetMETcorr.skipMuons = cms.bool(False)
 
@@ -305,7 +276,7 @@ process.triggerFilterHT450 = process.pfht350PassPrescaleFilter.clone(
     )
 process.passprescaleHT450filter = cms.Path( process.triggerFilterHT450 )
 
-if options.isFastSim:
+if datasetType=="526andLaterFastSim" or datasetType=="pre526FastSim":
         process.p = cms.Path( process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
 	process.p += process.kt6PFJetsForIsolation2012
 else:
