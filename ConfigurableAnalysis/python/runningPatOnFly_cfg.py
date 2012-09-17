@@ -30,7 +30,7 @@ maxEvents=10
 
 ## determine if we are running on an MC dataset
 isMC = False
-if globalTags[datasetType]=="MC" or globalTags[datasetType]=="pre526FastSim" or globalTags[datasetType]=="526andLaterFastSim":
+if datasetType=="MC" or datasetType=="pre526FastSim" or datasetType=="526andLaterFastSim":
 	isMC = True
 
 ## Print out the cfA configuration information
