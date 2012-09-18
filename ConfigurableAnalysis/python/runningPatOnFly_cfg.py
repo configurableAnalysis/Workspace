@@ -15,7 +15,7 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 process = cms.Process("PAT")
 options = VarParsing ('standard')
 
-globalTags = {"Data": "GR_P_V40_AN1::All", "Aug24ReReco": "FT_53_V10_AN2::All" , "Aug06ReReco": "FT_53_V6C_AN2::All", "July13ReReco": "FT_53_V6_AN2::All",
+globalTags = {"PromptReco": "GR_P_V40_AN1::All", "Aug24ReReco": "FT_53_V10_AN2::All" , "Aug06ReReco": "FT_53_V6C_AN2::All", "July13ReReco": "FT_53_V6_AN2::All",
 	      "pre526FastSim": "START53_V7F::All", "526andLaterFastSim": "START53_V7F::All", "MC": "START53_V7F::All"}
 ## ************************************************************
 ## The following line must be configured properly
