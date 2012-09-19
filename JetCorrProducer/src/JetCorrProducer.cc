@@ -195,7 +195,8 @@ JetCorrProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       //Get jet energy uncertainty
       jecUnc->setJetEta(ijet->eta());
       jecUnc->setJetPt(ijet->pt()); // here you must use the CORRECTED jet pt
-      ak5PFUncerts->push_back( jecUnc->getUncertainty(true) );
+      double unc = fabs(ijet->eta()) <5.2 ? jecUnc->getUncertainty(true) : 0.0;
+      ak5PFUncerts->push_back( unc );
       
    }
 
