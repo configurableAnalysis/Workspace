@@ -277,11 +277,11 @@ process.triggerFilterHT450 = process.pfht350PassPrescaleFilter.clone(
 process.passprescaleHT450filter = cms.Path( process.triggerFilterHT450 )
 
 if datasetType=="526andLaterFastSim" or datasetType=="pre526FastSim":
-        process.p = cms.Path( process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
+        process.p = cms.Path( process.goodOfflinePrimaryVertices + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
 	process.p += process.kt6PFJetsForIsolation2012
 else:
 	process.csctighthalofilter = cms.Path(process.CSCTightHaloFilter)
-        process.p = cms.Path(process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
+        process.p = cms.Path(process.goodOfflinePrimaryVertices + process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
 
 process.p += process.kt6PFJetsForIsolation2011
 
