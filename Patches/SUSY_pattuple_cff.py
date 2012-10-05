@@ -171,7 +171,8 @@ def loadPF2PAT(process,mcInfo,jetMetCorrections,extMatch,doSusyTopProjection,pos
     #-- PF2PAT config -------------------------------------------------------------
     from PhysicsTools.PatAlgos.tools.pfTools import usePF2PAT
     usePF2PAT(process,runPF2PAT=True, jetAlgo='AK5',runOnMC=(mcInfo==1),postfix=postfix, jetCorrections=('AK5PFchs', jetMetCorrections), pvCollection=cms.InputTag('goodOfflinePrimaryVertices'))
-
+    #restore inclusiveVertexFinder to using offlinePrimaryVertices because it crashes with goodOfflinePrimaryVertices
+    process.inclusiveVertexFinder.primaryVertices = "offlinePrimaryVertices"
     # Get a list of good primary vertices, in 42x, these are DAF vertices
     from PhysicsTools.SelectorUtils.pvSelector_cfi import pvSelector
     process.goodOfflinePrimaryVertices = cms.EDFilter(
@@ -250,8 +251,8 @@ def loadPF2PAT(process,mcInfo,jetMetCorrections,extMatch,doSusyTopProjection,pos
         filter = cms.bool(False),
     )
 
-    process.pfPileUpPF.Vertices = "goodVertices"
-    process.pfPileUpPF.Enable = True
+    #process.pfPileUpPF.Vertices = "goodVertices"
+    #process.pfPileUpPF.Enable = True
 
     process.pfNoPileUpSequencePF.replace(process.pfPileUpPF,
                                          process.goodVertices + process.pfPileUpPF)
