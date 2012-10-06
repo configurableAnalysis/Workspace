@@ -170,9 +170,8 @@ def loadPF2PAT(process,mcInfo,jetMetCorrections,extMatch,doSusyTopProjection,pos
     process.patJetCorrFactors.levels = jetMetCorrections 
     #-- PF2PAT config -------------------------------------------------------------
     from PhysicsTools.PatAlgos.tools.pfTools import usePF2PAT
-    usePF2PAT(process,runPF2PAT=True, jetAlgo='AK5',runOnMC=(mcInfo==1),postfix=postfix, jetCorrections=('AK5PFchs', jetMetCorrections), pvCollection=cms.InputTag('goodOfflinePrimaryVertices'))
-    #restore inclusiveVertexFinder to using offlinePrimaryVertices because it crashes with goodOfflinePrimaryVertices
-    process.inclusiveVertexFinder.primaryVertices = "offlinePrimaryVertices"
+    #usePF2PAT(process,runPF2PAT=True, jetAlgo='AK5',runOnMC=(mcInfo==1),postfix=postfix, jetCorrections=('AK5PFchs', jetMetCorrections), pvCollection=cms.InputTag('goodOfflinePrimaryVertices'))
+    usePF2PAT(process,runPF2PAT=True, jetAlgo='AK5',runOnMC=(mcInfo==1),postfix=postfix, jetCorrections=('AK5PFchs', jetMetCorrections))
     # Get a list of good primary vertices, in 42x, these are DAF vertices
     from PhysicsTools.SelectorUtils.pvSelector_cfi import pvSelector
     process.goodOfflinePrimaryVertices = cms.EDFilter(
@@ -193,6 +192,7 @@ def loadPF2PAT(process,mcInfo,jetMetCorrections,extMatch,doSusyTopProjection,pos
     process.muonMatchPF.maxDPtRel   = cms.double(999999.)
     process.muonMatchPF.checkCharge = False
     process.pfPileUpPF.checkClosestZVertex = False
+    process.pfPileUpPF.Vertices = "goodOfflinePrimaryVertices"
     if extMatch:
         process.electronMatchPF.mcStatus = cms.vint32(1,5)
         process.electronMatchPF.matched = "mergedTruth"
