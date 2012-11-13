@@ -1,4 +1,5 @@
 #include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/PatCandidates/interface/Photon.h"
 #include "DataFormats/PatCandidates/interface/TriggerPath.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 #include "DataFormats/PatCandidates/interface/TriggerAlgorithm.h"
@@ -30,6 +31,9 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+
+#include "EGamma/EGammaAnalysisTools/src/PFIsolationEstimator.cc"
+#include "DataFormats/VertexReco/interface/Vertex.h"
 
 using namespace std;
 
@@ -139,6 +143,9 @@ class AdHocNTupler : public NTupler {
     pfmets_fullSignifCov11_ = new float;
     softjetUp_dMEx_ = new float;
     softjetUp_dMEy_ = new float;
+	 photon_chIsoValues = new std::vector<float>;
+	 photon_phIsoValues = new std::vector<float>;
+	 photon_nhIsoValues = new std::vector<float>;
 
   }
 
@@ -224,6 +231,9 @@ class AdHocNTupler : public NTupler {
     delete  pfmets_fullSignifCov11_;
     delete softjetUp_dMEx_;
     delete softjetUp_dMEy_;
+	 delete photon_chIsoValues;
+	 delete photon_phIsoValues;
+	 delete photon_nhIsoValues;
 
   }
 
@@ -329,6 +339,9 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("pfmets_fullSignifCov11",pfmets_fullSignifCov11_,"pfmets_fullSignifCov11/F");
       tree_->Branch("softjetUp_dMEx",softjetUp_dMEx_,"softjetUp_dMEx/F");
       tree_->Branch("softjetUp_dMEy",softjetUp_dMEy_,"softjetUp_dMEy/F");
+      tree_->Branch("photon_chIsoValues",&photon_chIsoValues);
+      tree_->Branch("photon_phIsoValues",&photon_phIsoValues);
+      tree_->Branch("photon_nhIsoValues",&photon_nhIsoValues);
 
     }
 
@@ -560,6 +573,16 @@ class AdHocNTupler : public NTupler {
     edm::Handle< std::vector<pat::Electron> > PFelectrons;
     iEvent.getByLabel("selectedPatElectronsPF",PFelectrons);
 
+	 edm::Handle< std::vector<pat::Photon> > photons;
+	 iEvent.getByLabel("cleanPatPhotons", photons);
+
+	 edm::Handle< reco::VertexCollection> vertexCollection;
+	 iEvent.getByLabel("offlinePrimaryVertices", vertexCollection);
+
+	 edm::Handle< reco::PFCandidateCollection> pfCandidatesH;
+	 iEvent.getByLabel("particleFlow", pfCandidatesH);
+	 const PFCandidateCollection thePfColl = *(pfCandidatesH.product());
+
     edm::Handle<reco::TrackCollection> tracks_h;
     iEvent.getByLabel("generalTracks", tracks_h);
 
@@ -681,6 +704,31 @@ class AdHocNTupler : public NTupler {
 
     }
 
+	//-- Get Photon iso variables
+	PFIsolationEstimator isolator;
+	isolator.initializePhotonIsolation(kTRUE);
+	isolator. setConeSize(0.3);
+
+	unsigned int ivtx = 0;
+	VertexRef myVtxRef(vertexCollection, ivtx);
+
+	for(std::vector<pat::Photon>::const_iterator ph=photons->begin(); ph!=photons->end(); ++ph) {
+		//isolator.fGetIsolation((*ph),&candColl, myVtxRef, Vertices);
+	
+		isolator.fGetIsolation(&*ph,
+										&thePfColl,
+									myVtxRef,
+									vertexCollection);
+
+	//	std::cout << " ChargedIso " << isolator.getIsolationCharged() << std::endl;
+   //   std::cout << " PhotonIso " << isolator.getIsolationPhoton() << std::endl;
+   //   std::cout << " NeutralHadron Iso " << isolator.getIsolationNeutral()  << std::endl;
+	
+	  (*photon_chIsoValues).push_back(isolator.getIsolationCharged());	
+	  (*photon_phIsoValues).push_back(isolator.getIsolationPhoton());	
+	  (*photon_nhIsoValues).push_back(isolator.getIsolationNeutral());	
+
+	}
 
    //Get PF jets---------------------------
     edm::Handle< std::vector<pat::Jet> > jets;
@@ -861,6 +909,9 @@ class AdHocNTupler : public NTupler {
     (*PU_NumInteractions_).clear();
     (*PU_bunchCrossing_).clear();
     (*PU_TrueNumInteractions_).clear();
+    (*photon_chIsoValues).clear();
+    (*photon_phIsoValues).clear();
+    (*photon_nhIsoValues).clear();
 
   }
 
@@ -954,5 +1005,8 @@ class AdHocNTupler : public NTupler {
   float *  pfmets_fullSignifCov11_;
   float *  softjetUp_dMEx_;
   float *  softjetUp_dMEy_;
+  std::vector<float> * photon_chIsoValues;
+  std::vector<float> * photon_phIsoValues;
+  std::vector<float> * photon_nhIsoValues;
 
 };
