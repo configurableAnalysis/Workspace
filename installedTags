@@ -28,5 +28,9 @@ cvs co -r V00-00-08 RecoMET/METFilters
 #RA2b trigger prescale information
 cvs co -r V00-00-02 -d MyAnalyzers/TriggerFilter UserCode/Teo/MyAnalyzers/TriggerFilter
 
+# Required for 2012 photon isolation variables
+cvs co -r V00-00-21 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
+cvs up -r 1.13 EGamma/EGammaAnalysisTools/interface/PFIsolationEstimator.h
+cvs up -r 1.20 EGamma/EGammaAnalysisTools/src/PFIsolationEstimator.cc
 
 scram b -rj4
