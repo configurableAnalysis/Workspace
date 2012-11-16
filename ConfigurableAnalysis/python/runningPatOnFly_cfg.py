@@ -25,7 +25,8 @@ datasetType = "MC"
 
 ## options for testing
 options.output='configurableAnalysis.root'
-options.files='file:/cmsdata/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_PU_S10_START53_V7A_AODSIM/ECDEFDB7-AAE1-E111-B576-003048C68A88.root'
+#options.files='file:/cmsdata/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_PU_S10_START53_V7A_AODSIM/ECDEFDB7-AAE1-E111-B576-003048C68A88.root'
+options.files='/store/mc/Summer12_DR53X/TTJets_SemiLeptMGDecays_8TeV-madgraph/AODSIM/PU_S10_START53_V7A-v1/00000/76C5E954-4214-E211-ACBC-001E67397D7D.root'
 maxEvents=10
 
 ## determine if we are running on an MC dataset
@@ -212,13 +213,17 @@ process.EcalDeadCellBoundaryEnergyFilter.limitDeadCellToChannelStatusEB = cms.vi
 process.EcalDeadCellBoundaryEnergyFilter.limitDeadCellToChannelStatusEE = cms.vint32(12,14)
 # End of Boundary Energy filter configuration 
 
-## The HCAL laser filter _____________________________________________________||
+## The HCAL and ECAL laser filters _____________________________________________________||
 process.load("RecoMET.METFilters.hcalLaserEventFilter_cfi")
 process.hcalLaserEventFilter.vetoByRunEventNumber=cms.untracked.bool(False)
 process.hcalLaserEventFilter.vetoByHBHEOccupancy=cms.untracked.bool(True)
+process.load('RecoMET.METFilters.ecalLaserCorrFilter_cfi')
 
 ## The EE bad SuperCrystal filter ____________________________________________||
 process.load('RecoMET.METFilters.eeBadScFilter_cfi')
+
+## Tracking filters
+process.load("Workspace.ConfigurableAnalysis.trackingFilters_cfi")
 
 #compute rho for 2011 effective area Egamma isolation corrections
 from RecoJets.JetProducers.kt4PFJets_cfi import *
@@ -241,6 +246,7 @@ process.out.outputCommands.append('keep *_patPFMETsTypeIcorrected_*_PAT')
 # Full path
 #This is to run on full sim or data
 process.hcallaserfilter = cms.Path(process.hcalLaserEventFilter)
+process.ecallaserfilter = cms.Path(process.ecalLaserCorrFilter)
 process.eebadscfilter = cms.Path(process.eeBadScFilter)
 process.ecaltpfilter = cms.Path(process.EcalDeadCellTriggerPrimitiveFilter)
 #Run both TP and BE filters; doesn't work right now
@@ -249,6 +255,11 @@ process.scrapingveto = cms.Path(process.scrapingVeto)
 process.greedymuonfilter = cms.Path(process.greedyMuonPFCandidateFilter)
 process.inconsistentPFmuonfilter = cms.Path(process.inconsistentMuonPFCandidateFilter)
 process.eenoisefilter = cms.Path(process.eeNoiseFilter)
+process.trackercoherentnoisefilter1 = cms.Path(process.toomanystripclus53X)  
+process.trackercoherentnoisefilter2 = cms.Path(process.manystripclus53X)
+process.trackertoomanyclustersfilter = cms.Path(process.logErrorTooManyClusters)
+process.trackertoomanytripletsfilter = cms.Path(process.logErrorTooManyTripletsPairs)
+process.trackertoomanyseedsfilter = cms.Path(process.logErrorTooManySeeds)
 process.passprescalePFHT350filter = cms.Path( process.pfht350PassPrescaleFilter )
 ## Adding more HT "active trigger" variables
 process.triggerFilterHT250 = process.pfht350PassPrescaleFilter.clone(

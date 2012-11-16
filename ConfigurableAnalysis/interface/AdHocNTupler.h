@@ -101,6 +101,9 @@ class AdHocNTupler : public NTupler {
     pf_els_PFphotonIsoR03 = new std::vector<float>;
     pf_els_PFneutralHadronIsoR03 = new std::vector<float>;
     pf_els_hasMatchedConversion = new std::vector<bool>;
+    trk_nTOBTEC = new int;
+    trk_ratioAllTOBTEC = new float;
+    trk_ratioJetTOBTEC = new float;
     hbhefilter_decision_ = new int;
     cschalofilter_decision_ = new int;
     ecalTPfilter_decision_ = new int;
@@ -110,8 +113,14 @@ class AdHocNTupler : public NTupler {
     greedymuonfilter_decision_ = new int;
     inconsistentPFmuonfilter_decision_ = new int;
     hcallaserfilter_decision_ = new int;
+    ecallaserfilter_decision_ = new int;
     eenoisefilter_decision_ = new int;
     eebadscfilter_decision_ = new int;
+    trackercoherentnoisefilter1_decision_ = new int;  
+    trackercoherentnoisefilter2_decision_ = new int;  
+    trackertoomanyclustersfilter_decision_ = new int; 
+    trackertoomanytripletsfilter_decision_ = new int; 
+    trackertoomanyseedsfilter_decision_ = new int;    
     passprescalePFHT350filter_decision_ = new int;
     passprescaleHT250filter_decision_ = new int;
     passprescaleHT300filter_decision_ = new int;
@@ -189,6 +198,9 @@ class AdHocNTupler : public NTupler {
     delete pf_els_PFphotonIsoR03;
     delete pf_els_PFneutralHadronIsoR03;
     delete pf_els_hasMatchedConversion;
+    delete trk_nTOBTEC;
+    delete trk_ratioAllTOBTEC;
+    delete trk_ratioJetTOBTEC;
     delete hbhefilter_decision_;
     delete cschalofilter_decision_;
     delete ecalTPfilter_decision_;
@@ -198,8 +210,14 @@ class AdHocNTupler : public NTupler {
     delete greedymuonfilter_decision_;
     delete inconsistentPFmuonfilter_decision_;
     delete hcallaserfilter_decision_;
+    delete ecallaserfilter_decision_;
     delete eenoisefilter_decision_;
     delete eebadscfilter_decision_;
+    delete trackercoherentnoisefilter1_decision_;
+    delete trackercoherentnoisefilter2_decision_;
+    delete trackertoomanyclustersfilter_decision_;
+    delete trackertoomanytripletsfilter_decision_;
+    delete trackertoomanyseedsfilter_decision_; 
     delete passprescalePFHT350filter_decision_;
     delete passprescaleHT250filter_decision_;
     delete passprescaleHT300filter_decision_;
@@ -297,17 +315,26 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("pf_els_PFphotonIsoR03",&pf_els_PFphotonIsoR03);
       tree_->Branch("pf_els_PFneutralHadronIsoR03",&pf_els_PFneutralHadronIsoR03);
       tree_->Branch("pf_els_hasMatchedConversion",&pf_els_hasMatchedConversion);
+      tree_->Branch("trk_nTOBTEC",trk_nTOBTEC,"Ctrk_nTOBTEC/I");	
+      tree_->Branch("trk_ratioAllTOBTEC",trk_ratioAllTOBTEC,"trk_ratioAllTOBTEC/F");
+      tree_->Branch("trk_ratioJetTOBTEC",trk_ratioJetTOBTEC,"trk_ratioJetTOBTEC/F");
       tree_->Branch("hbhefilter_decision",hbhefilter_decision_,"hbhefilter_decision/I");
       tree_->Branch("trackingfailurefilter_decision",trackingfailurefilter_decision_,"trackingfailurefilter_decision/I");
-			tree_->Branch("cschalofilter_decision",cschalofilter_decision_,"cschalofilter_decision/I");
-			tree_->Branch("ecalTPfilter_decision",ecalTPfilter_decision_,"ecalTPfilter_decision/I");
-                        tree_->Branch("ecalBEfilter_decision",ecalBEfilter_decision_,"ecalBEfilter_decision/I");
-			tree_->Branch("scrapingVeto_decision",scrapingVeto_decision_,"scrapingVeto_decision/I");
+      tree_->Branch("cschalofilter_decision",cschalofilter_decision_,"cschalofilter_decision/I");  		   
+      tree_->Branch("ecalTPfilter_decision",ecalTPfilter_decision_,"ecalTPfilter_decision/I");	   		   
+      tree_->Branch("ecalBEfilter_decision",ecalBEfilter_decision_,"ecalBEfilter_decision/I");	 		   
+      tree_->Branch("scrapingVeto_decision",scrapingVeto_decision_,"scrapingVeto_decision/I");	   		   
       tree_->Branch("greedymuonfilter_decision",greedymuonfilter_decision_,"greedymuonfilter_decision/I");
       tree_->Branch("inconsistentPFmuonfilter_decision",inconsistentPFmuonfilter_decision_,"inconsistentPFmuonfilter_decision/I");
       tree_->Branch("hcallaserfilter_decision",hcallaserfilter_decision_,"hcallaserfilter_decision/I");
+      tree_->Branch("ecallaserfilter_decision",ecallaserfilter_decision_,"ecallaserfilter_decision/I");
       tree_->Branch("eenoisefilter_decision",eenoisefilter_decision_,"eenoisefilter_decision/I");
       tree_->Branch("eebadscfilter_decision",eebadscfilter_decision_,"eebadscfilter_decision/I");
+      tree_->Branch("trackercoherentnoisefilter1_decision", trackercoherentnoisefilter1_decision_, "trackercoherentnoisefilter1 /I");
+      tree_->Branch("trackercoherentnoisefilter2_decision", trackercoherentnoisefilter2_decision_, "trackercoherentnoisefilter2 /I");
+      tree_->Branch("trackertoomanyclustersfilter_decision", trackertoomanyclustersfilter_decision_, "trackertoomanyclustersfilter/I");
+      tree_->Branch("trackertoomanytripletsfilter_decision", trackertoomanytripletsfilter_decision_, "trackertoomanytripletsfilter/I");
+      tree_->Branch("trackertoomanyseedsfilter_decision", trackertoomanyseedsfilter_decision_, "trackertoomanyseedsfilter /I");
       tree_->Branch("passprescalePFHT350filter_decision",passprescalePFHT350filter_decision_,"passprescalePFHT350filter_decision/I");
       tree_->Branch("passprescaleHT250filter_decision",passprescaleHT250filter_decision_,"passprescaleHT250filter_decision/I");
       tree_->Branch("passprescaleHT300filter_decision",passprescaleHT300filter_decision_,"passprescaleHT300filter_decision/I");
@@ -374,10 +401,13 @@ class AdHocNTupler : public NTupler {
 		// get hold of trigger names - based on TriggerResults object!
 		const edm::TriggerNames & triggerNames_ = iEvent.triggerNames(*hltresults);
 		int cschalofilterResult =1, trackingfailturefilterResult=1, ecaltpfilterResult=1, ecalbefilterResult=1, scrapingVetoResult=1;
-		int greedymuonfilterResult=1, inconsistentPFmuonfilterResult=1, hcallaserfilterResult=1,  eenoisefilterResult=1, eebadscfilterResult=1, passprescalePFHT350filterResult=1, passprescaleHT250filterResult=1, passprescaleHT300filterResult=1, passprescaleHT350filterResult=1, passprescaleHT400filterResult=1, passprescaleHT450filterResult=1;
+		int greedymuonfilterResult=1, inconsistentPFmuonfilterResult=1, hcallaserfilterResult=1, ecallaserfilterResult=1,  eenoisefilterResult=1;
+		int eebadscfilterResult=1, passprescalePFHT350filterResult=1, passprescaleHT250filterResult=1, passprescaleHT300filterResult=1;
+		int passprescaleHT350filterResult=1, passprescaleHT400filterResult=1, passprescaleHT450filterResult=1;
+		int trackercoherentnoisefilter1Result=1, trackercoherentnoisefilter2Result=1, trackertoomanyclustersfilterResult=1, trackertoomanytripletsfilterResult=1, trackertoomanyseedsfilterResult=1;
 		for (int itrig=0; itrig< ntrigs; itrig++) {
  			std::string trigName = triggerNames_.triggerName(itrig);
-  		int hltflag = (*hltresults)[itrig].accept();
+  		        int hltflag = (*hltresults)[itrig].accept();
 	 		if (trigName=="csctighthalofilter") cschalofilterResult = hltflag;
 	 		if (trigName=="trackingfailturefilter") trackingfailturefilterResult = hltflag;
 	 		if (trigName=="ecaltpfilter") ecaltpfilterResult = hltflag;
@@ -386,8 +416,14 @@ class AdHocNTupler : public NTupler {
 			if (trigName=="greedymuonfilter") greedymuonfilterResult = hltflag;
                         if (trigName=="inconsistentPFmuonfilter") inconsistentPFmuonfilterResult = hltflag;
                         if (trigName=="hcallaserfilter") hcallaserfilterResult = hltflag;
+                        if (trigName=="ecallaserfilter") ecallaserfilterResult = hltflag;
                         if (trigName=="eenoisefilter") eenoisefilterResult = hltflag;
                         if (trigName=="eebadscfilter") eebadscfilterResult = hltflag;
+			if (trigName=="trackercoherentnoisefilter1") trackercoherentnoisefilter1Result = hltflag; 
+                        if (trigName=="trackercoherentnoisefilter2") trackercoherentnoisefilter2Result = hltflag;
+                        if (trigName=="trackertoomanyclustersfilter") trackertoomanyclustersfilterResult = hltflag;
+                        if (trigName=="trackertoomanytripletsfilter") trackertoomanytripletsfilterResult = hltflag;
+                        if (trigName=="trackertoomanyseedsfilter") trackertoomanyseedsfilterResult = hltflag;
                         if (trigName=="passprescalePFHT350filter") passprescalePFHT350filterResult = hltflag;
 			if (trigName=="passprescaleHT250filter") passprescaleHT250filterResult = hltflag;
                         if (trigName=="passprescaleHT300filter") passprescaleHT300filterResult = hltflag;
@@ -405,8 +441,14 @@ class AdHocNTupler : public NTupler {
     *greedymuonfilter_decision_ = greedymuonfilterResult;
     *inconsistentPFmuonfilter_decision_ = inconsistentPFmuonfilterResult;
     *hcallaserfilter_decision_ = hcallaserfilterResult;
+    *ecallaserfilter_decision_ = ecallaserfilterResult;
     *eenoisefilter_decision_ = eenoisefilterResult;
     *eebadscfilter_decision_ = eebadscfilterResult;
+    *trackercoherentnoisefilter1_decision_ = trackercoherentnoisefilter1Result;
+    *trackercoherentnoisefilter2_decision_ = trackercoherentnoisefilter2Result;
+    *trackertoomanyclustersfilter_decision_ = trackertoomanyclustersfilterResult;
+    *trackertoomanytripletsfilter_decision_ = trackertoomanytripletsfilterResult;
+    *trackertoomanyseedsfilter_decision_ = trackertoomanyseedsfilterResult;
     *passprescalePFHT350filter_decision_ = passprescalePFHT350filterResult;	
     *passprescaleHT250filter_decision_ = passprescaleHT250filterResult;
     *passprescaleHT300filter_decision_ = passprescaleHT300filterResult;
@@ -852,6 +894,88 @@ class AdHocNTupler : public NTupler {
    *pfmets_fullSignifCov10_ = (pfMEThandle->front() ).getSignificanceMatrix()(1,0);
    *pfmets_fullSignifCov11_ = (float) sigmaY2;
 
+   //get tracking TOBTEC filter variables
+   // code copied from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/KStenson/TrackingFilters/plugins/TobTecFakesFilter.cc?view=markup
+   const double piconst = 3.141592653589793;
+   const double twopiconst = 2.0*piconst;
+   const int phibins = 100;
+   const double phibinsize = twopiconst/static_cast<double>(phibins);
+   Handle<reco::TrackCollection> trks;
+   iEvent.getByLabel("generalTracks",trks);
+  
+   int pxlmin = 4; // iteration 0 (InitialStep)
+   int pxlmax = 6; // iteration 2 (PixelPairStep)
+   int itertobtec = 10; // iteration 6 (TobTecStep)
+
+   int phiIterPixelTrks[phibins][2] = { {0} };
+   int phiIterTobTecTrks[phibins][2] = { {0} };
+   double n_iterPixelTrks = 0;
+   double n_iterTobTecTrks = 0;
+
+   int i_trkphi;
+   double trkabseta;
+   int trkalgo;
+
+   // Count up pixel seeded tracks (n_iterPixelTrks) and TOBTEC seeded tracks (n_iterTobTecTrks)
+   // Also count up pixel seeded and TOBTEC seeded tracks in bins of phi in the transition region
+   for (reco::TrackCollection::const_iterator trk=trks->begin(); trk!=trks->end(); ++trk){
+     trkalgo = trk->algo();
+     if (trkalgo >= pxlmin && trkalgo <= pxlmax) ++n_iterPixelTrks;
+     if (trkalgo == itertobtec) ++n_iterTobTecTrks;
+     trkabseta = fabs(trk->eta());
+     int zside = 0;
+     if (trk->eta() > 0) zside = 1;
+     if (trkabseta < 1.6 && trkabseta > 0.9) { // hardcode eta range from 0.9 to 1.6
+       i_trkphi = std::max(0,std::min(phibins-1,(int) ((trk->phi()+piconst)/phibinsize)));
+       if (trkalgo >= pxlmin && trkalgo <= pxlmax) ++phiIterPixelTrks[i_trkphi][zside];
+       if (trkalgo == itertobtec) ++phiIterTobTecTrks[i_trkphi][zside];
+     }
+   }
+   if (n_iterPixelTrks < 0.5) n_iterPixelTrks = 1.0; // avoid divide by zero
+   double ritertobtec = n_iterTobTecTrks / n_iterPixelTrks; // ratio of TOBTEC seeded to pixel seeded tracks
+
+   // Simple jet finder for TOBTEC seeded tracks.  Find the value of phi that maximizes
+   // the number of tracks inside a phi window of windowRange (only for tracks in the 
+   // transition region.
+   int windowRange = std::max(1,static_cast<int>(0.7/phibinsize+0.5));
+   int runPhiIterTobTec[phibins][2] = { {0} };
+   int lowindx;
+   int maxIterTobTecPhiTrks = -1;
+   int maxIterTobTecPhiTrksBin = -1;
+   int maxIterTobTecPhiTrksZBin = -1;
+   for (int zside = 0; zside < 2; ++zside) {
+     for (int iphi = phibins-windowRange+1; iphi < phibins; ++iphi) {
+       runPhiIterTobTec[0][zside] += phiIterTobTecTrks[iphi][zside];
+     }
+     runPhiIterTobTec[0][zside] += phiIterTobTecTrks[0][zside];
+     for (int iphi = 1; iphi < phibins; ++iphi) {
+       lowindx = iphi-windowRange;
+       if (lowindx < 0) lowindx += phibins;
+       runPhiIterTobTec[iphi][zside] = runPhiIterTobTec[iphi-1][zside] + phiIterTobTecTrks[iphi][zside] - phiIterTobTecTrks[lowindx][zside];
+       if (runPhiIterTobTec[iphi][zside] > maxIterTobTecPhiTrks) {
+ 	 maxIterTobTecPhiTrks = runPhiIterTobTec[iphi][zside];
+	 maxIterTobTecPhiTrksBin = iphi;
+	 maxIterTobTecPhiTrksZBin = zside;
+       }
+     }
+   }
+   double n_iterTobTecTrksInIterTobTecJet = static_cast<double>(maxIterTobTecPhiTrks);
+   double n_iterPixelTrksInIterTobTecJet = 0.0;
+
+   // Find the number of pixel seeded tracks in the same region that maximizes the number
+   // of TOBTEC seeded tracks.
+   int indx;
+   for (int iphi = maxIterTobTecPhiTrksBin-windowRange+1; iphi < maxIterTobTecPhiTrksBin+1; ++iphi) {
+     indx = iphi < 0 ? phibins+iphi : iphi;
+     n_iterPixelTrksInIterTobTecJet += phiIterPixelTrks[indx][maxIterTobTecPhiTrksZBin];
+   }
+   if (n_iterPixelTrksInIterTobTecJet < 0.5) n_iterPixelTrksInIterTobTecJet = 1.0; // avoid divide by zero
+   // Calculate ratio of TOBTEC seeded tracks in "jet" to pixel seeded tracks in same region
+   double ritertobtecjet = n_iterTobTecTrksInIterTobTecJet / n_iterPixelTrksInIterTobTecJet;
+
+   *trk_nTOBTEC = n_iterTobTecTrksInIterTobTecJet;
+   *trk_ratioAllTOBTEC = ritertobtec;
+   *trk_ratioJetTOBTEC = ritertobtecjet;
 
    //fill the tree    
     if (ownTheTree_){ tree_->Fill(); }
@@ -963,6 +1087,9 @@ class AdHocNTupler : public NTupler {
   std::vector<float> * pf_els_PFphotonIsoR03;
   std::vector<float> * pf_els_PFneutralHadronIsoR03;
   std::vector<bool> * pf_els_hasMatchedConversion;
+  int * trk_nTOBTEC;
+  float * trk_ratioAllTOBTEC;
+  float * trk_ratioJetTOBTEC;
   int * hbhefilter_decision_;
   int * cschalofilter_decision_;
   int * ecalTPfilter_decision_;
@@ -972,8 +1099,14 @@ class AdHocNTupler : public NTupler {
   int * greedymuonfilter_decision_;
   int * inconsistentPFmuonfilter_decision_;
   int * hcallaserfilter_decision_;
+  int * ecallaserfilter_decision_;
   int * eenoisefilter_decision_;
   int * eebadscfilter_decision_;
+  int * trackercoherentnoisefilter1_decision_; 
+  int * trackercoherentnoisefilter2_decision_;  
+  int * trackertoomanyclustersfilter_decision_; 
+  int * trackertoomanytripletsfilter_decision_; 
+  int * trackertoomanyseedsfilter_decision_;
   int * passprescalePFHT350filter_decision_;
   int * passprescaleHT250filter_decision_;
   int * passprescaleHT300filter_decision_;

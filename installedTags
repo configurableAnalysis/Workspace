@@ -23,7 +23,7 @@ cp Workspace/Patches/SUSY_pattuple_cff.py PhysicsTools/Configuration/python/SUSY
 # for CSC halo filter (not yet updated for 2012)
 cvs co -r V00-00-08 RecoMET/METAnalyzers
 
-cvs co -r V00-00-08 RecoMET/METFilters
+cvs co -r V00-00-10 RecoMET/METFilters
 
 #RA2b trigger prescale information
 cvs co -r V00-00-02 -d MyAnalyzers/TriggerFilter UserCode/Teo/MyAnalyzers/TriggerFilter
@@ -32,5 +32,11 @@ cvs co -r V00-00-02 -d MyAnalyzers/TriggerFilter UserCode/Teo/MyAnalyzers/Trigge
 cvs co -r V00-00-21 -d EGamma/EGammaAnalysisTools UserCode/EGamma/EGammaAnalysisTools
 cvs up -r 1.13 EGamma/EGammaAnalysisTools/interface/PFIsolationEstimator.h
 cvs up -r 1.20 EGamma/EGammaAnalysisTools/src/PFIsolationEstimator.cc
+
+# Tags for bad tracking filters
+cvs co -r V01-00-11-01 DPGAnalysis/Skims
+cvs co -r V00-11-17 DPGAnalysis/SiStripTools
+cvs co -r V00-00-08 DataFormats/TrackerCommon
+cvs co -r V01-09-05 RecoLocalTracker/SubCollectionProducers
 
 scram b -rj4

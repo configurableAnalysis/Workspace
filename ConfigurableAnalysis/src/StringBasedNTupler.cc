@@ -45,6 +45,7 @@ TreeBranch::value TreeBranch::branch(const edm::Event& iEvent){
   else ANOTHER_VECTOR_CLASS(pat::Tau);
   else ANOTHER_VECTOR_CLASS(pat::Hemisphere);
   else ANOTHER_VECTOR_CLASS(pat::Photon);
+  else ANOTHER_VECTOR_CLASS(reco::CaloMET);
   else ANOTHER_VECTOR_CLASS(reco::Muon);
   else ANOTHER_VECTOR_CLASS(reco::Track);
   else ANOTHER_VECTOR_CLASS(reco::GsfElectron);

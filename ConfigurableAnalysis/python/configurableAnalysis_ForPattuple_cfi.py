@@ -795,6 +795,18 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                   Class = cms.string('pat::MET')
             ),
                                                                         
+            metsHO = cms.PSet(
+                  src = cms.InputTag("metHO"),
+                  leaves = cms.PSet(
+                      vars = cms.vstring('et:et',
+                                         'phi:phi',
+                                         'ex:px',
+                                         'ey:py',
+                                         'sumEt:sumEt',
+                                         )
+                      ),
+                  Class = cms.string('reco::CaloMET')
+            ),
 
             photons = cms.PSet(
                 src = cms.InputTag("cleanPatPhotons"),#clean<=>all
