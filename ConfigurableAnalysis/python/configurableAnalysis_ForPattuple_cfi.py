@@ -813,6 +813,7 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                 leaves = cms.PSet(
                     basicKinematicLeaves,
                     vars= cms.vstring('hadOverEM:hadronicOverEm',
+                                      'hadTowOverEM:hadTowOverEm',
                                       'scEnergy:superCluster.energy',
                                       'scRawEnergy:superCluster.rawEnergy',
                                       'scEta:superCluster.position.eta',
