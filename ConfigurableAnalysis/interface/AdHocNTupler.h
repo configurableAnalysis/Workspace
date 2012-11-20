@@ -35,6 +35,9 @@
 #include "EGamma/EGammaAnalysisTools/src/PFIsolationEstimator.cc"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 
+//for conversion safe electron veto
+#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
+
 using namespace std;
 
 class AdHocNTupler : public NTupler {
@@ -155,6 +158,7 @@ class AdHocNTupler : public NTupler {
 	 photon_chIsoValues = new std::vector<float>;
 	 photon_phIsoValues = new std::vector<float>;
 	 photon_nhIsoValues = new std::vector<float>;
+	 photon_passElectronVeto = new std::vector<bool>;
 
   }
 
@@ -252,6 +256,7 @@ class AdHocNTupler : public NTupler {
 	 delete photon_chIsoValues;
 	 delete photon_phIsoValues;
 	 delete photon_nhIsoValues;
+	 delete photon_passElectronVeto;
 
   }
 
@@ -369,6 +374,7 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("photon_chIsoValues",&photon_chIsoValues);
       tree_->Branch("photon_phIsoValues",&photon_phIsoValues);
       tree_->Branch("photon_nhIsoValues",&photon_nhIsoValues);
+      tree_->Branch("photon_passElectronVeto",&photon_passElectronVeto);
 
     }
 
@@ -746,6 +752,13 @@ class AdHocNTupler : public NTupler {
 
     }
 
+	//-- Prepare safe electron conversion variables
+	edm::Handle<reco::ConversionCollection> hVetoConversions;
+	iEvent.getByLabel("allConversions", hVetoConversions);
+
+	edm::Handle<reco::GsfElectronCollection> hVetoElectrons;
+	iEvent.getByLabel("gsfElectrons", hVetoElectrons);	
+
 	//-- Get Photon iso variables
 	PFIsolationEstimator isolator;
 	isolator.initializePhotonIsolation(kTRUE);
@@ -753,6 +766,8 @@ class AdHocNTupler : public NTupler {
 
 	unsigned int ivtx = 0;
 	VertexRef myVtxRef(vertexCollection, ivtx);
+
+	bool passelectronveto = false;
 
 	for(std::vector<pat::Photon>::const_iterator ph=photons->begin(); ph!=photons->end(); ++ph) {
 		//isolator.fGetIsolation((*ph),&candColl, myVtxRef, Vertices);
@@ -768,7 +783,11 @@ class AdHocNTupler : public NTupler {
 	
 	  (*photon_chIsoValues).push_back(isolator.getIsolationCharged());	
 	  (*photon_phIsoValues).push_back(isolator.getIsolationPhoton());	
-	  (*photon_nhIsoValues).push_back(isolator.getIsolationNeutral());	
+	  (*photon_nhIsoValues).push_back(isolator.getIsolationNeutral());
+
+	  	passelectronveto = !ConversionTools::hasMatchedPromptElectron(ph->superCluster(), hVetoElectrons, hVetoConversions, beamspot.position());
+
+		(*photon_passElectronVeto).push_back(passelectronveto);
 
 	}
 
@@ -1036,6 +1055,7 @@ class AdHocNTupler : public NTupler {
     (*photon_chIsoValues).clear();
     (*photon_phIsoValues).clear();
     (*photon_nhIsoValues).clear();
+    (*photon_passElectronVeto).clear();
 
   }
 
@@ -1141,5 +1161,6 @@ class AdHocNTupler : public NTupler {
   std::vector<float> * photon_chIsoValues;
   std::vector<float> * photon_phIsoValues;
   std::vector<float> * photon_nhIsoValues;
+  std::vector<bool> * photon_passElectronVeto;
 
 };
