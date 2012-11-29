@@ -762,7 +762,7 @@ class AdHocNTupler : public NTupler {
 	//-- Get Photon iso variables
 	PFIsolationEstimator isolator;
 	isolator.initializePhotonIsolation(kTRUE);
-	isolator. setConeSize(0.3);
+	isolator.setConeSize(0.3);
 
 	unsigned int ivtx = 0;
 	VertexRef myVtxRef(vertexCollection, ivtx);
