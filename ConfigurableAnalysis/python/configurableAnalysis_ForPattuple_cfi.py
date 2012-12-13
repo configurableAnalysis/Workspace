@@ -882,6 +882,42 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                 Class = cms.string('pat::Photon')
             ),
 
+            pf_photons = cms.PSet(
+                src = cms.InputTag("pfPhotonTranslator:pfphot"),#pf photons
+                leaves = cms.PSet(
+                    basicKinematicLeaves,
+                    vars= cms.vstring('hadOverEM:hadronicOverEm',
+                                      'hadTowOverEM:hadTowOverEm',
+                                      'scEnergy:superCluster.energy',
+                                      'scRawEnergy:superCluster.rawEnergy',
+                                      'scEta:superCluster.position.eta',
+                                      'scPhi:superCluster.position.phi',
+                                      'scEtaWidth:superCluster.etaWidth',
+                                      'scPhiWidth:superCluster.phiWidth',
+                                      'isAlsoElectron:isElectron',
+                                      'hasPixelSeed:hasPixelSeed',
+                                      'isConverted:isConvertedPhoton',
+                                      'isEBGap:isEBGap',
+                                      'isEEGap:isEEGap',
+                                      'isEBEEGap:isEBEEGap',
+                                      'isEBPho:isEB',#changed from isEBPho
+                                      'isEEPho:isEE',#changed from isEEPho
+                                      'maxEnergyXtal:maxEnergyXtal',
+                                      'e1x5:e1x5',
+                                      'e2x5:e2x5',
+                                      'e3x3:e3x3',
+                                      'e5x5:e5x5',
+                                      'sigmaEtaEta:sigmaEtaEta',
+                                      'sigmaIetaIeta:sigmaIetaIeta',
+                                      'r9:r9',
+                                      'chIso:chargedHadronIso',
+                                      'nhIso:neutralHadronIso',
+                                      'phIso:photonIso'
+                                    )
+                                    ),
+               Class = cms.string('reco::Photon')
+            ),
+
             mc_doc = cms.PSet(
                 src = cms.InputTag("genParticles"),
                 leaves = cms.PSet(
