@@ -423,7 +423,6 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                Class = cms.string('reco::Vertex'),
            ),
 
-
            beamSpot = cms.PSet(  
            	src = cms.InputTag("offlineBeamSpot"),
             leaves = cms.PSet(
@@ -450,6 +449,20 @@ configurableAnalysis = cms.EDFilter("ConfigurableAnalysis",
                 ),
             Class = cms.string('reco::BeamSpot')
             ),
+
+            mc_pdf = cms.PSet(
+              src = cms.InputTag("generator"),
+               leaves = cms.PSet(
+                       vars = cms.vstring(
+                         'x1:pdf.x.first',
+                         'x2:pdf.x.second',
+                         'q:pdf.scalePDF',
+                         'id1:pdf.id.first',
+                         'id2:pdf.id.second'
+                      ),
+                   ),
+               Class = cms.string('GenEventInfoProduct'),
+               ),
                                                                               
             mus = cms.PSet(
                 src = cms.string('muons'),

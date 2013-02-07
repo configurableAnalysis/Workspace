@@ -155,6 +155,9 @@ class AdHocNTupler : public NTupler {
     pfmets_fullSignifCov11_ = new float;
     softjetUp_dMEx_ = new float;
     softjetUp_dMEy_ = new float;
+    pdfweights_cteq_ = new std::vector<float>;
+    pdfweights_mstw_ = new std::vector<float>;
+    pdfweights_nnpdf_ = new std::vector<float>;
 	 photon_chIsoValues = new std::vector<float>;
 	 photon_phIsoValues = new std::vector<float>;
 	 photon_nhIsoValues = new std::vector<float>;
@@ -253,6 +256,9 @@ class AdHocNTupler : public NTupler {
     delete  pfmets_fullSignifCov11_;
     delete softjetUp_dMEx_;
     delete softjetUp_dMEy_;
+    delete pdfweights_cteq_;
+    delete pdfweights_mstw_;
+    delete pdfweights_nnpdf_;
 	 delete photon_chIsoValues;
 	 delete photon_phIsoValues;
 	 delete photon_nhIsoValues;
@@ -371,6 +377,9 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("pfmets_fullSignifCov11",pfmets_fullSignifCov11_,"pfmets_fullSignifCov11/F");
       tree_->Branch("softjetUp_dMEx",softjetUp_dMEx_,"softjetUp_dMEx/F");
       tree_->Branch("softjetUp_dMEy",softjetUp_dMEy_,"softjetUp_dMEy/F");
+      tree_->Branch("pdfweights_cteq",&pdfweights_cteq_);
+      tree_->Branch("pdfweights_mstw",&pdfweights_mstw_);
+      tree_->Branch("pdfweights_nnpdf",&pdfweights_nnpdf_);
       tree_->Branch("photon_chIsoValues",&photon_chIsoValues);
       tree_->Branch("photon_phIsoValues",&photon_phIsoValues);
       tree_->Branch("photon_nhIsoValues",&photon_nhIsoValues);
@@ -913,6 +922,40 @@ class AdHocNTupler : public NTupler {
    *pfmets_fullSignifCov10_ = (pfMEThandle->front() ).getSignificanceMatrix()(1,0);
    *pfmets_fullSignifCov11_ = (float) sigmaY2;
 
+   //this is slightly dangerous in the sense that if the inputtag is missing but
+   //the user intends it to be there, the code will silently continue
+   //But it provides a smooth mechanism to disable the pdf weights in the python...
+   //just don't run the PdfWeightProducer
+   edm::InputTag pdfWeightTag("pdfWeights:cteq66"); // or any other PDF set
+   edm::Handle<std::vector<double> > weightHandle;
+   iEvent.getByLabel(pdfWeightTag, weightHandle);
+
+   if (!weightHandle.failedToGet()) {
+     std::vector<double> weights = (*weightHandle);
+     unsigned int nmembers = weights.size();
+     for (unsigned int j=0; j<nmembers; j++)   pdfweights_cteq_->push_back(weights[j]);
+   }
+
+   edm::InputTag pdfWeightTag2("pdfWeights:MSTW2008nlo68cl"); // or any other PDF set
+   edm::Handle<std::vector<double> > weightHandle2;
+   iEvent.getByLabel(pdfWeightTag2, weightHandle2);
+
+   if (!weightHandle2.failedToGet()) {
+     std::vector<double> weights2 = (*weightHandle2);
+     unsigned int nmembers2 = weights2.size();
+     for (unsigned int j2=0; j2<nmembers2; j2++) pdfweights_mstw_->push_back(weights2[j2]);
+   }
+   
+   edm::InputTag pdfWeightTag3("pdfWeights:NNPDF20"); // or any other PDF set
+   edm::Handle<std::vector<double> > weightHandle3;
+   iEvent.getByLabel(pdfWeightTag3, weightHandle3);
+
+   if (!weightHandle3.failedToGet()) {
+     std::vector<double> weights3 = (*weightHandle3);
+     unsigned int nmembers3 = weights3.size();
+     for (unsigned int j3=0; j3<nmembers3; j3++) pdfweights_nnpdf_->push_back(weights3[j3]);
+   }
+
    //get tracking TOBTEC filter variables
    // code copied from http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/KStenson/TrackingFilters/plugins/TobTecFakesFilter.cc?view=markup
    const double piconst = 3.141592653589793;
@@ -1052,6 +1095,9 @@ class AdHocNTupler : public NTupler {
     (*PU_NumInteractions_).clear();
     (*PU_bunchCrossing_).clear();
     (*PU_TrueNumInteractions_).clear();
+    (*pdfweights_cteq_).clear();
+    (*pdfweights_mstw_).clear();
+    (*pdfweights_nnpdf_).clear();
     (*photon_chIsoValues).clear();
     (*photon_phIsoValues).clear();
     (*photon_nhIsoValues).clear();
@@ -1158,6 +1204,9 @@ class AdHocNTupler : public NTupler {
   float *  pfmets_fullSignifCov11_;
   float *  softjetUp_dMEx_;
   float *  softjetUp_dMEy_;
+  std::vector<float> * pdfweights_cteq_;
+  std::vector<float> * pdfweights_mstw_;
+  std::vector<float> * pdfweights_nnpdf_;
   std::vector<float> * photon_chIsoValues;
   std::vector<float> * photon_phIsoValues;
   std::vector<float> * photon_nhIsoValues;

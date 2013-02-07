@@ -22,11 +22,14 @@ globalTags = {"PromptReco": "GR_P_V40_AN1::All", "Aug24ReReco": "FT_53_V10_AN2::
 ## datasetType must be one of the options above in "globalTags"
 ## ************************************************************
 datasetType = "MC"
+#change to True to store the PDF weights in the ntuple (requires special setup)
+usePdfWeights = False
 
 ## options for testing
 options.output='configurableAnalysis.root'
-#options.files='file:/cmsdata/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_PU_S10_START53_V7A_AODSIM/ECDEFDB7-AAE1-E111-B576-003048C68A88.root'
-options.files='/store/mc/Summer12_DR53X/TTJets_SemiLeptMGDecays_8TeV-madgraph/AODSIM/PU_S10_START53_V7A-v1/00000/76C5E954-4214-E211-ACBC-001E67397D7D.root'
+options.files='file:/cmsdata/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_PU_S10_START53_V7A_AODSIM/ECDEFDB7-AAE1-E111-B576-003048C68A88.root'
+#options.files='/store/mc/Summer12_DR53X/TTJets_SemiLeptMGDecays_8TeV-madgraph/AODSIM/PU_S10_START53_V7A-v1/00000/76C5E954-4214-E211-ACBC-001E67397D7D.root'
+#options.files='file:/cu1/joshmt/Validation/store__mc__Summer12__T2tt_Mgluino-225to1200_mLSP-0to1000_8TeV-Pythia6Z__AODSIM.root'
 maxEvents=10
 
 ## determine if we are running on an MC dataset
@@ -47,7 +50,11 @@ process.MessageLogger.cerr.PATSummaryTables = cms.untracked.PSet(
     limit = cms.untracked.int32(-1),
     reportEvery = cms.untracked.int32(100)
 )
-process.MessageLogger.suppressError = cms.untracked.vstring('patElectronsPF', 'patMuonsPF')
+
+if datasetType=="526andLaterFastSim":
+	process.MessageLogger.suppressError = cms.untracked.vstring('patElectronsPF', 'patMuonsPF', 'patTrigger')
+else:
+	process.MessageLogger.suppressError = cms.untracked.vstring('patElectronsPF', 'patMuonsPF')
 
 #-- Source information ------------------------------------------------------
 process.source = cms.Source("PoolSource",
@@ -255,11 +262,12 @@ process.scrapingveto = cms.Path(process.scrapingVeto)
 process.greedymuonfilter = cms.Path(process.greedyMuonPFCandidateFilter)
 process.inconsistentPFmuonfilter = cms.Path(process.inconsistentMuonPFCandidateFilter)
 process.eenoisefilter = cms.Path(process.eeNoiseFilter)
-process.trackercoherentnoisefilter1 = cms.Path(process.toomanystripclus53X)  
-process.trackercoherentnoisefilter2 = cms.Path(process.manystripclus53X)
-process.trackertoomanyclustersfilter = cms.Path(process.logErrorTooManyClusters)
-process.trackertoomanytripletsfilter = cms.Path(process.logErrorTooManyTripletsPairs)
-process.trackertoomanyseedsfilter = cms.Path(process.logErrorTooManySeeds)
+if not (datasetType=="526andLaterFastSim" or datasetType=="pre526FastSim"): #these don't work for fastsim
+	process.trackercoherentnoisefilter1 = cms.Path(process.toomanystripclus53X)  
+	process.trackercoherentnoisefilter2 = cms.Path(process.manystripclus53X)
+	process.trackertoomanyclustersfilter = cms.Path(process.logErrorTooManyClusters)
+	process.trackertoomanytripletsfilter = cms.Path(process.logErrorTooManyTripletsPairs)
+	process.trackertoomanyseedsfilter = cms.Path(process.logErrorTooManySeeds)
 process.passprescalePFHT350filter = cms.Path( process.pfht350PassPrescaleFilter )
 ## Adding more HT "active trigger" variables
 process.triggerFilterHT250 = process.pfht350PassPrescaleFilter.clone(
@@ -287,6 +295,19 @@ process.triggerFilterHT450 = process.pfht350PassPrescaleFilter.clone(
     )
 process.passprescaleHT450filter = cms.Path( process.triggerFilterHT450 )
 
+if usePdfWeights:
+	process.pdfWeights = cms.EDProducer("PdfWeightProducer",
+					    #FixPOWHEG = cms.untracked.string("cteq66.LHgrid"),
+					    #GenTag = cms.untracked.InputTag("genParticles"),
+					    PdfInfoTag = cms.untracked.InputTag("generator"),
+					    PdfSetNames = cms.untracked.vstring(
+		"cteq66.LHgrid"
+		, "MSTW2008nlo68cl.LHgrid"
+		, "NNPDF20_100.LHgrid"
+		)
+					    )
+
+
 if datasetType=="526andLaterFastSim" or datasetType=="pre526FastSim":
         process.p = cms.Path( process.goodOfflinePrimaryVertices + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
 	process.p += process.kt6PFJetsForIsolation2012
@@ -306,6 +327,8 @@ process.p += process.patPFMETsTypeIType0PFCandcorrected
 process.p += process.pfType1XYCorrectedMet
 process.p += process.patPFMETsTypeIXYcorrected
 
+if usePdfWeights:
+	process.p += process.pdfWeights
 
 process.trackingfailturefilter = cms.Path(process.trackingFailureFilter)
 process.outpath = cms.EndPath(cms.ignore(process.configurableAnalysis))
