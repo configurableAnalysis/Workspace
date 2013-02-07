@@ -17,7 +17,7 @@ addpkg JetMETCorrections/Type1MET V04-06-09
 
 addpkg PhysicsTools/Configuration V00-12-03
 
-cvs co -r cfA_v67 -d Workspace UserCode/pbgeff/cmssw/Workspace
+cvs co -r cfA_v68 -d Workspace UserCode/pbgeff/cmssw/Workspace
 cp Workspace/Patches/SUSY_pattuple_cff.py PhysicsTools/Configuration/python/SUSY_pattuple_cff.py
 
 # for CSC halo filter (not yet updated for 2012)
