@@ -38,6 +38,8 @@
 //for conversion safe electron veto
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 
+#include "CMGTools/External/interface/PileupJetIdentifier.h"
+
 using namespace std;
 
 class AdHocNTupler : public NTupler {
@@ -162,6 +164,13 @@ class AdHocNTupler : public NTupler {
 	 photon_phIsoValues = new std::vector<float>;
 	 photon_nhIsoValues = new std::vector<float>;
 	 photon_passElectronVeto = new std::vector<bool>;
+    //PU Jet ID vars
+    puJet_rejectionBeta = new std::vector<std::vector<float> >;
+    puJet_rejectionMVA  = new std::vector<std::vector<float> >;
+    pfmets_fullSignif_2012_ = new float;
+    pfmets_fullSignifCov00_2012_ = new float;
+    pfmets_fullSignifCov10_2012_ = new float;
+    pfmets_fullSignifCov11_2012_ = new float;
 
   }
 
@@ -263,6 +272,12 @@ class AdHocNTupler : public NTupler {
 	 delete photon_phIsoValues;
 	 delete photon_nhIsoValues;
 	 delete photon_passElectronVeto;
+    delete puJet_rejectionBeta;
+    delete puJet_rejectionMVA;
+    delete  pfmets_fullSignif_2012_;
+    delete  pfmets_fullSignifCov00_2012_;
+    delete  pfmets_fullSignifCov10_2012_;
+    delete  pfmets_fullSignifCov11_2012_;
 
   }
 
@@ -384,6 +399,12 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("photon_phIsoValues",&photon_phIsoValues);
       tree_->Branch("photon_nhIsoValues",&photon_nhIsoValues);
       tree_->Branch("photon_passElectronVeto",&photon_passElectronVeto);
+      tree_->Branch("puJet_rejectionBeta",&puJet_rejectionBeta);
+      tree_->Branch("puJet_rejectionMVA",&puJet_rejectionMVA);
+      tree_->Branch("pfmets_fullSignif_2012",pfmets_fullSignif_2012_,"pfmets_fullSignif_2012/F");
+      tree_->Branch("pfmets_fullSignifCov00_2012",pfmets_fullSignifCov00_2012_,"pfmets_fullSignifCov00_2012/F");
+      tree_->Branch("pfmets_fullSignifCov10_2012",pfmets_fullSignifCov10_2012_,"pfmets_fullSignifCov10_2012/F");
+      tree_->Branch("pfmets_fullSignifCov11_2012",pfmets_fullSignifCov11_2012_,"pfmets_fullSignifCov11_2012/F");
 
     }
 
@@ -1039,6 +1060,109 @@ class AdHocNTupler : public NTupler {
    *trk_ratioAllTOBTEC = ritertobtec;
    *trk_ratioJetTOBTEC = ritertobtecjet;
 
+///////
+
+  // PU Jet Rejection Variables
+
+  edm::Handle<edm::View<pat::Jet> > pujets;
+  iEvent.getByLabel("selectedPatJetsPF",pujets);
+  const View<pat::Jet> & jetss = *pujets;
+
+  Handle<ValueMap<StoredPileupJetIdentifier> > puJetId;
+  iEvent.getByLabel("puJetIdChs",puJetId);
+  //const edm::ValueMap<StoredPileupJetIdentifier> * puId = puJetId.product();
+
+  edm::Handle<ValueMap<float> > puJetIdMVA_full;
+  iEvent.getByLabel("puJetMvaChs","fullDiscriminant",puJetIdMVA_full);
+  edm::Handle<ValueMap<int> > puJetIdFlag_full;
+  iEvent.getByLabel("puJetMvaChs","fullId",puJetIdFlag_full);
+
+  //For some reason the simpleDiscriminant isn't produced... 
+
+  edm::Handle<ValueMap<float> > puJetIdMVA_cutbased;
+  iEvent.getByLabel("puJetMvaChs","cutbasedDiscriminant",puJetIdMVA_cutbased);
+  edm::Handle<ValueMap<int> > puJetIdFlag_cutbased;
+  iEvent.getByLabel("puJetMvaChs","cutbasedId",puJetIdFlag_cutbased);
+
+  std::vector<float> betavector;
+  std::vector<float> mvavector;
+
+  //Fill the vector of vectors. They need to be done separately..      
+      
+  //Store for each jet: pT, eta, beta, betaStar, betaClassic, betaStarClassic
+  for ( unsigned int i=0; i<jetss.size(); ++i ) {
+    const pat::Jet & patjet = jetss.at(i);
+    float jec = patjet.jecFactor(0);
+    float jpt = patjet.pt();
+    
+    //Apply the same jet pt cut as is done for eventB jet collection
+    if ( jpt*jec>10.0 || jpt>20.0 ) { 	
+	
+      float pt =  (*puJetId)[jetss.refAt(i)].jetPt() ;
+      float eta =  (*puJetId)[jetss.refAt(i)].jetEta() ;
+      float beta =  (*puJetId)[jetss.refAt(i)].beta() ;
+      float betaStar =  (*puJetId)[jetss.refAt(i)].betaStar() ;
+      float betaClassic =  (*puJetId)[jetss.refAt(i)].betaClassic() ;
+      float betaStarClassic =  (*puJetId)[jetss.refAt(i)].betaStarClassic() ;
+
+    //cout << "pt=" << pt << " jpt=" << jpt << " jec=" << jec << " rawpt=" << jpt*jec <<  endl;
+      betavector.push_back(pt);
+      betavector.push_back(eta);
+      betavector.push_back(beta);
+      betavector.push_back(betaStar);
+      betavector.push_back(betaClassic);
+      betavector.push_back(betaStarClassic);
+ 
+      (*puJet_rejectionBeta).push_back(betavector);
+    } // jet pt cut
+    betavector.clear();
+  }//end
+
+  //Store for each jet: pT, eta, MVA Full Discrim, MVA Full ID, MVA Cut Discrim, MVA Cut ID     
+  for ( unsigned int jeti = 0; jeti != jetss.size(); jeti++) {
+    const pat::Jet & patjet = jetss.at(jeti);
+    float pt = patjet.pt() ;
+    float eta = patjet.eta();
+    float jec = patjet.jecFactor(0);
+    
+    //Apply the same jet pt cut as is done for eventB jet collection
+    if ( pt*jec>10.0 || pt>20.0 ) { 	
+
+      float mvaF    = (*puJetIdMVA_full)[jetss.refAt(jeti)];
+      int   idflagF = (*puJetIdFlag_full)[jetss.refAt(jeti)];
+      float mvaC    = (*puJetIdMVA_cutbased)[jetss.refAt(jeti)];
+      int   idflagC = (*puJetIdFlag_cutbased)[jetss.refAt(jeti)];
+
+      mvavector.push_back(pt);
+      mvavector.push_back(eta);
+      mvavector.push_back(mvaF);
+      mvavector.push_back(idflagF);
+      mvavector.push_back(mvaC);
+      mvavector.push_back(idflagC);
+    
+      (*puJet_rejectionMVA).push_back(mvavector);
+    } // jet pt cut
+    mvavector.clear();
+  }
+
+   // Met Significance
+
+   edm::Handle<double> metsigHandle;
+   iEvent.getByLabel("pfMetSig","METSignificance", metsigHandle);
+   edm::Handle<double> metsigm00Handle;
+   iEvent.getByLabel("pfMetSig","CovarianceMatrix00", metsigm00Handle);
+   edm::Handle<double> metsigm10Handle;
+   iEvent.getByLabel("pfMetSig","CovarianceMatrix10", metsigm10Handle);
+   edm::Handle<double> metsigm11Handle;
+   iEvent.getByLabel("pfMetSig","CovarianceMatrix11", metsigm11Handle);
+   *pfmets_fullSignif_2012_ = *(metsigHandle.product());
+   *pfmets_fullSignifCov00_2012_ = *(metsigm00Handle.product());
+   *pfmets_fullSignifCov10_2012_ = *(metsigm10Handle.product());
+   *pfmets_fullSignifCov11_2012_ = *(metsigm11Handle.product());
+
+
+///////
+
    //fill the tree    
     if (ownTheTree_){ tree_->Fill(); }
     (*trigger_prescalevalue).clear();
@@ -1102,6 +1226,8 @@ class AdHocNTupler : public NTupler {
     (*photon_phIsoValues).clear();
     (*photon_nhIsoValues).clear();
     (*photon_passElectronVeto).clear();
+    (*puJet_rejectionBeta).clear();
+    (*puJet_rejectionMVA).clear();
 
   }
 
@@ -1211,5 +1337,11 @@ class AdHocNTupler : public NTupler {
   std::vector<float> * photon_phIsoValues;
   std::vector<float> * photon_nhIsoValues;
   std::vector<bool> * photon_passElectronVeto;
+  std::vector<std::vector<float> > * puJet_rejectionBeta;
+  std::vector<std::vector<float> > * puJet_rejectionMVA;
+  float *  pfmets_fullSignif_2012_;
+  float *  pfmets_fullSignifCov00_2012_;
+  float *  pfmets_fullSignifCov10_2012_;
+  float *  pfmets_fullSignifCov11_2012_;
 
 };

@@ -27,8 +27,9 @@ usePdfWeights = False
 
 ## options for testing
 options.output='configurableAnalysis.root'
-options.files='file:/cmsdata/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_PU_S10_START53_V7A_AODSIM/ECDEFDB7-AAE1-E111-B576-003048C68A88.root'
+#options.files='file:/cmsdata/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_PU_S10_START53_V7A_AODSIM/ECDEFDB7-AAE1-E111-B576-003048C68A88.root'
 #options.files='/store/mc/Summer12_DR53X/TTJets_SemiLeptMGDecays_8TeV-madgraph/AODSIM/PU_S10_START53_V7A-v1/00000/76C5E954-4214-E211-ACBC-001E67397D7D.root'
+options.files='file:/uscms_data/d3/pjand001/TChihh_250_1.lhe.root'
 #options.files='file:/cu1/joshmt/Validation/store__mc__Summer12__T2tt_Mgluino-225to1200_mLSP-0to1000_8TeV-Pythia6Z__AODSIM.root'
 maxEvents=10
 
@@ -315,6 +316,92 @@ else:
 	process.csctighthalofilter = cms.Path(process.CSCTightHaloFilter)
         process.p = cms.Path(process.goodOfflinePrimaryVertices + process.HBHENoiseFilterResultProducer + process.BFieldColl + process.susyPatDefaultSequence + process.JetCorrColl)
 
+#####################################################
+# My extra cfA stuff: PUJet ID, METsig (2012)
+#####################################################
+
+# load the PU JetID sequence
+from CMGTools.External.JetIdParams_cfi import *
+from CMGTools.External.puJetIDAlgo_cff import *
+process.load("CMGTools.External.pujetidsequence_cff")
+full_53x_chs = cms.PSet(
+ impactParTkThreshold = cms.double(1.) ,
+ cutBased = cms.bool(False),
+ tmvaWeights = cms.string("CMGTools/External/data/TMVAClassificationCategory_JetID_53X_Dec2012.weights.xml"),
+ tmvaMethod  = cms.string("JetIDMVAHighPt"),
+ version = cms.int32(-1),
+ tmvaVariables = cms.vstring(
+    "nvtx"     ,   
+    "dZ"       ,   
+    "beta"     ,   
+    "betaStar" , 
+    "nCharged" , 
+    "nNeutrals", 
+    "dR2Mean"  ,   
+    "ptD"      ,   
+    "frac01"   ,   
+    "frac02"   ,   
+    "frac03"   ,   
+    "frac04"   ,   
+    "frac05"   ,   
+    ),  
+ tmvaSpectators = cms.vstring(
+    "jetPt",
+    "jetEta",
+    "jetPhi"
+    ),  
+ JetIdParams = full_53x_chs_wp,
+ label = cms.string("full")
+)
+chsalgos = cms.VPSet(full_53x_chs,cutbased)
+
+process.puJetIdChs.jets = cms.InputTag('selectedPatJetsPF')
+process.puJetMvaChs.jets = cms.InputTag('selectedPatJetsPF')
+process.puJetMvaChs.algos = chsalgos
+
+# METsig 
+
+process.load("JetMETAnalysis.METSignificance.metsignificance_cfi")
+if isMC:
+       process.pfMetSig.runOnMC = cms.untracked.bool(True)
+else:
+       process.pfMetSig.runOnMC = cms.untracked.bool(False)
+
+if not isMC:
+   process.pfMetSig.pfjetCorrectorL123 = 'ak5PFL1FastL2L3Residual'
+
+process.load("CommonTools.ParticleFlow.PF2PAT_cff")
+process.pfPileUp.Enable = False
+
+process.pfAllMuons.src="particleFlow"
+process.pfMuonsFromVertex.dzCut=9999
+process.pfNoMuon.bottomCollection   = "particleFlow"
+process.pfJets.doAreaFastjet        = True
+process.pfJets.jetPtMin             = 0
+process.pfJets.src                  = "pfNoElectron"
+
+process.load("RecoJets.JetProducers.ak5PFJets_cfi")
+process.ak5PFJets.doAreaFastjet = cms.bool(True)
+
+process.mypf2pat = cms.Sequence(
+      process.pfNoPileUpSequence * # pfPileUp enable is false
+      process.pfParticleSelectionSequence *
+      process.pfAllMuons * 
+      process.pfMuonsFromVertex *
+      process.pfSelectedMuons *
+      process.pfNoMuon *
+      process.pfElectronSequence *
+      process.pfNoElectron *
+      process.pfJets
+      )
+
+#####################################################
+
+process.p += process.mypf2pat
+#process.p += process.mymet
+process.p += process.pfMetSig
+
+process.p += process.puJetIdSqeuenceChs
 process.p += process.kt6PFJetsForIsolation2011
 
 process.p += process.pfMEtSysShiftCorrSequence
