@@ -29,9 +29,9 @@ usePdfWeights = False
 options.output='configurableAnalysis.root'
 #options.files='file:/cmsdata/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_PU_S10_START53_V7A_AODSIM/ECDEFDB7-AAE1-E111-B576-003048C68A88.root'
 #options.files='/store/mc/Summer12_DR53X/TTJets_SemiLeptMGDecays_8TeV-madgraph/AODSIM/PU_S10_START53_V7A-v1/00000/76C5E954-4214-E211-ACBC-001E67397D7D.root'
-options.files='file:/uscms_data/d3/pjand001/TChihh_250_1.lhe.root'
-#options.files='file:/cu1/joshmt/Validation/store__mc__Summer12__T2tt_Mgluino-225to1200_mLSP-0to1000_8TeV-Pythia6Z__AODSIM.root'
-maxEvents=10
+#options.files='file:/uscms_data/d3/pjand001/TChihh_250_1.lhe.root'
+options.files='file:/cu1/joshmt/Validation/store__mc__Summer12_DR53X__TT_CT10_TuneZ2star_8TeV-powheg-tauola_0095DA1D-B001-E211-A5F3-003048FFCC1E.root'
+maxEvents=50
 
 ## determine if we are running on an MC dataset
 isMC = False
@@ -359,9 +359,10 @@ process.puJetIdChs.jets = cms.InputTag('selectedPatJetsPF')
 process.puJetMvaChs.jets = cms.InputTag('selectedPatJetsPF')
 process.puJetMvaChs.algos = chsalgos
 
-# METsig 
+# "2012" version of MET significance
 
 process.load("JetMETAnalysis.METSignificance.metsignificance_cfi")
+#by default, want to use different resolutions for data and MC
 if isMC:
        process.pfMetSig.runOnMC = cms.untracked.bool(True)
 else:
@@ -369,6 +370,10 @@ else:
 
 if not isMC:
    process.pfMetSig.pfjetCorrectorL123 = 'ak5PFL1FastL2L3Residual'
+
+#make a copy that will *always* use the 'Data' resolutions
+process.pfMetSigDataResolutions = process.pfMetSig.clone()
+process.pfMetSigDataResolutions.runOnMC = cms.untracked.bool(False)
 
 process.load("CommonTools.ParticleFlow.PF2PAT_cff")
 process.pfPileUp.Enable = False
@@ -394,12 +399,22 @@ process.mypf2pat = cms.Sequence(
       process.pfNoElectron *
       process.pfJets
       )
+#finally, isolated tracks
+process.trackIsolationMaker = cms.EDProducer("TrackIsolationMaker",
+                                     pfCandidatesTag     = cms.InputTag("particleFlow"),
+                                     vertexInputTag      = cms.InputTag("offlinePrimaryVertices"),
+                                     dR_ConeSize         = cms.double(0.3),
+                                     dz_CutValue         = cms.double(0.05),
+                                     minPt_PFCandidate   = cms.double(5.0), #looser than the likely analysis selection
+				     maxIso_PFCandidate  = cms.double(0.25) #very loose
+)
 
 #####################################################
 
 process.p += process.mypf2pat
 #process.p += process.mymet
 process.p += process.pfMetSig
+process.p += process.pfMetSigDataResolutions
 
 process.p += process.puJetIdSqeuenceChs
 process.p += process.kt6PFJetsForIsolation2011
@@ -416,6 +431,8 @@ process.p += process.patPFMETsTypeIXYcorrected
 
 if usePdfWeights:
 	process.p += process.pdfWeights
+
+process.p += process.trackIsolationMaker
 
 process.trackingfailturefilter = cms.Path(process.trackingFailureFilter)
 process.outpath = cms.EndPath(cms.ignore(process.configurableAnalysis))

@@ -171,7 +171,18 @@ class AdHocNTupler : public NTupler {
     pfmets_fullSignifCov00_2012_ = new float;
     pfmets_fullSignifCov10_2012_ = new float;
     pfmets_fullSignifCov11_2012_ = new float;
-
+    pfmets_fullSignif_2012_dataRes_ = new float;
+    pfmets_fullSignifCov00_2012_dataRes_ = new float;
+    pfmets_fullSignifCov10_2012_dataRes_ = new float;
+    pfmets_fullSignifCov11_2012_dataRes_ = new float;
+    //isolated tracks (charged pf candidates)
+    isotk_pt_ = new std::vector<float>;
+    isotk_phi_ = new std::vector<float>;
+    isotk_eta_ = new std::vector<float>;
+    isotk_iso_ = new std::vector<float>;
+    isotk_dzpv_ = new std::vector<float>;
+    isotk_charge_ = new std::vector<int>;
+ 
   }
 
   ~AdHocNTupler(){
@@ -278,6 +289,16 @@ class AdHocNTupler : public NTupler {
     delete  pfmets_fullSignifCov00_2012_;
     delete  pfmets_fullSignifCov10_2012_;
     delete  pfmets_fullSignifCov11_2012_;
+    delete  pfmets_fullSignif_2012_dataRes_;
+    delete  pfmets_fullSignifCov00_2012_dataRes_;
+    delete  pfmets_fullSignifCov10_2012_dataRes_;
+    delete  pfmets_fullSignifCov11_2012_dataRes_;
+    delete    isotk_pt_;
+    delete    isotk_phi_;
+    delete    isotk_eta_;
+    delete    isotk_iso_;
+    delete    isotk_dzpv_;
+    delete    isotk_charge_;
 
   }
 
@@ -405,6 +426,16 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("pfmets_fullSignifCov00_2012",pfmets_fullSignifCov00_2012_,"pfmets_fullSignifCov00_2012/F");
       tree_->Branch("pfmets_fullSignifCov10_2012",pfmets_fullSignifCov10_2012_,"pfmets_fullSignifCov10_2012/F");
       tree_->Branch("pfmets_fullSignifCov11_2012",pfmets_fullSignifCov11_2012_,"pfmets_fullSignifCov11_2012/F");
+      tree_->Branch("pfmets_fullSignif_2012_dataRes",pfmets_fullSignif_2012_dataRes_,"pfmets_fullSignif_2012_dataRes/F");
+      tree_->Branch("pfmets_fullSignifCov00_2012_dataRes",pfmets_fullSignifCov00_2012_dataRes_,"pfmets_fullSignifCov00_2012_dataRes/F");
+      tree_->Branch("pfmets_fullSignifCov10_2012_dataRes",pfmets_fullSignifCov10_2012_dataRes_,"pfmets_fullSignifCov10_2012_dataRes/F");
+      tree_->Branch("pfmets_fullSignifCov11_2012_dataRes",pfmets_fullSignifCov11_2012_dataRes_,"pfmets_fullSignifCov11_2012_dataRes/F");
+      tree_->Branch("isotk_pt",&isotk_pt_);
+      tree_->Branch("isotk_phi",&isotk_phi_);
+      tree_->Branch("isotk_eta",&isotk_eta_);
+      tree_->Branch("isotk_iso",&isotk_iso_);
+      tree_->Branch("isotk_dzpv",&isotk_dzpv_);
+      tree_->Branch("isotk_charge",&isotk_charge_);
 
     }
 
@@ -1145,8 +1176,9 @@ class AdHocNTupler : public NTupler {
     mvavector.clear();
   }
 
-   // Met Significance
+   // '2012' Met Significance -- 2 versions
 
+  //version 1 -- uses different resolutions for data and MC
    edm::Handle<double> metsigHandle;
    iEvent.getByLabel("pfMetSig","METSignificance", metsigHandle);
    edm::Handle<double> metsigm00Handle;
@@ -1159,6 +1191,44 @@ class AdHocNTupler : public NTupler {
    *pfmets_fullSignifCov00_2012_ = *(metsigm00Handle.product());
    *pfmets_fullSignifCov10_2012_ = *(metsigm10Handle.product());
    *pfmets_fullSignifCov11_2012_ = *(metsigm11Handle.product());
+
+   // version 2 -- uses 'data' resolutions all the time
+   edm::Handle<double> metsigHandleD;
+   iEvent.getByLabel("pfMetSigDataResolutions","METSignificance", metsigHandleD);
+   edm::Handle<double> metsigm00HandleD;
+   iEvent.getByLabel("pfMetSigDataResolutions","CovarianceMatrix00", metsigm00HandleD);
+   edm::Handle<double> metsigm10HandleD;
+   iEvent.getByLabel("pfMetSigDataResolutions","CovarianceMatrix10", metsigm10HandleD);
+   edm::Handle<double> metsigm11HandleD;
+   iEvent.getByLabel("pfMetSigDataResolutions","CovarianceMatrix11", metsigm11HandleD);
+   *pfmets_fullSignif_2012_dataRes_ = *(metsigHandleD.product());
+   *pfmets_fullSignifCov00_2012_dataRes_ = *(metsigm00HandleD.product());
+   *pfmets_fullSignifCov10_2012_dataRes_ = *(metsigm10HandleD.product());
+   *pfmets_fullSignifCov11_2012_dataRes_ = *(metsigm11HandleD.product());
+
+
+   //isolated pf candidates as found by TrackIsolationMaker
+   edm::Handle< vector<float> > pfcand_dzpv;
+   iEvent.getByLabel("trackIsolationMaker","pfcandsdzpv", pfcand_dzpv);
+   edm::Handle< vector<float> > pfcand_pt;
+   iEvent.getByLabel("trackIsolationMaker","pfcandspt", pfcand_pt);
+   edm::Handle< vector<float> > pfcand_eta;
+   iEvent.getByLabel("trackIsolationMaker","pfcandseta", pfcand_eta);
+   edm::Handle< vector<float> > pfcand_phi;
+   iEvent.getByLabel("trackIsolationMaker","pfcandsphi", pfcand_phi);
+   edm::Handle< vector<float> > pfcand_iso;
+   iEvent.getByLabel("trackIsolationMaker","pfcandstrkiso", pfcand_iso);
+   edm::Handle< vector<int> > pfcand_charge;
+   iEvent.getByLabel("trackIsolationMaker","pfcandschg", pfcand_charge);
+
+   for (size_t it=0; it<pfcand_pt->size(); ++it ) {
+     isotk_pt_->push_back( pfcand_pt->at(it));
+     isotk_phi_ -> push_back( pfcand_phi->at(it));
+     isotk_eta_ -> push_back( pfcand_eta->at(it));
+     isotk_iso_ -> push_back( pfcand_iso->at(it));
+     isotk_dzpv_ -> push_back( pfcand_dzpv->at(it));
+     isotk_charge_ -> push_back( pfcand_charge->at(it));
+   }
 
 
 ///////
@@ -1228,6 +1298,12 @@ class AdHocNTupler : public NTupler {
     (*photon_passElectronVeto).clear();
     (*puJet_rejectionBeta).clear();
     (*puJet_rejectionMVA).clear();
+    (*isotk_pt_).clear();
+    (*isotk_phi_).clear();
+    (*isotk_eta_).clear();
+    (*isotk_iso_).clear();
+    (*isotk_dzpv_).clear();
+    (*isotk_charge_).clear();
 
   }
 
@@ -1343,5 +1419,15 @@ class AdHocNTupler : public NTupler {
   float *  pfmets_fullSignifCov00_2012_;
   float *  pfmets_fullSignifCov10_2012_;
   float *  pfmets_fullSignifCov11_2012_;
+  float *  pfmets_fullSignif_2012_dataRes_;
+  float *  pfmets_fullSignifCov00_2012_dataRes_;
+  float *  pfmets_fullSignifCov10_2012_dataRes_;
+  float *  pfmets_fullSignifCov11_2012_dataRes_;
+  std::vector<float> * isotk_pt_;
+  std::vector<float> * isotk_phi_;
+  std::vector<float> * isotk_eta_;
+  std::vector<float> * isotk_iso_;
+  std::vector<float> * isotk_dzpv_;
+  std::vector<int> *   isotk_charge_;
 
 };
