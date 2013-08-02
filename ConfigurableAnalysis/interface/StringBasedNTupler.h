@@ -102,8 +102,10 @@ class StringLeaveHelper {
       edm::Handle<Object> oH;
       iEvent.getByLabel(B.src(), oH);
       //empty vector if product not found
-      if (oH.failedToGet()){
-	edm::LogError("StringBranchHelper")<<"cannot open: "<<B.src();
+      if (oH.failedToGet() ) {
+	if (!(iEvent.isRealData() && (B.src().label()==std::string("generator")) ) ) {  //don't output generator error in data 
+	  edm::LogError("StringBranchHelper")<<"cannot open: "<<B.src();
+	}
 	value_.reset(new std::vector<float>(0));
       }
       else{
@@ -137,10 +139,9 @@ public:
       edm::Handle<Collection> oH;
       iEvent.getByLabel(B.src(), oH);
 
-
       //empty vector if product not found
       if (oH.failedToGet()){
-	if(!(iEvent.isRealData() && B.className()=="reco::GenParticle") ) {  //don't output genparticle error in data 
+	if (!(iEvent.isRealData() && (B.className()=="reco::GenParticle")) ) {  //don't output genparticle error in data 
   	  edm::LogError("StringBranchHelper")<<"cannot open: "<<B.src()<<"  "<<B.className();
         }
         value_.reset(new std::vector<float>());
