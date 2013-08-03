@@ -132,6 +132,7 @@ class AdHocNTupler : public NTupler {
     passprescaleHT350filter_decision_ = new int;
     passprescaleHT400filter_decision_ = new int;
     passprescaleHT450filter_decision_ = new int;
+    passprescaleJet30MET80filter_decision_ = new int;
     MPT_ = new float;
     genHT_ = new float;
     jets_AK5PFclean_corrL2L3_ = new std::vector<float>; 
@@ -251,6 +252,7 @@ class AdHocNTupler : public NTupler {
     delete passprescaleHT350filter_decision_;
     delete passprescaleHT400filter_decision_;
     delete passprescaleHT450filter_decision_;
+    delete passprescaleJet30MET80filter_decision_;
     delete MPT_;
     delete genHT_;
     delete jets_AK5PFclean_corrL2L3_;
@@ -388,6 +390,7 @@ class AdHocNTupler : public NTupler {
       tree_->Branch("passprescaleHT350filter_decision",passprescaleHT350filter_decision_,"passprescaleHT350filter_decision/I");
       tree_->Branch("passprescaleHT400filter_decision",passprescaleHT400filter_decision_,"passprescaleHT400filter_decision/I");
       tree_->Branch("passprescaleHT450filter_decision",passprescaleHT450filter_decision_,"passprescaleHT450filter_decision/I");
+      tree_->Branch("passprescaleJet30MET80filter_decision",passprescaleJet30MET80filter_decision_,"passprescaleJet30MET80filter_decision/I");
       tree_->Branch("MPT",MPT_,"MPT/F");
       tree_->Branch("genHT",genHT_,"genHT/F");
       tree_->Branch("jets_AK5PFclean_corrL2L3",&jets_AK5PFclean_corrL2L3_);
@@ -470,7 +473,7 @@ class AdHocNTupler : public NTupler {
 		int cschalofilterResult =1, trackingfailturefilterResult=1, ecaltpfilterResult=1, ecalbefilterResult=1, scrapingVetoResult=1;
 		int greedymuonfilterResult=1, inconsistentPFmuonfilterResult=1, hcallaserfilterResult=1, ecallaserfilterResult=1,  eenoisefilterResult=1;
 		int eebadscfilterResult=1, passprescalePFHT350filterResult=1, passprescaleHT250filterResult=1, passprescaleHT300filterResult=1;
-		int passprescaleHT350filterResult=1, passprescaleHT400filterResult=1, passprescaleHT450filterResult=1;
+		int passprescaleHT350filterResult=1, passprescaleHT400filterResult=1, passprescaleHT450filterResult=1, passprescaleJet30MET80filterResult=1;
 		int trackercoherentnoisefilter1Result=1, trackercoherentnoisefilter2Result=1, trackertoomanyclustersfilterResult=1, trackertoomanytripletsfilterResult=1, trackertoomanyseedsfilterResult=1;
 		for (int itrig=0; itrig< ntrigs; itrig++) {
  			std::string trigName = triggerNames_.triggerName(itrig);
@@ -497,6 +500,7 @@ class AdHocNTupler : public NTupler {
                         if (trigName=="passprescaleHT350filter") passprescaleHT350filterResult = hltflag;
                         if (trigName=="passprescaleHT400filter") passprescaleHT400filterResult = hltflag;
                         if (trigName=="passprescaleHT450filter") passprescaleHT450filterResult = hltflag;
+                        if (trigName=="passprescaleJet30MET80filter") passprescaleJet30MET80filterResult = hltflag;
 
 	 	}
 		
@@ -522,6 +526,7 @@ class AdHocNTupler : public NTupler {
     *passprescaleHT350filter_decision_ = passprescaleHT350filterResult;
     *passprescaleHT400filter_decision_ = passprescaleHT400filterResult;
     *passprescaleHT450filter_decision_ = passprescaleHT450filterResult;
+    *passprescaleJet30MET80filter_decision_ = passprescaleJet30MET80filterResult;
 
 	
     edm::Handle< std::vector<pat::TriggerPath> > triggerpaths;
@@ -1381,6 +1386,7 @@ class AdHocNTupler : public NTupler {
   int * passprescaleHT350filter_decision_;
   int * passprescaleHT400filter_decision_;
   int * passprescaleHT450filter_decision_;
+  int * passprescaleJet30MET80filter_decision_;
   float * MPT_;
   float * genHT_;
   std::vector<float> * jets_AK5PFclean_corrL2L3_;

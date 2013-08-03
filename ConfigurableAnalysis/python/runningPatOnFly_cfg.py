@@ -296,6 +296,12 @@ process.triggerFilterHT450 = process.pfht350PassPrescaleFilter.clone(
     )
 process.passprescaleHT450filter = cms.Path( process.triggerFilterHT450 )
 
+process.triggerFilterJet30MET80 = process.pfht350PassPrescaleFilter.clone(
+    HLTPaths = cms.vstring('HLT_DiCentralPFJet30_PFMET80_v[0-9]')   
+    )
+process.passprescaleJet30MET80filter = cms.Path( process.triggerFilterJet30MET80 )
+
+
 if usePdfWeights:
 	process.pdfWeights = cms.EDProducer("PdfWeightProducer",
 					    #FixPOWHEG = cms.untracked.string("cteq66.LHgrid"),
