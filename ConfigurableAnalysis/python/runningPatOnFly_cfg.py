@@ -28,10 +28,11 @@ usePdfWeights = False
 ## options for testing
 options.output='configurableAnalysis.root'
 #options.files='file:/cmsdata/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_PU_S10_START53_V7A_AODSIM/ECDEFDB7-AAE1-E111-B576-003048C68A88.root'
-#options.files='/store/mc/Summer12_DR53X/TTJets_SemiLeptMGDecays_8TeV-madgraph/AODSIM/PU_S10_START53_V7A-v1/00000/76C5E954-4214-E211-ACBC-001E67397D7D.root'
+options.files='/store/mc/Summer12_DR53X/TTJets_SemiLeptMGDecays_8TeV-madgraph/AODSIM/PU_S10_START53_V7A-v1/00000/76C5E954-4214-E211-ACBC-001E67397D7D.root'
 #options.files='file:/uscms_data/d3/pjand001/TChihh_250_1.lhe.root'
-options.files='file:/cu1/joshmt/Validation/store__mc__Summer12_DR53X__TT_CT10_TuneZ2star_8TeV-powheg-tauola_0095DA1D-B001-E211-A5F3-003048FFCC1E.root'
-maxEvents=50
+#options.files='file:/cu1/joshmt/Validation/store_data_Run2012A_MET_AOD_13Jul2012-v1_00000_D697799D-39D1-E111-9293-003048679214.root'
+#options.files='file:/cu1/joshmt/Validation/store__mc__Summer12_DR53X__TT_CT10_TuneZ2star_8TeV-powheg-tauola_0095DA1D-B001-E211-A5F3-003048FFCC1E.root'
+maxEvents=20
 
 ## determine if we are running on an MC dataset
 isMC = False
