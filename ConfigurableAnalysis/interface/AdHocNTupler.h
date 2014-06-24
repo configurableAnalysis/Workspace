@@ -32,13 +32,13 @@
 
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 
-#include "EGamma/EGammaAnalysisTools/src/PFIsolationEstimator.cc"
+#include "EgammaAnalysis/ElectronTools/src/PFIsolationEstimator.cc"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 
 //for conversion safe electron veto
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 
-#include "CMGTools/External/interface/PileupJetIdentifier.h"
+#include "Workspace/CMGTools/External/interface/PileupJetIdentifier.h"
 
 using namespace std;
 
