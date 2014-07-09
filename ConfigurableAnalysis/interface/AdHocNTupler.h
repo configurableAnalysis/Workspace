@@ -37,8 +37,7 @@
 
 //for conversion safe electron veto
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
-
-#include "Workspace/CMGTools/External/interface/PileupJetIdentifier.h"
+//#include "Workspace/CMGTools/External/interface/PileupJetIdentifier.h"
 
 using namespace std;
 
@@ -1104,8 +1103,8 @@ class AdHocNTupler : public NTupler {
   iEvent.getByLabel("selectedPatJetsPF",pujets);
   const View<pat::Jet> & jetss = *pujets;
 
-  Handle<ValueMap<StoredPileupJetIdentifier> > puJetId;
-  iEvent.getByLabel("puJetIdChs",puJetId);
+  //Handle<ValueMap<StoredPileupJetIdentifier> > puJetId;
+  //iEvent.getByLabel("puJetIdChs",puJetId);
   //const edm::ValueMap<StoredPileupJetIdentifier> * puId = puJetId.product();
 
   edm::Handle<ValueMap<float> > puJetIdMVA_full;
@@ -1126,33 +1125,33 @@ class AdHocNTupler : public NTupler {
   //Fill the vector of vectors. They need to be done separately..      
       
   //Store for each jet: pT, eta, beta, betaStar, betaClassic, betaStarClassic
-  for ( unsigned int i=0; i<jetss.size(); ++i ) {
-    const pat::Jet & patjet = jetss.at(i);
-    float jec = patjet.jecFactor(0);
-    float jpt = patjet.pt();
-    
-    //Apply the same jet pt cut as is done for eventB jet collection
-    if ( jpt*jec>10.0 || jpt>20.0 ) { 	
-	
-      float pt =  (*puJetId)[jetss.refAt(i)].jetPt() ;
-      float eta =  (*puJetId)[jetss.refAt(i)].jetEta() ;
-      float beta =  (*puJetId)[jetss.refAt(i)].beta() ;
-      float betaStar =  (*puJetId)[jetss.refAt(i)].betaStar() ;
-      float betaClassic =  (*puJetId)[jetss.refAt(i)].betaClassic() ;
-      float betaStarClassic =  (*puJetId)[jetss.refAt(i)].betaStarClassic() ;
-
-    //cout << "pt=" << pt << " jpt=" << jpt << " jec=" << jec << " rawpt=" << jpt*jec <<  endl;
-      betavector.push_back(pt);
-      betavector.push_back(eta);
-      betavector.push_back(beta);
-      betavector.push_back(betaStar);
-      betavector.push_back(betaClassic);
-      betavector.push_back(betaStarClassic);
- 
-      (*puJet_rejectionBeta).push_back(betavector);
-    } // jet pt cut
-    betavector.clear();
-  }//end
+  //for ( unsigned int i=0; i<jetss.size(); ++i ) {
+  //  const pat::Jet & patjet = jetss.at(i);
+  //  float jec = patjet.jecFactor(0);
+  //  float jpt = patjet.pt();
+  //  
+  //  //Apply the same jet pt cut as is done for eventB jet collection
+  //  if ( jpt*jec>10.0 || jpt>20.0 ) { 	
+  //	
+  //    float pt =  (*puJetId)[jetss.refAt(i)].jetPt() ;
+  //    float eta =  (*puJetId)[jetss.refAt(i)].jetEta() ;
+  //    float beta =  (*puJetId)[jetss.refAt(i)].beta() ;
+  //    float betaStar =  (*puJetId)[jetss.refAt(i)].betaStar() ;
+  //    float betaClassic =  (*puJetId)[jetss.refAt(i)].betaClassic() ;
+  //    float betaStarClassic =  (*puJetId)[jetss.refAt(i)].betaStarClassic() ;
+  //
+  //  //cout << "pt=" << pt << " jpt=" << jpt << " jec=" << jec << " rawpt=" << jpt*jec <<  endl;
+  //    betavector.push_back(pt);
+  //    betavector.push_back(eta);
+  //    betavector.push_back(beta);
+  //    betavector.push_back(betaStar);
+  //    betavector.push_back(betaClassic);
+  //    betavector.push_back(betaStarClassic);
+  //
+  //    (*puJet_rejectionBeta).push_back(betavector);
+  //  } // jet pt cut
+  //  betavector.clear();
+  //}//end
 
   //Store for each jet: pT, eta, MVA Full Discrim, MVA Full ID, MVA Cut Discrim, MVA Cut ID     
   for ( unsigned int jeti = 0; jeti != jetss.size(); jeti++) {

@@ -8,9 +8,6 @@
 <use   name="DataFormats/PatCandidates"/>
 <use   name="DataFormats/L1Trigger"/>
 <use   name="DataFormats/JetReco"/>
-<use   name="Workspace/Dictionaries"/>
-<use   name="Workspace/BFieldProducer"/>
-<use   name="Workspace/JetCorrProducer"/>
 <use   name="root"/>
 <use   name="RecoEgamma/EgammaTools"/>
 <export>
